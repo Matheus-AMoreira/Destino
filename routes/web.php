@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Administracao\DashboardController;
 use App\Http\Controllers\Administracao\HotelController;
 use App\Http\Controllers\Administracao\OfertaController;
 use App\Http\Controllers\Administracao\PacoteController;
@@ -44,8 +45,7 @@ Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
 Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/', [RouteController::class, 'administracao'])->name('index');
-    Route::get('/dashboard', [RouteController::class, 'administracaoDashboard'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
     Route::get('/hotel/registrar', [HotelController::class, 'create'])->name('hotel.registrar');
     Route::post('/hotel/registrar', [HotelController::class, 'store'])->name('hotel.store');

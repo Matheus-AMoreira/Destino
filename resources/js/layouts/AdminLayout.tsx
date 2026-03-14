@@ -1,22 +1,20 @@
+import GuestLayout from '@/layouts/GuestLayout';
 import Sidebar from '@/components/administracao/SideBar';
-import { Head } from '@inertiajs/react';
-import { ReactNode } from 'react';
+import React, { PropsWithChildren } from 'react';
 
-interface Props {
-    children: ReactNode;
-    title?: string;
+interface Props extends PropsWithChildren {
+    title: string;
 }
 
 export default function AdminLayout({ children, title }: Props) {
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            <Head title={title} />
-            
-            <Sidebar />
-
-            <main className="flex-1 p-8 overflow-y-auto">
-                {children}
-            </main>
-        </div>
+        <GuestLayout title={title}>
+            <div className="flex flex-1 bg-gray-50/50">
+                <Sidebar />
+                <main className="flex-1 p-8 overflow-y-auto">
+                    {children}
+                </main>
+            </div>
+        </GuestLayout>
     );
 }

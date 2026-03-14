@@ -1,11 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
-import { 
-    LayoutDashboard, 
-    MapPinned, 
-    Camera, 
-    Hotel, 
-    Truck, 
-    Users, 
+import {
+    LayoutDashboard,
+    MapPinned,
+    Camera,
+    Hotel,
+    Truck,
+    Users,
     ChevronDown,
     Map,
     Tag
@@ -55,8 +55,8 @@ export default function Sidebar() {
                             className="w-full flex items-center justify-between px-4 py-2 rounded-lg font-bold text-gray-800 hover:bg-gray-50"
                         >
                             <span className="text-xs uppercase tracking-wider">Opções</span>
-                            <ChevronDown 
-                                size={16} 
+                            <ChevronDown
+                                size={16}
                                 className={`transform transition-transform ${isAdminOpen ? 'rotate-180' : ''}`}
                             />
                         </button>
