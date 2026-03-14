@@ -50,9 +50,9 @@ export default function Edit({ hotel, regioes, estados, cidades }: Props) {
         nome: hotel.nome,
         endereco: hotel.endereco,
         diaria: hotel.diaria,
-        cidade_id: hotel.cidade_id,
-        regiao_id: hotel.cidade?.estado?.regiao?.id || '',
-        estado_id: hotel.cidade?.estado?.id || '',
+        cidade_id: hotel.cidade_id as string | number,
+        regiao_id: (hotel.cidade?.estado?.regiao?.id || '') as string | number,
+        estado_id: (hotel.cidade?.estado?.id || '') as string | number,
     });
 
     const filteredEstados = useMemo(() => {

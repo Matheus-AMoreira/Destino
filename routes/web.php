@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Administracao\HotelController;
+use App\Http\Controllers\Administracao\OfertaController;
 use App\Http\Controllers\Administracao\PacoteController;
+use App\Http\Controllers\Administracao\PacoteFotoController;
 use App\Http\Controllers\Administracao\TransporteController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -56,8 +58,19 @@ Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'ver
     Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
     Route::put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
     Route::delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
-    Route::get('/pacotedefoto/listar', [RouteController::class, 'administracaoPacotedefotoListar'])->name('pacotedefoto.listar');
-    Route::get('/pacotedefoto/registrar', [RouteController::class, 'administracaoPacotedefotoRegistrar'])->name('pacotedefoto.registrar');
+    Route::get('/pacotedefoto/listar', [PacoteFotoController::class, 'index'])->name('pacotedefoto.listar');
+    Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar');
+    Route::post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');
+    Route::get('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'edit'])->name('pacotedefoto.edit');
+    Route::post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update'); // Using POST for file upload spoofing
+    Route::delete('/pacotedefoto/{pacotedefoto}', [PacoteFotoController::class, 'destroy'])->name('pacotedefoto.destroy');
+
+    Route::get('/oferta/listar', [OfertaController::class, 'index'])->name('oferta.listar');
+    Route::get('/oferta/registrar', [OfertaController::class, 'create'])->name('oferta.registrar');
+    Route::post('/oferta/registrar', [OfertaController::class, 'store'])->name('oferta.store');
+    Route::get('/oferta/editar/{oferta}', [OfertaController::class, 'edit'])->name('oferta.edit');
+    Route::put('/oferta/editar/{oferta}', [OfertaController::class, 'update'])->name('oferta.update');
+    Route::delete('/oferta/{oferta}', [OfertaController::class, 'destroy'])->name('oferta.destroy');
     Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
     Route::get('/transporte/registrar', [TransporteController::class, 'create'])->name('transporte.registrar');
     Route::post('/transporte/registrar', [TransporteController::class, 'store'])->name('transporte.store');

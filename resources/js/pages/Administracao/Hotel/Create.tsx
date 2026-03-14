@@ -32,9 +32,9 @@ export default function Create({ regioes, estados, cidades }: Props) {
         nome: '',
         endereco: '',
         diaria: 0,
-        cidade_id: '',
-        regiao_id: '',
-        estado_id: '',
+        cidade_id: '' as string | number,
+        regiao_id: '' as string | number,
+        estado_id: '' as string | number,
     });
 
     const filteredEstados = useMemo(() => {

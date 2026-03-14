@@ -7,7 +7,8 @@ import {
     Truck, 
     Users, 
     ChevronDown,
-    Map
+    Map,
+    Tag
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -91,6 +92,13 @@ export default function Sidebar() {
                                 >
                                     <Truck size={18} />
                                     <span>Transporte</span>
+                                </Link>
+                                <Link
+                                    href="/administracao/oferta/listar"
+                                    className={linkClass('/administracao/oferta', true)}
+                                >
+                                    <Tag size={18} />
+                                    <span>Ofertas</span>
                                 </Link>
                                 <Link
                                     href="/administracao/usuario/listar"
