@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Compra;
 use App\Models\User;
-use App\Models\Usuario;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,9 +43,9 @@ class RouteController extends Controller
         return Inertia::render('Contato');
     }
 
-    public function administracao(): Response
+    public function administracao(): Response|RedirectResponse
     {
-        return redirect()->route('administracao.dashboard');
+        return Inertia::render('Administracao/Dashboard');
     }
 
     public function administracaoDashboard(): Response
@@ -56,7 +56,7 @@ class RouteController extends Controller
     public function administracaoUsuarioListar(): Response
     {
         return Inertia::render('Administracao/Usuarios', [
-            'usuarios' => Usuario::all(),
+            'usuarios' => User::all(),
         ]);
     }
 
