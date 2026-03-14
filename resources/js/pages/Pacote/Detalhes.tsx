@@ -2,7 +2,7 @@ import GuestLayout from '@/layouts/GuestLayout';
 import { Pacote } from '@/types/Pacote';
 import { Link, router } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
-import { FaCalendarAlt, FaMoneyCheckAlt, FaTreeCity } from 'react-icons/fa6';
+import { FaCalendar, FaMoneyCheck, FaTreeCity } from 'react-icons/fa6';
 import { MdAirplaneTicket, MdOutlineAirplanemodeActive } from 'react-icons/md';
 
 interface DetalhesProps {
@@ -42,9 +42,8 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
     const handleComprar = () => {
         if (!ofertaAtual) return;
-        router.get('/checkout', {
-            pacote_id: pacote?.id,
-            oferta_id: ofertaAtual.id
+        router.get(route('checkout.index'), {
+            ofertaId: ofertaAtual.id
         });
     };
 
@@ -147,7 +146,7 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <FaCalendarAlt className="text-xl" />
+                                        <FaCalendar className="text-xl" />
                                         <span>
                                             {ofertaAtual ? formatarData(ofertaAtual.inicio) : ''} até {ofertaAtual ? formatarData(ofertaAtual.fim) : ''}
                                         </span>

@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
-Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/', [RouteController::class, 'administracao'])->name('index');
     Route::get('/dashboard', [RouteController::class, 'administracaoDashboard'])->name('dashboard');
     Route::get('/hotel/listar', [RouteController::class, 'administracaoHotelListar'])->name('hotel.listar');
@@ -49,9 +49,12 @@ Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'ver
     Route::get('/usuario/listar', [RouteController::class, 'administracaoUsuarioListar'])->name('usuario.listar');
 });
 
+use App\Http\Controllers\CheckoutController;
+
 Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [RouteController::class, 'checkout'])->name('index');
-    Route::get('/confirmacao/{compraId}', [RouteController::class, 'checkoutConfirmacao'])->name('confirmacao');
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/processar', [CheckoutController::class, 'processar'])->name('processar');
+    Route::get('/confirmacao/{compraId}', [CheckoutController::class, 'confirmacao'])->name('confirmacao');
 });
 
 Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');

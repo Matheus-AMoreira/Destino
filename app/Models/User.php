@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UsuarioAuthority;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,6 +15,19 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            if (empty($user->authorities)) {
+                $user->authorities = match ($user->role) {
+                    UserRole::ADMINISTRADOR => [UsuarioAuthority::DELETAR_USUARIO->value],
+                    UserRole::FUNCIONARIO => [UsuarioAuthority::CRIAR_PACOTE->value],
+                    default => [UsuarioAuthority::EDICAO_PERFIL->value],
+                };
+            }
+        });
+    }
 
     /**
      * Set the primary key type.
@@ -71,5 +85,11 @@ class User extends Authenticatable implements MustVerifyEmail
             'role' => UserRole::class,
             'authorities' => 'array',
         ];
+    /**
+     * Get the purchases for the user.
+     */
+    public function compras(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Compra::class);
     }
 }
