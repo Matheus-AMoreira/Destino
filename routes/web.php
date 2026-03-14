@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Administracao\HotelController;
+use App\Http\Controllers\Administracao\PacoteController;
 use App\Http\Controllers\Administracao\TransporteController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -49,8 +50,12 @@ Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'ver
     Route::get('/hotel/editar/{hotel}', [HotelController::class, 'edit'])->name('hotel.edit');
     Route::put('/hotel/editar/{hotel}', [HotelController::class, 'update'])->name('hotel.update');
     Route::delete('/hotel/{hotel}', [HotelController::class, 'destroy'])->name('hotel.destroy');
-    Route::get('/pacote/listar', [RouteController::class, 'administracaoPacoteListar'])->name('pacote.listar');
-    Route::get('/pacote/registrar', [RouteController::class, 'administracaoPacoteRegistrar'])->name('pacote.registrar');
+    Route::get('/pacote/listar', [PacoteController::class, 'index'])->name('pacote.listar');
+    Route::get('/pacote/registrar', [PacoteController::class, 'create'])->name('pacote.registrar');
+    Route::post('/pacote/registrar', [PacoteController::class, 'store'])->name('pacote.store');
+    Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
+    Route::put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
+    Route::delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
     Route::get('/pacotedefoto/listar', [RouteController::class, 'administracaoPacotedefotoListar'])->name('pacotedefoto.listar');
     Route::get('/pacotedefoto/registrar', [RouteController::class, 'administracaoPacotedefotoRegistrar'])->name('pacotedefoto.registrar');
     Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
