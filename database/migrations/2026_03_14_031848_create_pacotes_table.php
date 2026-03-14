@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('avaliacaos', function (Blueprint $table) {
+        Schema::create('pacotes', function (Blueprint $table) {
             $table->id();
-            $table->integer('nota');
-            $table->text('comentario')->nullable();
-            $table->timestamp('data');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('pacote_id')->constrained('pacotes')->onDelete('cascade');
+            $table->string('nome', 100);
+            $table->text('descricao');
+            $table->foreignUuid('funcionario_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('pacote_foto_id')->nullable()->constrained('pacote_fotos')->onDelete('set null');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('avaliacaos');
+        Schema::dropIfExists('pacotes');
     }
 };

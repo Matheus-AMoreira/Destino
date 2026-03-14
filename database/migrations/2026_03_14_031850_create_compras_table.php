@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('processador_pagamento');
             $table->integer('parcelas');
             $table->decimal('valor_final', 10, 2);
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('oferta_id')->constrained('ofertas')->onDelete('cascade');
             $table->timestamps();
         });
