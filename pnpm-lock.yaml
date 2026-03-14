@@ -65,6 +65,9 @@ importers:
       vite:
         specifier: ^7.0.4
         version: 7.3.1(@types/node@22.19.15)(jiti@2.6.1)(lightningcss@1.31.1)
+      ziggy-js:
+        specifier: ^2.6.2
+        version: 2.6.2
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -2066,6 +2069,10 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  qs-esm@7.0.3:
+    resolution: {integrity: sha512-8jbjCR0PPbqoQcv83C2K/zvVeytRPwPpt3WPDbq51qyLAxcWGtXVRjSe6GHtLCoVbg9+NEFkv7GyUxqjcDIJzw==}
+    engines: {node: '>=18'}
+
   qs@6.15.0:
     resolution: {integrity: sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ==}
     engines: {node: '>=0.6'}
@@ -2464,6 +2471,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  ziggy-js@2.6.2:
+    resolution: {integrity: sha512-41xc9wRvv5Olh8pZjKSaL5vDAjw4BfTDMFoeLwRpDGc2B+uqcdwIKd81EHs6uwpqahdRrU7uMab0xWj0hBSDjg==}
 
   zod-validation-error@4.0.2:
     resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
@@ -4373,6 +4383,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  qs-esm@7.0.3: {}
+
   qs@6.15.0:
     dependencies:
       side-channel: 1.1.0
@@ -4896,6 +4908,10 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  ziggy-js@2.6.2:
+    dependencies:
+      qs-esm: 7.0.3
 
   zod-validation-error@4.0.2(zod@4.3.6):
     dependencies:

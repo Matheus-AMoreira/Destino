@@ -45,15 +45,15 @@ export default function Navbar() {
                     {auth?.user ? (
                         <span className="flex items-center space-x-2 font-bold text-white">
                             <Link
-                                href={`/${auth.user.nome}/viagem/listar`}
+                                href="/"
                                 className="flex items-center space-x-2 hover:text-[#2071b3]"
                             >
                                 <FaUser className="text-xl" />
-                                <span>Usuário: {auth.user.nome}</span>
+                                <span>Usuário: {auth.user.nome} {auth.user.sobre_nome}</span>
                             </Link>
                             <span className="ml-2">|</span>
                             <Link
-                                href="/logout"
+                                href={route('logout')}
                                 method="post"
                                 as="button"
                                 className="ml-2 flex items-center space-x-1 font-bold text-white hover:cursor-pointer hover:text-[#2071b3] hover:underline"

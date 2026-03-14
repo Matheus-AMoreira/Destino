@@ -1,15 +1,41 @@
-<?php
-
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RouteController::class, 'index'])->name('home');
-Route::get('/entrar', [RouteController::class, 'entrar'])->name('entrar');
-Route::get('/cadastro', [RouteController::class, 'cadastro'])->name('cadastro');
+
+Route::middleware('guest')->group(function () {
+    Route::get('cadastro', [RegisteredUserController::class, 'create'])->name('cadastro');
+    Route::post('cadastro', [RegisteredUserController::class, 'store']);
+
+    Route::get('entrar', [AuthenticatedSessionController::class, 'create'])->name('entrar');
+    Route::post('entrar', [AuthenticatedSessionController::class, 'store'])->name('login');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('verify-email', EmailVerificationPromptController::class)
+                ->name('verification.notice');
+
+    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+                ->middleware(['signed', 'throttle:6,1'])
+                ->name('verification.verify');
+
+    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+                ->middleware('throttle:6,1')
+                ->name('verification.send');
+
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+                ->name('logout');
+});
+
 Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
-Route::prefix('administracao')->name('administracao.')->group(function () {
+Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [RouteController::class, 'administracao'])->name('index');
     Route::get('/dashboard', [RouteController::class, 'administracaoDashboard'])->name('dashboard');
     Route::get('/hotel/listar', [RouteController::class, 'administracaoHotelListar'])->name('hotel.listar');
@@ -23,14 +49,14 @@ Route::prefix('administracao')->name('administracao.')->group(function () {
     Route::get('/usuario/listar', [RouteController::class, 'administracaoUsuarioListar'])->name('usuario.listar');
 });
 
-Route::prefix('checkout')->name('checkout.')->group(function () {
+Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [RouteController::class, 'checkout'])->name('index');
     Route::get('/confirmacao/{compraId}', [RouteController::class, 'checkoutConfirmacao'])->name('confirmacao');
 });
 
 Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');
 
-Route::prefix('{usuario}/viagem/listar')->name('usuario.viagem.')->group(function () {
+Route::prefix('{usuario}/viagem/listar')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [RouteController::class, 'usuarioViagemListar'])->name('listar');
     Route::get('/{id}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
 });

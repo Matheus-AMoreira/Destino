@@ -17,16 +17,6 @@ class RouteController extends Controller
         ]);
     }
 
-    public function entrar(): Response
-    {
-        return Inertia::render('Auth/Entrar');
-    }
-
-    public function cadastro(): Response
-    {
-        return Inertia::render('Auth/Cadastro');
-    }
-
     public function buscar(Request $request): Response
     {
         return Inertia::render('Buscar', [
