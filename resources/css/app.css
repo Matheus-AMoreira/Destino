@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@theme {
+    --bg-color-orange: #fa7f46ff;
+    --navbar-blue-text: #007bff;
+    --button-verde: #28a745;
+}
+
+body {
+    font-family: 'Roboto', Nunito, Arial, sans-serif;
+    height: 100vh;
+}
+
+#root {
+    height: 100%;
+}
