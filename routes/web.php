@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Administracao\HotelController;
+use App\Http\Controllers\Administracao\TransporteController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -52,8 +53,12 @@ Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'ver
     Route::get('/pacote/registrar', [RouteController::class, 'administracaoPacoteRegistrar'])->name('pacote.registrar');
     Route::get('/pacotedefoto/listar', [RouteController::class, 'administracaoPacotedefotoListar'])->name('pacotedefoto.listar');
     Route::get('/pacotedefoto/registrar', [RouteController::class, 'administracaoPacotedefotoRegistrar'])->name('pacotedefoto.registrar');
-    Route::get('/transporte/listar', [RouteController::class, 'administracaoTransporteListar'])->name('transporte.listar');
-    Route::get('/transporte/registrar', [RouteController::class, 'administracaoTransporteRegistrar'])->name('transporte.registrar');
+    Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
+    Route::get('/transporte/registrar', [TransporteController::class, 'create'])->name('transporte.registrar');
+    Route::post('/transporte/registrar', [TransporteController::class, 'store'])->name('transporte.store');
+    Route::get('/transporte/editar/{transporte}', [TransporteController::class, 'edit'])->name('transporte.edit');
+    Route::put('/transporte/editar/{transporte}', [TransporteController::class, 'update'])->name('transporte.update');
+    Route::delete('/transporte/{transporte}', [TransporteController::class, 'destroy'])->name('transporte.destroy');
     Route::get('/usuario/listar', [RouteController::class, 'administracaoUsuarioListar'])->name('usuario.listar');
 });
 
