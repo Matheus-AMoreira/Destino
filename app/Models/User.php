@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use App\Enums\UsuarioAuthority;
+use App\Enums\UserAuthority;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasUuids;
@@ -21,9 +21,9 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         static::creating(function ($user) {
             if (empty($user->authorities)) {
                 $user->authorities = match ($user->role) {
-                    UserRole::ADMINISTRADOR => [UsuarioAuthority::DELETAR_USUARIO->value],
-                    UserRole::FUNCIONARIO => [UsuarioAuthority::CRIAR_PACOTE->value],
-                    default => [UsuarioAuthority::EDICAO_PERFIL->value],
+                    UserRole::ADMINISTRADOR => [UserAuthority::DELETAR_USUARIO->value],
+                    UserRole::FUNCIONARIO => [UserAuthority::CRIAR_PACOTE->value],
+                    default => [UserAuthority::EDICAO_PERFIL->value],
                 };
             }
         });
@@ -70,7 +70,7 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
     /**
-     * @return HasMany<Compra,Usuario>
+     * @return HasMany<Compra,User>
      */
     public function compras(): HasMany
     {

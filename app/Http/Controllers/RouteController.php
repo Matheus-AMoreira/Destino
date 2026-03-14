@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Compra;
 use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -13,7 +14,7 @@ class RouteController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render('Index', [
-            'pacotes' => [], // Placeholder
+            'pacotes' => [],
             'totalPaginas' => 1,
             'paginaAtual' => (int) $request->get('page', 0),
         ]);
@@ -22,7 +23,7 @@ class RouteController extends Controller
     public function buscar(Request $request): Response
     {
         return Inertia::render('Buscar', [
-            'pacotes' => [], // Placeholder
+            'pacotes' => [],
             'filters' => [
                 'termo' => $request->get('termo', ''),
                 'precoMax' => (int) $request->get('precoMax', 0),
@@ -55,7 +56,7 @@ class RouteController extends Controller
     public function administracaoUsuarioListar(): Response
     {
         return Inertia::render('Administracao/Usuarios', [
-            'usuarios' => User::all(),
+            'usuarios' => Usuario::all(),
         ]);
     }
 

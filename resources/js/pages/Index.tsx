@@ -12,10 +12,14 @@ interface IndexProps {
     paginaAtual: number;
 }
 
-export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 }: IndexProps) {
+export default function Index({
+    pacotes = [],
+    totalPaginas = 0,
+    paginaAtual = 0,
+}: IndexProps) {
     const [termoBusca, setTermoBusca] = useState('');
 
-    const handleSearchSubmit = (e: React.FormEvent) => {
+    const handleSearchSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
         router.get('/buscar', { termo: termoBusca });
     };
@@ -42,9 +46,10 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                         </h1>
                         <div className="p-4 text-lg md:px-8">
                             <p>
-                                Planeje a jornada dos seus sonhos sem complicações. Descubra
-                                roteiros exclusivos, personalize cada detalhe e acesse pacotes
-                                de viagem inesquecíveis.
+                                Planeje a jornada dos seus sonhos sem
+                                complicações. Descubra roteiros exclusivos,
+                                personalize cada detalhe e acesse pacotes de
+                                viagem inesquecíveis.
                             </p>
                         </div>
                         <div className="mt-6 flex justify-center px-4 md:justify-start md:px-8">
@@ -56,9 +61,9 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                             </button>
                         </div>
                     </div>
-                    <div className="mt-8 flex justify-center w-full xl:mt-0 xl:w-[48%]">
+                    <div className="mt-8 flex w-full justify-center xl:mt-0 xl:w-[48%]">
                         <img
-                            className="max-w-xgg rounded-3xl w-full shadow-xl"
+                            className="max-w-xgg w-full rounded-3xl shadow-xl"
                             src="/destaque.jpg"
                             alt="Destaque"
                         />
@@ -78,14 +83,19 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                             <span>Procurar Viagens</span>
                         </div>
 
-                        <form onSubmit={handleSearchSubmit} className="flex gap-4">
+                        <form
+                            onSubmit={handleSearchSubmit}
+                            className="flex gap-4"
+                        >
                             <div className="relative flex-1">
                                 <input
                                     type="text"
                                     value={termoBusca}
-                                    onChange={(e) => setTermoBusca(e.target.value)}
+                                    onChange={(e) =>
+                                        setTermoBusca(e.target.value)
+                                    }
                                     placeholder="Ex.: Pacote Fernando de Noronha"
-                                    className="w-full rounded-xl border border-gray-300 py-3 pl-12 pr-6 text-lg text-gray-800 shadow-md outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full rounded-xl border border-gray-300 py-3 pr-6 pl-12 text-lg text-gray-800 shadow-md outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
@@ -105,7 +115,10 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                                     key={pacote.id}
                                     title={pacote.nome}
                                     description={pacote.descricao}
-                                    imageUrl={pacote.fotosDoPacote?.fotoDoPacote || 'placeholder'}
+                                    imageUrl={
+                                        pacote.fotosDoPacote?.fotoDoPacote ||
+                                        'placeholder'
+                                    }
                                     detalharHref={`/pacote/${pacote.nome}`}
                                 />
                             ))
@@ -117,13 +130,13 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                     </div>
 
                     {totalPaginas > 1 && (
-                        <div className="mb-8 mt-4 flex items-center justify-center gap-4">
+                        <div className="mt-4 mb-8 flex items-center justify-center gap-4">
                             <button
                                 onClick={handlePaginaAnterior}
                                 disabled={paginaAtual === 0}
-                                className={`p-3 rounded-full shadow-md transition ${
+                                className={`rounded-full p-3 shadow-md transition ${
                                     paginaAtual === 0
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
                                 }`}
                             >
@@ -137,9 +150,9 @@ export default function Index({ pacotes = [], totalPaginas = 0, paginaAtual = 0 
                             <button
                                 onClick={handleProximaPagina}
                                 disabled={paginaAtual === totalPaginas - 1}
-                                className={`p-3 rounded-full shadow-md transition ${
+                                className={`rounded-full p-3 shadow-md transition ${
                                     paginaAtual === totalPaginas - 1
-                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
                                 }`}
                             >
