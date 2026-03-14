@@ -1,4 +1,4 @@
-import { route as ziggyRoute } from 'ziggy-js';
+import type { route as ziggyRoute } from 'ziggy-js';
 import type { Auth } from '@/types/auth';
 
 declare global {

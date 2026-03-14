@@ -1,4 +1,4 @@
-import React from 'react';
+import { router } from '@inertiajs/react';
 
 export interface ModalData {
     show: boolean;
@@ -11,21 +11,20 @@ interface CustomModalProps {
     setModal: (data: ModalData) => void;
 }
 
-export default function CustomModal({ modalData, setModal }: CustomModalProps) {
-    if (!modalData.show) return null;
-
+export default function Modal({ modalData, setModal }: CustomModalProps) {
     const handleClose = () => {
         setModal({ ...modalData, show: false });
+
         if (modalData.url) {
-            window.location.href = modalData.url;
+            router.visit(modalData.url);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
             <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
                 <div className="mb-4 text-center">
-                    <p className="whitespace-pre-line text-lg font-medium text-gray-800">
+                    <p className="text-lg font-medium whitespace-pre-line text-gray-800">
                         {modalData.mensagem}
                     </p>
                 </div>
