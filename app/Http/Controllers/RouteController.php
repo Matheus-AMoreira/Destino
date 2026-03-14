@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Compra;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
 
 class RouteController extends Controller
 {
@@ -53,7 +55,7 @@ class RouteController extends Controller
     public function administracaoUsuarioListar(): Response
     {
         return Inertia::render('Administracao/Usuarios', [
-            'usuarios' => \App\Models\User::all(),
+            'usuarios' => User::all(),
         ]);
     }
 
@@ -117,12 +119,12 @@ class RouteController extends Controller
         ]);
     }
 
-    public function usuarioViagemListar(Request $request): Response
+    public function usuarioViagemListar(Request $request, string $usuario): Response
     {
         $view = $request->query('view', 'andamento');
         $user = auth()->user();
 
-        $query = \App\Models\Compra::with(['oferta.pacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
+        $query = Compra::with(['oferta.pacote.fotosDoPacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
             ->where('user_id', $user->id);
 
         if ($view === 'concluidas') {
@@ -143,7 +145,7 @@ class RouteController extends Controller
 
     public function usuarioViagemListarId(string $usuario, string $id): Response
     {
-        $compra = \App\Models\Compra::with(['oferta.pacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
+        $compra = Compra::with(['oferta.pacote.fotosDoPacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
             ->where('user_id', auth()->id())
             ->findOrFail($id);
 
