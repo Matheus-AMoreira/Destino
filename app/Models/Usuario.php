@@ -2,21 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Enums\UsuarioAuthority;
 use App\Enums\UserRole;
-use Database\Factories\UserFactory;
+use App\Enums\UsuarioAuthority;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class Usuario extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasUuids;
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::creating(function ($user) {
             if (empty($user->authorities)) {
@@ -49,7 +49,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
-        'id',
         'nome',
         'sobre_nome',
         'cpf',
@@ -70,6 +69,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
+    /**
+     * @return HasMany<Compra,Usuario>
+     */
+    public function compras(): HasMany
+    {
+        return $this->hasMany(Compra::class);
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -85,11 +91,5 @@ class User extends Authenticatable implements MustVerifyEmail
             'role' => UserRole::class,
             'authorities' => 'array',
         ];
-    /**
-     * Get the purchases for the user.
-     */
-    public function compras(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Compra::class);
     }
 }

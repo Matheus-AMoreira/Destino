@@ -35,12 +35,16 @@ class Compra extends Model
             'valor_final' => 'decimal:2',
         ];
     }
-
-    public function user(): BelongsTo
+    /**
+     * @return BelongsTo<Usuario,Compra>
+     */
+    public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Usuario::class);
     }
-
+    /**
+     * @return BelongsTo<Oferta,Compra>
+     */
     public function oferta(): BelongsTo
     {
         return $this->belongsTo(Oferta::class);

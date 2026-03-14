@@ -29,22 +29,30 @@ class Oferta extends Model
             'status' => OfertaStatus::class,
         ];
     }
-
+    /**
+     * @return BelongsTo<Pacote,Oferta>
+     */
     public function pacote(): BelongsTo
     {
         return $this->belongsTo(Pacote::class);
     }
-
+    /**
+     * @return BelongsTo<Hotel,Oferta>
+     */
     public function hotel(): BelongsTo
     {
         return $this->belongsTo(Hotel::class);
     }
-
+    /**
+     * @return BelongsTo<Transporte,Oferta>
+     */
     public function transporte(): BelongsTo
     {
         return $this->belongsTo(Transporte::class);
     }
-
+    /**
+     * @return HasMany<Compra,Oferta>
+     */
     public function compras(): HasMany
     {
         return $this->hasMany(Compra::class);
