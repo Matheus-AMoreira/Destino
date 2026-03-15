@@ -1,4 +1,5 @@
 import AdminLayout from '@/layouts/AdminLayout';
+import { Link } from '@inertiajs/react';
 import { 
     Hotel, 
     Truck, 
@@ -82,9 +83,12 @@ export default function Dashboard({ stats }: Props) {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900">Relatórios Detalhados</h3>
                     <p className="mt-2 text-gray-500">Visualize métricas avançadas e tendências de vendas em breve.</p>
-                    <button className="mt-6 rounded-xl bg-gray-900 px-6 py-2 text-sm font-bold text-white shadow-lg transition hover:bg-gray-800">
+                    <Link 
+                        href={route('administracao.dashboard.estatisticas')}
+                        className="mt-6 rounded-xl bg-gray-900 px-6 py-2 text-sm font-bold text-white shadow-lg transition hover:bg-gray-800"
+                    >
                         Ver Mais
-                    </button>
+                    </Link>
                 </div>
             </div>
         </AdminLayout>
