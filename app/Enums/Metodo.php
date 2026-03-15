@@ -4,6 +4,6 @@ namespace App\Enums;
 
 enum Metodo: string
 {
-    case VISTA = "";
-    case PARCELADO = "";
+    case VISTA = 'VISTA';
+    case PARCELADO = 'PARCELADO';
 }
