@@ -1,11 +1,18 @@
-import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import GuestLayout from '@/layouts/GuestLayout';
-import { FaCalendarAlt, FaHistory, FaMapMarkerAlt, FaUser, FaGlobeAmericas } from 'react-icons/fa';
-import { TbPlayerTrackNextFilled } from 'react-icons/tb';
-import { MdAirplaneTicket } from 'react-icons/md';
-import { LuPackageSearch } from 'react-icons/lu';
 import { Auth } from '@/types';
+import { useMemo } from 'react';
+import {
+    ArrowRightFromLine,
+    CalendarDays,
+    Globe,
+    History,
+    MapPin,
+    PackageSearch,
+    Ticket,
+    TicketsPlane,
+    User,
+} from 'lucide-react';
 
 interface Compra {
     id: string;
@@ -20,14 +27,14 @@ interface Compra {
             id: number;
             nome: string;
             descricao: string;
-            fotosDoPacote: {
+            fotos_do_pacote: {
                 fotos: { url: string }[];
             };
-            hotel: {
-                cidade: {
-                    nome: string;
-                    estado: { sigla: string };
-                };
+        };
+        hotel: {
+            cidade: {
+                nome: string;
+                estado: { sigla: string };
             };
         };
     };
@@ -54,173 +61,292 @@ export default function Listar({ compras, view, auth }: Props) {
     };
 
     const getStatusColor = (status: string) => {
-        if (isHistorico) return "bg-gray-100 text-gray-500 border-gray-200";
+        if (isHistorico) return 'bg-gray-100 text-gray-500 border-gray-200';
         switch (status) {
-            case 'CONCLUIDO':
-                return "bg-green-100 text-green-700 border-green-200";
+            case 'ACEITO':
+                return 'bg-green-100 text-green-700 border-green-200';
             case 'PENDENTE':
-                return "bg-yellow-100 text-yellow-700 border-yellow-200";
+                return 'bg-yellow-100 text-yellow-700 border-yellow-200';
             case 'CANCELADO':
-                return "bg-red-100 text-red-700 border-red-200";
+                return 'bg-red-100 text-red-700 border-red-200';
             default:
-                return "bg-gray-100 text-gray-700 border-gray-200";
+                return 'bg-gray-100 text-gray-700 border-gray-200';
         }
     };
 
+    const groupedCompras = useMemo(() => {
+        const groups: Record<number, { pacote: any; tickets: Compra[] }> = {};
+
+        compras.forEach((compra) => {
+            const pacoteId = compra.oferta.pacote.id;
+            if (!groups[pacoteId]) {
+                groups[pacoteId] = {
+                    pacote: compra.oferta.pacote,
+                    tickets: [],
+                };
+            }
+            groups[pacoteId].tickets.push(compra);
+        });
+
+        return Object.values(groups).sort((a, b) => {
+            // Sort groups by the newest ticket date
+            const dateA = new Date(a.tickets[0].data_compra).getTime();
+            const dateB = new Date(b.tickets[0].data_compra).getTime();
+            return dateB - dateA;
+        });
+    }, [compras]);
+
     return (
         <GuestLayout>
-            <Head title={isHistorico ? "Histórico de Viagens" : "Minhas Viagens"} />
-            
-            <div className="min-h-screen bg-gray-50 flex">
-                <aside className="w-72 bg-white border-r border-gray-200 hidden lg:block sticky top-0 h-screen overflow-y-auto">
-                    <div className="p-8 border-b border-gray-100">
-                        <div className="flex items-center gap-4 mb-2">
-                            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                                <FaUser size={20} />
+            <Head
+                title={isHistorico ? 'Histórico de Viagens' : 'Minhas Viagens'}
+            />
+
+            <div className="flex min-h-screen bg-gray-50">
+                <aside className="sticky top-0 hidden h-screen w-72 overflow-y-auto border-r border-gray-200 bg-white lg:block">
+                    <div className="border-b border-gray-100 p-8">
+                        <div className="mb-2 flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+                                <User />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-gray-900 leading-tight">Minha Conta</h1>
-                                <p className="text-sm text-gray-500 font-medium truncate max-w-[140px]">{auth.user.email}</p>
+                                <h1 className="text-xl leading-tight font-bold text-gray-900">
+                                    Minha Conta
+                                </h1>
+                                <p className="max-w-[140px] truncate text-sm font-medium text-gray-500">
+                                    {auth.user.email}
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <nav className="p-4 space-y-2 mt-4">
+                    <nav className="mt-4 space-y-2 p-4">
                         <Link
-                            href={route('usuario.viagem.listar', { usuario: auth.user.nome, view: 'andamento' })}
-                            className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all duration-200 ${
+                            href={route('usuario.viagem.listar', {
+                                user: auth.user.id,
+                                view: 'andamento',
+                            })}
+                            className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
                                 view === 'andamento'
-                                    ? "bg-blue-600 text-white shadow-xl shadow-blue-100 translate-x-1"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+                                    ? 'translate-x-1 bg-blue-600 text-white shadow-xl shadow-blue-100'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
                             }`}
                         >
-                            <TbPlayerTrackNextFilled size={22} />
+                            <ArrowRightFromLine />
                             <span>Próximas Viagens</span>
                         </Link>
 
                         <Link
-                            href={route('usuario.viagem.listar', { usuario: auth.user.nome, view: 'concluidas' })}
-                            className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold transition-all duration-200 ${
+                            href={route('usuario.viagem.listar', {
+                                user: auth.user.id,
+                                view: 'concluidas',
+                            })}
+                            className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
                                 view === 'concluidas'
-                                    ? "bg-blue-600 text-white shadow-xl shadow-blue-100 translate-x-1"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-blue-600"
+                                    ? 'translate-x-1 bg-blue-600 text-white shadow-xl shadow-blue-100'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
                             }`}
                         >
-                            <FaHistory size={20} />
+                            <History />
                             <span>Histórico</span>
                         </Link>
                     </nav>
                 </aside>
 
                 <main className="flex-1 p-6 lg:p-12">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+                    <div className="mx-auto max-w-6xl">
+                        <div className="mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                             <div>
-                                <h1 className="text-4xl font-black text-gray-900 flex items-center gap-4 font-outfit">
-                                    <FaGlobeAmericas className="text-blue-600" />
-                                    <span>{isHistorico ? "Histórico de Viagens" : "Minhas Viagens"}</span>
+                                <h1 className="font-outfit flex items-center gap-4 text-4xl font-black text-gray-900">
+                                    <Globe className="text-blue-600" />
+                                    <span>
+                                        {isHistorico
+                                            ? 'Histórico de Viagens'
+                                            : 'Minhas Viagens'}
+                                    </span>
                                 </h1>
-                                <p className="text-gray-500 mt-2 font-medium text-lg">
+                                <p className="mt-2 text-lg font-medium text-gray-500">
                                     {isHistorico
-                                        ? "Relembre suas aventuras passadas com a Destino"
-                                        : "Gerencie suas próximas aventuras inesquecíveis"}
+                                        ? 'Relembre suas aventuras passadas com a Destino'
+                                        : 'Gerencie suas próximas aventuras inesquecíveis'}
                                 </p>
                             </div>
 
-                            <div className="bg-white px-6 py-3 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-2">
-                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Total:</span>
-                                <strong className="text-blue-600 text-lg font-black">{compras.length}</strong>
+                            <div className="flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-6 py-3 shadow-sm">
+                                <span className="text-sm font-bold tracking-widest text-gray-400 uppercase">
+                                    Total:
+                                </span>
+                                <strong className="text-lg font-black text-blue-600">
+                                    {compras.length}
+                                </strong>
                             </div>
                         </div>
 
                         {compras.length === 0 ? (
-                            <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
-                                <div className="text-8xl mb-6 text-gray-200 flex justify-center">
-                                    <MdAirplaneTicket />
+                            <div className="rounded-3xl border-2 border-dashed border-gray-200 bg-white py-20 text-center">
+                                <div className="mb-6 flex justify-center text-8xl text-gray-200">
+                                    <TicketsPlane />
                                 </div>
-                                <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
-                                    {isHistorico ? "Seu histórico está vazio" : "Nenhuma viagem agendada"}
+                                <h3 className="mb-2 text-2xl font-extrabold text-gray-900">
+                                    {isHistorico
+                                        ? 'Seu histórico está vazio'
+                                        : 'Nenhuma viagem agendada'}
                                 </h3>
-                                <p className="text-gray-500 mb-8 max-w-sm mx-auto font-medium">
-                                    {isHistorico 
-                                        ? "Você ainda não completou nenhuma viagem conosco. Que tal começar agora?"
-                                        : "Parece que você ainda não tem planos. Vamos encontrar o destino perfeito?"}
+                                <p className="mx-auto mb-8 max-w-sm font-medium text-gray-500">
+                                    {isHistorico
+                                        ? 'Você ainda não completou nenhuma viagem conosco. Que tal começar agora?'
+                                        : 'Parece que você ainda não tem planos. Vamos encontrar o destino perfeito?'}
                                 </p>
                                 {!isHistorico && (
                                     <Link
                                         href={route('buscar')}
-                                        className="inline-flex items-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 transition-all"
+                                        className="inline-flex items-center gap-3 rounded-2xl bg-blue-600 px-8 py-4 font-bold text-white shadow-lg shadow-blue-100 transition-all hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
                                     >
-                                        <LuPackageSearch size={22} />
+                                        <PackageSearch />
                                         <span>Explorar Destinos</span>
                                     </Link>
                                 )}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {compras.map((compra) => (
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                                {groupedCompras.map((grupo) => (
                                     <div
-                                        key={compra.id}
-                                        className={`group bg-white rounded-3xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-50/50 hover:border-blue-100 flex flex-col ${
-                                            isHistorico ? "opacity-90 saturate-50" : ""
+                                        key={grupo.pacote.id}
+                                        className={`group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white transition-all duration-300 hover:border-blue-100 hover:shadow-2xl hover:shadow-blue-50/50 ${
+                                            isHistorico
+                                                ? 'opacity-90 saturate-50'
+                                                : ''
                                         }`}
                                     >
-                                        <div className="h-60 relative overflow-hidden">
+                                        <div className="relative h-60 overflow-hidden">
                                             <img
-                                                src={compra.oferta.pacote.fotosDoPacote?.fotos[0]?.url || '/images/placeholder.jpg'}
-                                                alt={compra.oferta.pacote.nome}
-                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                src={
+                                                    grupo.pacote.fotos_do_pacote
+                                                        ?.fotos[0]?.url ||
+                                                    '/images/placeholder.jpg'
+                                                }
+                                                alt={grupo.pacote.nome}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
-                                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-                                            
-                                            <div className="absolute top-4 right-4">
-                                                <span className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider shadow-sm border ${getStatusColor(compra.status)}`}>
-                                                    {isHistorico ? "CONCLUÍDA" : compra.status}
-                                                </span>
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 transition-opacity group-hover:opacity-80" />
+
+                                            <div className="absolute top-4 left-4 flex gap-2">
+                                                {grupo.tickets.length > 1 && (
+                                                    <span className="flex items-center gap-2 rounded-xl bg-blue-600/90 px-3 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
+                                                        <Ticket />
+                                                        {
+                                                            grupo.tickets.length
+                                                        }{' '}
+                                                        PASSAGENS
+                                                    </span>
+                                                )}
                                             </div>
 
                                             <div className="absolute bottom-4 left-6">
-                                                <div className="flex items-center gap-2 text-white/90 text-sm font-bold bg-black/20 backdrop-blur-md px-3 py-1 rounded-lg">
-                                                    <FaMapMarkerAlt className="text-red-400" />
-                                                    <span>{compra.oferta.pacote.hotel.cidade.nome}, {compra.oferta.pacote.hotel.cidade.estado.sigla}</span>
+                                                <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-bold text-white/90 backdrop-blur-md">
+                                                    <MapPin className="text-red-400" />
+                                                    <span>
+                                                        {
+                                                            grupo.tickets[0]
+                                                                .oferta.hotel
+                                                                .cidade.nome
+                                                        }
+                                                        ,{' '}
+                                                        {
+                                                            grupo.tickets[0]
+                                                                .oferta.hotel
+                                                                .cidade.estado
+                                                                .sigla
+                                                        }
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="p-8 flex-1 flex flex-col">
-                                            <h3 className="text-2xl font-black text-gray-900 mb-3 group-hover:text-blue-600 transition-colors font-outfit truncate">
-                                                {compra.oferta.pacote.nome}
+                                        <div className="flex flex-1 flex-col p-8">
+                                            <h3 className="font-outfit mb-3 truncate text-2xl font-black text-gray-900 transition-colors group-hover:text-blue-600">
+                                                {grupo.pacote.nome}
                                             </h3>
 
-                                            <p className="text-gray-500 text-sm font-medium mb-6 line-clamp-2 leading-relaxed">
-                                                {compra.oferta.pacote.descricao}
+                                            <p className="mb-6 line-clamp-2 text-sm leading-relaxed font-medium text-gray-500">
+                                                {grupo.pacote.descricao}
                                             </p>
 
-                                            <div className="space-y-4 mt-auto pt-6 border-t border-gray-50">
-                                                <div className="bg-gray-50 rounded-2xl p-4 flex items-center justify-between group-hover:bg-blue-50/50 transition-colors">
-                                                    <div className="flex items-center gap-3">
-                                                        <FaCalendarAlt className="text-blue-500" size={18} />
-                                                        <span className="text-sm font-bold text-gray-700">
-                                                            {formatarData(compra.oferta.inicio)} - {formatarData(compra.oferta.fim)}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            <div className="mt-auto space-y-4 border-t border-gray-100 pt-6">
+                                                {grupo.tickets.map(
+                                                    (compra, idx) => (
+                                                        <div
+                                                            key={compra.id}
+                                                            className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}
+                                                        >
+                                                            <div className="mb-4 flex items-center justify-between">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span
+                                                                        className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}
+                                                                    >
+                                                                        {isHistorico
+                                                                            ? 'CONCLUÍDA'
+                                                                            : compra.status}
+                                                                    </span>
+                                                                    <span className="text-[10px] font-bold text-gray-400 uppercase">
+                                                                        Ticket #
+                                                                        {
+                                                                            compra.id.split(
+                                                                                '-',
+                                                                            )[0]
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <span className="block text-xs font-black text-gray-900">
+                                                                        {formatarValor(
+                                                                            compra.valor_final,
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
 
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1">Preço Total</span>
-                                                        <span className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tight">
-                                                            {formatarValor(compra.valor_final)}
-                                                        </span>
-                                                    </div>
-
-                                                    <Link
-                                                        href={route('usuario.viagem.detalhes', { usuario: auth.user.nome, id: compra.id })}
-                                                        className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
-                                                    >
-                                                        Ver Detalhes
-                                                    </Link>
-                                                </div>
+                                                            <div className="mb-4 flex items-center justify-between rounded-2xl border border-transparent bg-gray-50 p-4 transition-colors group-hover:border-blue-100/50 group-hover:bg-blue-50/50">
+                                                                <div className="flex items-center gap-3">
+                                                                    <CalendarDays
+                                                                        className="text-blue-500"
+                                                                        size={
+                                                                            18
+                                                                        }
+                                                                    />
+                                                                    <span className="text-sm font-bold text-gray-700">
+                                                                        {formatarData(
+                                                                            compra
+                                                                                .oferta
+                                                                                .inicio,
+                                                                        )}{' '}
+                                                                        -{' '}
+                                                                        {formatarData(
+                                                                            compra
+                                                                                .oferta
+                                                                                .fim,
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                                <Link
+                                                                    href={route(
+                                                                        'usuario.viagem.detalhes',
+                                                                        {
+                                                                            user: auth
+                                                                                .user
+                                                                                .id,
+                                                                            compra: compra.id,
+                                                                        },
+                                                                    )}
+                                                                    className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
+                                                                >
+                                                                    Detalhes
+                                                                    <ArrowRightFromLine />
+                                                                </Link>
+                                                            </div>
+                                                        </div>
+                                                    ),
+                                                )}
                                             </div>
                                         </div>
                                     </div>
