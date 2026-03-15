@@ -6,13 +6,16 @@ use App\Http\Controllers\Administracao\OfertaController;
 use App\Http\Controllers\Administracao\PacoteController;
 use App\Http\Controllers\Administracao\PacoteFotoController;
 use App\Http\Controllers\Administracao\TransporteController;
+use App\Http\Controllers\Administracao\UsuarioController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\PasswordRecoveryController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\Usuario\PerfilController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RouteController::class, 'index'])->name('home');
@@ -23,6 +26,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('entrar', [AuthenticatedSessionController::class, 'create'])->name('entrar');
     Route::post('entrar', [AuthenticatedSessionController::class, 'store'])->name('login');
+    Route::post('recuperar-senha', [PasswordRecoveryController::class, 'recover'])->name('password.recover');
 });
 
 Route::middleware('auth')->group(function () {
@@ -44,8 +48,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
-Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'verified', 'admin'])->group(function () {
+Route::group(['prefix' => 'administracao', 'as' => 'administracao.', 'middleware' => ['auth', 'verified', 'admin']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas');
     Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
     Route::get('/hotel/registrar', [HotelController::class, 'create'])->name('hotel.registrar');
     Route::post('/hotel/registrar', [HotelController::class, 'store'])->name('hotel.store');
@@ -77,7 +82,13 @@ Route::prefix('administracao')->name('administracao.')->middleware(['auth', 'ver
     Route::get('/transporte/editar/{transporte}', [TransporteController::class, 'edit'])->name('transporte.edit');
     Route::put('/transporte/editar/{transporte}', [TransporteController::class, 'update'])->name('transporte.update');
     Route::delete('/transporte/{transporte}', [TransporteController::class, 'destroy'])->name('transporte.destroy');
-    Route::get('/usuario/listar', [RouteController::class, 'administracaoUsuarioListar'])->name('usuario.listar');
+    Route::get('/usuario/listar', [UsuarioController::class, 'index'])->name('usuario.listar');
+    Route::get('/usuario/{user}', [UsuarioController::class, 'show'])->name('usuario.show');
+    Route::post('/usuario/{user}/aprovar', [UsuarioController::class, 'aprovar'])->name('usuario.aprovar');
+    Route::post('/usuario/{user}/block', [UsuarioController::class, 'toggleBlock'])->name('usuario.toggle-block');
+    Route::put('/usuario/{user}/access', [UsuarioController::class, 'updateAccess'])->name('usuario.update-access');
+    Route::put('/usuario/{user}/perfil', [PerfilController::class, 'adminUpdate'])->name('usuario.perfil-update');
+    Route::get('/usuario/{user}/compras', [UsuarioController::class, 'compras'])->name('usuario.compras');
 });
 
 Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->group(function () {
@@ -88,7 +99,13 @@ Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->
 
 Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');
 
-Route::prefix('{usuario}/viagem/listar')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('usuario/{user}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [RouteController::class, 'usuarioViagemListar'])->name('listar');
-    Route::get('/{id}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
+    Route::get('/detalhes/{compra}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
+});
+
+Route::prefix('usuario/perfil')->name('usuario.perfil.')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [PerfilController::class, 'edit'])->name('edit');
+    Route::put('/', [PerfilController::class, 'update'])->name('update');
+    Route::put('/senha', [PerfilController::class, 'updatePassword'])->name('password');
 });

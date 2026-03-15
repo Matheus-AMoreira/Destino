@@ -21,17 +21,156 @@ declare module 'ziggy-js' {
     "logout": [],
     "buscar": [],
     "contato": [],
-    "administracao.index": [],
     "administracao.dashboard": [],
     "administracao.hotel.listar": [],
     "administracao.hotel.registrar": [],
+    "administracao.hotel.store": [],
+    "administracao.hotel.edit": [
+        {
+            "name": "hotel",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.hotel.update": [
+        {
+            "name": "hotel",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.hotel.destroy": [
+        {
+            "name": "hotel",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.pacote.listar": [],
     "administracao.pacote.registrar": [],
+    "administracao.pacote.store": [],
+    "administracao.pacote.edit": [
+        {
+            "name": "pacote",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.pacote.update": [
+        {
+            "name": "pacote",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.pacote.destroy": [
+        {
+            "name": "pacote",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.pacotedefoto.listar": [],
     "administracao.pacotedefoto.registrar": [],
+    "administracao.pacotedefoto.store": [],
+    "administracao.pacotedefoto.edit": [
+        {
+            "name": "pacotedefoto",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.pacotedefoto.update": [
+        {
+            "name": "pacotedefoto",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.pacotedefoto.destroy": [
+        {
+            "name": "pacotedefoto",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.oferta.listar": [],
+    "administracao.oferta.registrar": [],
+    "administracao.oferta.store": [],
+    "administracao.oferta.edit": [
+        {
+            "name": "oferta",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.oferta.update": [
+        {
+            "name": "oferta",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.oferta.destroy": [
+        {
+            "name": "oferta",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.transporte.listar": [],
     "administracao.transporte.registrar": [],
+    "administracao.transporte.store": [],
+    "administracao.transporte.edit": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.transporte.update": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.transporte.destroy": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.usuario.listar": [],
+    "administracao.usuario.aprovar": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.toggle-block": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.update-access": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.compras": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "checkout.index": [],
     "checkout.processar": [],
     "checkout.confirmacao": [
@@ -48,18 +187,21 @@ declare module 'ziggy-js' {
     ],
     "usuario.viagem.listar": [
         {
-            "name": "usuario",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "id"
         }
     ],
     "usuario.viagem.detalhes": [
         {
-            "name": "usuario",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "id"
         },
         {
-            "name": "id",
-            "required": true
+            "name": "compra",
+            "required": true,
+            "binding": "id"
         }
     ],
     "storage.local": [
