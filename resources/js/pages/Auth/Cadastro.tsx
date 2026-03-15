@@ -5,6 +5,7 @@ import CampoInput from '@/components/auth/CampoInput';
 import type { ModalData } from '@/components/Modal';
 import CustomModal from '@/components/Modal';
 import { useState } from 'react';
+import RequisitosSenha from '@/components/auth/RequisitosSenha';
 
 const formatarCPF = (val: string) =>
     val
@@ -38,10 +39,10 @@ const schemaCadastro = z
         password: z
             .string()
             .min(8, 'Mínimo 8 caracteres')
-            .regex(/[A-Z]/)
-            .regex(/[a-z]/)
-            .regex(/\d/)
-            .regex(/[@$!%*?&#\-_]/),
+            .regex(/[A-Z]/, 'Uma letra maiúscula é obrigatória')
+            .regex(/[a-z]/, 'Uma letra minúscula é obrigatória')
+            .regex(/\d/, 'Um número é obrigatório')
+            .regex(/[@$!%*?&#\-_]/, 'Um caractere especial (@$!%*?&#-_) é obrigatório'),
         password_confirmation: z.string(),
     })
     .refine((data) => data.password === data.password_confirmation, {
@@ -117,16 +118,6 @@ export default function Cadastro() {
         });
     };
 
-    const requisitosSenha = [
-        { label: 'Mínimo de 8 caracteres', valido: data.password.length >= 8 },
-        { label: 'Uma letra maiúscula', valido: /[A-Z]/.test(data.password) },
-        { label: 'Uma letra minúscula', valido: /[a-z]/.test(data.password) },
-        { label: 'Um número', valido: /\d/.test(data.password) },
-        {
-            label: 'Um caractere especial',
-            valido: /[@$!%*?&#\-_]/.test(data.password),
-        },
-    ];
 
     return (
         <div className="flex min-h-screen w-full items-center justify-center overflow-y-auto bg-linear-to-br from-[#fff6ea] via-[#ffffff] to-[#fff6ea] py-8">
@@ -228,28 +219,7 @@ export default function Cadastro() {
                             </div>
                         </div>
 
-                        {data.password.length > 0 && (
-                            <div className="col-span-2 mt-2 rounded-lg border border-gray-200 bg-gray-50 p-3 text-left">
-                                <p className="mb-2 text-xs font-semibold text-gray-500">
-                                    Requisitos da senha:
-                                </p>
-                                <ul className="space-y-1 text-xs">
-                                    {requisitosSenha.map((req, idx) => (
-                                        <li
-                                            key={idx}
-                                            className={`flex items-center gap-2 ${req.valido ? 'font-medium text-green-600' : 'text-gray-400'}`}
-                                        >
-                                            <span
-                                                className={`flex h-4 w-4 items-center justify-center rounded-full text-[10px] ${req.valido ? 'bg-green-100' : 'bg-gray-200'}`}
-                                            >
-                                                {req.valido ? '✓' : '•'}
-                                            </span>
-                                            {req.label}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                        <RequisitosSenha senha={data.password} />
 
                         <button
                             type="submit"

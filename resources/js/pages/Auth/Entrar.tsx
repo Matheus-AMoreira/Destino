@@ -11,6 +11,12 @@ export default function Entrar() {
         password: '',
     });
 
+    const recoveryForm = useForm({
+        email: '',
+    });
+
+    const [isRecovering, setIsRecovering] = useState(false);
+
     const [modal, setModal] = useState<ModalData>({
         show: false,
         mensagem: '',
@@ -21,12 +27,34 @@ export default function Entrar() {
         e.preventDefault();
         post(route('login'), {
             onError: (err) => {
+                const message = err.email || err.password || err.login || 'Erro ao realizar login.';
                 setModal({
                     show: true,
-                    mensagem: err.login || 'Erro ao realizar login.',
-                    url: route('home'),
+                    mensagem: message,
+                    url: null,
                 });
             },
+        });
+    };
+
+    const handleRecovery = (e: React.FormEvent) => {
+        e.preventDefault();
+        recoveryForm.post(route('password.recover'), {
+            onSuccess: () => {
+                setIsRecovering(false);
+                setModal({
+                    show: true,
+                    mensagem: 'Uma nova senha foi enviada para o seu e-mail.',
+                    url: null
+                });
+            },
+            onError: (err) => {
+                setModal({
+                    show: true,
+                    mensagem: err.email || 'Erro ao recuperar senha.',
+                    url: null
+                });
+            }
         });
     };
 
@@ -39,38 +67,79 @@ export default function Entrar() {
                         Conecte-se
                     </h1>
 
-                    <form onSubmit={handleSubmit}>
-                        <CampoInput
-                            label="E-mail"
-                            type="email"
-                            value={data.email}
-                            onChange={(e) => setData('email', e.target.value)}
-                            required
-                            maxLength={100}
-                        />
-                        <CampoInput
-                            label="Senha"
-                            type="password"
-                            value={data.password}
-                            onChange={(e) =>
-                                setData('password', e.target.value)
-                            }
-                            required
-                            maxLength={100}
-                        />
+                    {!isRecovering ? (
+                        <form onSubmit={handleSubmit}>
+                            <CampoInput
+                                label="E-mail"
+                                type="email"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                required
+                                maxLength={100}
+                            />
+                            <CampoInput
+                                label="Senha"
+                                type="password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                required
+                                maxLength={100}
+                            />
 
-                        <button
-                            className={`mt-3 w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
-                                processing
-                                    ? 'cursor-not-allowed opacity-70'
-                                    : 'cursor-pointer'
-                            }`}
-                            type="submit"
-                            disabled={processing}
-                        >
-                            {processing ? 'Entrando...' : 'Entrar'}
-                        </button>
-                    </form>
+                            <div className="mb-4 flex justify-end">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsRecovering(true)}
+                                    className="text-xs font-bold text-[#007bff] hover:underline"
+                                >
+                                    Esqueceu sua senha?
+                                </button>
+                            </div>
+
+                            <button
+                                className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
+                                    processing ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                                }`}
+                                type="submit"
+                                disabled={processing}
+                            >
+                                {processing ? 'Entrando...' : 'Entrar'}
+                            </button>
+                        </form>
+                    ) : (
+                        <form onSubmit={handleRecovery}>
+                            <p className="mb-6 text-sm text-gray-500">
+                                Digite seu e-mail para receber uma nova senha de acesso.
+                            </p>
+                            <CampoInput
+                                label="E-mail"
+                                type="email"
+                                value={recoveryForm.data.email}
+                                onChange={(e) => recoveryForm.setData('email', e.target.value)}
+                                required
+                                maxLength={100}
+                            />
+
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
+                                        recoveryForm.processing ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                                    }`}
+                                    type="submit"
+                                    disabled={recoveryForm.processing}
+                                >
+                                    {recoveryForm.processing ? 'Enviando...' : 'Recuperar Senha'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsRecovering(false)}
+                                    className="text-sm font-bold text-gray-500 hover:text-gray-700"
+                                >
+                                    Voltar para Login
+                                </button>
+                            </div>
+                        </form>
+                    )}
 
                     <p className="mt-6 text-sm text-[#666]">
                         Não possui uma conta?
