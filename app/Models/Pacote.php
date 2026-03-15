@@ -12,6 +12,13 @@ class Pacote extends Model
 {
     protected $fillable = ['nome', 'descricao', 'funcionario_id', 'pacote_foto_id', 'tag_ids'];
 
+    protected function casts(): array
+    {
+        return [
+            'tag_ids' => 'array',
+        ];
+    }
+
     /**
      * @return BelongsToMany<Tag,Pacote,Pivot>
      */
@@ -39,7 +46,7 @@ class Pacote extends Model
     /**
      * @return BelongsTo<PacoteFoto,Pacote>
      */
-    public function fotosDoPacote(): BelongsTo
+    public function fotos_do_pacote(): BelongsTo
     {
         return $this->belongsTo(PacoteFoto::class, 'pacote_foto_id');
     }

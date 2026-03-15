@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Regiao extends Model
 {
     public $incrementing = false;
+
     protected $fillable = ['id', 'sigla', 'nome'];
+
     /**
      * @return HasMany<Estado,Regiao>
      */

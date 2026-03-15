@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class Tag extends Model
 {
     protected $fillable = ['nome'];
+
     /**
      * @return BelongsToMany<Pacote,Tag,Pivot>
      */
