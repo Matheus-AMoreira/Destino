@@ -18,6 +18,7 @@ class Oferta extends Model
         'pacote_id',
         'hotel_id',
         'transporte_id',
+        'is_available',
     ];
 
     protected function casts(): array
@@ -27,8 +28,17 @@ class Oferta extends Model
             'inicio' => 'date',
             'fim' => 'date',
             'status' => OfertaStatus::class,
+            'is_available' => 'boolean',
         ];
     }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Oferta $oferta) {
+            $oferta->is_available = $oferta->disponibilidade > 0;
+        });
+    }
+
     /**
      * @return BelongsTo<Pacote,Oferta>
      */
@@ -36,6 +46,7 @@ class Oferta extends Model
     {
         return $this->belongsTo(Pacote::class);
     }
+
     /**
      * @return BelongsTo<Hotel,Oferta>
      */
@@ -43,6 +54,7 @@ class Oferta extends Model
     {
         return $this->belongsTo(Hotel::class);
     }
+
     /**
      * @return BelongsTo<Transporte,Oferta>
      */
@@ -50,6 +62,7 @@ class Oferta extends Model
     {
         return $this->belongsTo(Transporte::class);
     }
+
     /**
      * @return HasMany<Compra,Oferta>
      */

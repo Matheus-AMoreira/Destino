@@ -22,6 +22,7 @@ export default function Create({ funcionarios, pacoteFotos }: Props) {
     const { data, setData, post, processing, errors } = useForm({
         nome: '',
         descricao: '',
+        tags: '',
         funcionario_id: '',
         pacote_foto_id: '',
     });
@@ -115,6 +116,30 @@ export default function Create({ funcionarios, pacoteFotos }: Props) {
                                 ))}
                             </select>
                             {errors.pacote_foto_id && <p className="mt-1 text-xs text-red-500">{errors.pacote_foto_id}</p>}
+                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-gray-100">
+                        <div>
+                            <label className={labelClasses}>
+                                <Package size={16} className="text-orange-500" />
+                                Tags do Pacote (separadas por vírgula)
+                            </label>
+                            <input
+                                type="text"
+                                value={data.tags}
+                                onChange={e => {
+                                    const value = e.target.value;
+                                    // Permitir apenas letras, espaços e vírgulas
+                                    if (/^[a-zA-Z\s,]*$/.test(value)) {
+                                        setData('tags', value);
+                                    }
+                                }}
+                                className={inputClasses}
+                                placeholder="Ex: aventura, praia, luxo"
+                            />
+                            {errors.tags && <p className="mt-1 text-xs text-red-500">{errors.tags}</p>}
+                            <p className="mt-1 text-[10px] text-gray-400 italic">Cada vírgula cria uma nova tag automagicamente.</p>
                         </div>
                     </div>
 

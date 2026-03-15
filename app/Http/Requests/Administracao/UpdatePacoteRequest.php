@@ -19,6 +19,7 @@ class UpdatePacoteRequest extends FormRequest
         return [
             'nome' => ['sometimes', 'required', 'string', 'max:100'],
             'descricao' => ['sometimes', 'required', 'string'],
+            'tags' => ['sometimes', 'nullable', 'string'],
             'funcionario_id' => ['sometimes', 'required', 'exists:users,id'],
             'pacote_foto_id' => ['nullable', 'exists:pacote_fotos,id'],
         ];

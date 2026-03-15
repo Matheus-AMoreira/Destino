@@ -21,7 +21,6 @@ export default function Create({ pacotes, hoteis, transportes, statuses }: Props
         inicio: '',
         fim: '',
         disponibilidade: 10,
-        status: '',
         pacote_id: '',
         hotel_id: '',
         transporte_id: '',
@@ -70,18 +69,6 @@ export default function Create({ pacotes, hoteis, transportes, statuses }: Props
                             {errors.pacote_id && <p className="mt-1 text-xs text-red-500">{errors.pacote_id}</p>}
                         </div>
 
-                        <div>
-                            <label className={labelClasses}>Status da Oferta</label>
-                            <select
-                                value={data.status}
-                                onChange={e => setData('status', e.target.value)}
-                                className={inputClasses}
-                            >
-                                <option value="">Selecione...</option>
-                                {statuses.map(s => <option key={s.name} value={s.value}>{s.name}</option>)}
-                            </select>
-                            {errors.status && <p className="mt-1 text-xs text-red-500">{errors.status}</p>}
-                        </div>
 
                         <div>
                             <label className={labelClasses}>

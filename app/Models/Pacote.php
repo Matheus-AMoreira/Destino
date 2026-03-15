@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Pacote extends Model
 {
-    protected $fillable = ['nome', 'descricao', 'funcionario_id', 'pacote_foto_id'];
+    protected $fillable = ['nome', 'descricao', 'funcionario_id', 'pacote_foto_id', 'tag_ids'];
+
     /**
      * @return BelongsToMany<Tag,Pacote,Pivot>
      */
@@ -18,6 +19,7 @@ class Pacote extends Model
     {
         return $this->belongsToMany(Tag::class, 'pacote_tag');
     }
+
     /**
      * @return HasMany<Oferta,Pacote>
      */
@@ -25,13 +27,15 @@ class Pacote extends Model
     {
         return $this->hasMany(Oferta::class);
     }
+
     /**
      * @return BelongsTo<Usuario,Pacote>
      */
     public function funcionario(): BelongsTo
     {
-        return $this->belongsTo(Usuario::class, 'funcionario_id');
+        return $this->belongsTo(User::class, 'funcionario_id');
     }
+
     /**
      * @return BelongsTo<PacoteFoto,Pacote>
      */
@@ -39,6 +43,7 @@ class Pacote extends Model
     {
         return $this->belongsTo(PacoteFoto::class, 'pacote_foto_id');
     }
+
     /**
      * @return HasMany<Avaliacao,Pacote>
      */

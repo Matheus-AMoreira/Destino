@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('pacote_fotos', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
-            $table->text('foto_do_pacote');
+            $table->string('storage_type')->default('local');
+            $table->text('foto_capa');
+            $table->boolean('is_url')->default(false);
             $table->timestamps();
         });
     }

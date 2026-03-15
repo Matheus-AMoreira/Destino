@@ -35,7 +35,10 @@ class OfertaController extends Controller
 
     public function store(StoreOfertaRequest $request): RedirectResponse
     {
-        Oferta::create($request->validated());
+        $data = $request->validated();
+        $data['status'] = OfertaStatus::EMANDAMENTO;
+
+        Oferta::create($data);
 
         return redirect()->route('administracao.oferta.listar')
             ->with('success', 'Oferta criada com sucesso!');

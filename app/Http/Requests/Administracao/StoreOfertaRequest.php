@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\Administracao;
 
-use App\Enums\OfertaStatus;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreOfertaRequest extends FormRequest
 {
@@ -23,7 +21,6 @@ class StoreOfertaRequest extends FormRequest
             'inicio' => ['required', 'date'],
             'fim' => ['required', 'date', 'after_or_equal:inicio'],
             'disponibilidade' => ['required', 'integer', 'min:0'],
-            'status' => ['required', Rule::enum(OfertaStatus::class)],
             'pacote_id' => ['required', 'exists:pacotes,id'],
             'hotel_id' => ['required', 'exists:hotels,id'],
             'transporte_id' => ['required', 'exists:transportes,id'],

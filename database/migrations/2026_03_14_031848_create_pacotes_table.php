@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('descricao');
             $table->foreignUuid('funcionario_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('pacote_foto_id')->nullable()->constrained('pacote_fotos')->onDelete('set null');
+            $table->json('tag_ids')->nullable();
             $table->timestamps();
         });
     }

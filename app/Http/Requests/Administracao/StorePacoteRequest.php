@@ -19,6 +19,7 @@ class StorePacoteRequest extends FormRequest
         return [
             'nome' => ['required', 'string', 'max:100'],
             'descricao' => ['required', 'string'],
+            'tags' => ['nullable', 'string'],
             'funcionario_id' => ['required', 'exists:users,id'],
             'pacote_foto_id' => ['nullable', 'exists:pacote_fotos,id'],
         ];

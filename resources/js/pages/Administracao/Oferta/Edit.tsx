@@ -34,7 +34,6 @@ export default function Edit({ oferta, pacotes, hoteis, transportes, statuses }:
         inicio: oferta.inicio.split('T')[0],
         fim: oferta.fim.split('T')[0],
         disponibilidade: oferta.disponibilidade,
-        status: oferta.status,
         pacote_id: oferta.pacote_id,
         hotel_id: oferta.hotel_id,
         transporte_id: oferta.transporte_id,
@@ -82,17 +81,6 @@ export default function Edit({ oferta, pacotes, hoteis, transportes, statuses }:
                             {errors.pacote_id && <p className="mt-1 text-xs text-red-500">{errors.pacote_id}</p>}
                         </div>
 
-                        <div>
-                            <label className={labelClasses}>Status da Oferta</label>
-                            <select
-                                value={data.status}
-                                onChange={e => setData('status', e.target.value)}
-                                className={inputClasses}
-                            >
-                                {statuses.map(s => <option key={s.name} value={s.value}>{s.name}</option>)}
-                            </select>
-                            {errors.status && <p className="mt-1 text-xs text-red-500">{errors.status}</p>}
-                        </div>
 
                         <div>
                             <label className={labelClasses}>

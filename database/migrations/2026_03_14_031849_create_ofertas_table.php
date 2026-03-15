@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('fim');
             $table->integer('disponibilidade');
             $table->string('status');
+            $table->boolean('is_available')->default(true);
             $table->foreignId('pacote_id')->constrained('pacotes')->onDelete('cascade');
             $table->foreignId('hotel_id')->constrained('hotels')->onDelete('cascade');
             $table->foreignId('transporte_id')->constrained('transportes')->onDelete('cascade');

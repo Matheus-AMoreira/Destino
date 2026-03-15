@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pacote_foto_id')->constrained('pacote_fotos')->cascadeOnDelete();
             $table->string('caminho');
+            $table->boolean('is_url')->default(false);
             $table->integer('ordem')->default(0);
             $table->timestamps();
         });
