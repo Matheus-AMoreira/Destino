@@ -2,10 +2,14 @@ import PacoteCard from '@/components/busca/PacoteCard';
 import GuestLayout from '@/layouts/GuestLayout';
 import { Pacote } from '@/types/Pacote';
 import { router } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaMoneyCheckAlt } from 'react-icons/fa';
-import { MdOutlineTravelExplore } from 'react-icons/md';
-import { PiPackageBold } from 'react-icons/pi';
+import {
+    ChevronLeft,
+    ChevronRight,
+    CreditCard,
+    MapPinned,
+    Package,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface BuscarProps {
     pacotes: Pacote[];
@@ -22,7 +26,11 @@ interface BuscarProps {
     };
 }
 
-export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps) {
+export default function Buscar({
+    pacotes = [],
+    filters,
+    paginacao,
+}: BuscarProps) {
     const [inputTermo, setInputTermo] = useState(filters.termo || '');
     const [inputPreco, setInputPreco] = useState(filters.precoMax || 0);
 
@@ -31,22 +39,36 @@ export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps
         setInputPreco(filters.precoMax || 0);
     }, [filters]);
 
-    const handleBuscar = (e: React.FormEvent) => {
+    const handleBuscar = (e: React.SubmitEvent) => {
         e.preventDefault();
-        router.get('/buscar', {
-            termo: inputTermo,
-            precoMax: inputPreco,
-            page: 0,
-            size: filters.size
-        }, { preserveState: true });
+        router.get(
+            '/buscar',
+            {
+                termo: inputTermo,
+                precoMax: inputPreco,
+                page: 0,
+                size: filters.size,
+            },
+            { preserveState: true },
+        );
     };
 
     const handleMudarPagina = (novaPagina: number) => {
-        router.get('/buscar', { ...filters, page: novaPagina }, { preserveState: true });
+        router.get(
+            '/buscar',
+            { ...filters, page: novaPagina },
+            { preserveState: true },
+        );
     };
 
-    const handleMudarTamanhoPagina = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        router.get('/buscar', { ...filters, size: Number(e.target.value), page: 0 }, { preserveState: true });
+    const handleMudarTamanhoPagina = (
+        e: React.ChangeEvent<HTMLSelectElement>,
+    ) => {
+        router.get(
+            '/buscar',
+            { ...filters, size: Number(e.target.value), page: 0 },
+            { preserveState: true },
+        );
     };
 
     return (
@@ -55,26 +77,32 @@ export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps
                 {/* Sidebar de Filtros */}
                 <aside className="z-10 w-full shrink-0 bg-white p-6 shadow-lg lg:w-80">
                     <div className="mb-8 flex justify-center">
-                        <img src="/logo.png" alt="Logo" className="w-32 object-contain" />
+                        <img
+                            src="/logo.png"
+                            alt="Logo"
+                            className="w-32 object-contain"
+                        />
                     </div>
 
                     <form onSubmit={handleBuscar} className="space-y-6">
                         <div>
-                            <label className="mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500">
-                                <FaMoneyCheckAlt /> Preço Máximo
+                            <label className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wider text-gray-500 uppercase">
+                                <CreditCard /> Preço Máximo
                             </label>
                             <input
                                 type="number"
                                 value={inputPreco}
-                                onChange={(e) => setInputPreco(Number(e.target.value))}
+                                onChange={(e) =>
+                                    setInputPreco(Number(e.target.value))
+                                }
                                 placeholder="Ex: 2000"
                                 className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
 
                         <div>
-                            <label className="mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500">
-                                <PiPackageBold /> Pacotes por página
+                            <label className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wider text-gray-500 uppercase">
+                                <Package /> Pacotes por página
                             </label>
                             <select
                                 value={filters.size}
@@ -102,7 +130,7 @@ export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps
                     {/* Barra de Busca Topo */}
                     <div className="mx-auto mb-8 max-w-4xl">
                         <div className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-700">
-                            <MdOutlineTravelExplore />
+                            <MapPinned />
                             <span>Encontre seu destino</span>
                         </div>
                         <form onSubmit={handleBuscar} className="flex gap-4">
@@ -129,14 +157,18 @@ export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps
                                 {paginacao.totalElements} Pacotes encontrados
                             </h2>
                             <span className="text-sm text-gray-500">
-                                Página {paginacao.page + 1} de {paginacao.totalPages}
+                                Página {paginacao.page + 1} de{' '}
+                                {paginacao.totalPages}
                             </span>
                         </div>
 
                         {pacotes.length > 0 ? (
                             <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {pacotes.map((pacote) => (
-                                    <PacoteCard key={pacote.id} pacote={pacote} />
+                                    <PacoteCard
+                                        key={pacote.id}
+                                        pacote={pacote}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -151,45 +183,66 @@ export default function Buscar({ pacotes = [], filters, paginacao }: BuscarProps
                         {paginacao.totalPages > 1 && (
                             <div className="mt-8 flex items-center justify-center gap-6">
                                 <button
-                                    onClick={() => handleMudarPagina(paginacao.page - 1)}
+                                    onClick={() =>
+                                        handleMudarPagina(paginacao.page - 1)
+                                    }
                                     disabled={paginacao.page === 0}
                                     className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    <FaChevronLeft />
+                                    <ChevronLeft />
                                 </button>
 
                                 <div className="flex gap-2">
-                                    {Array.from({ length: Math.min(5, paginacao.totalPages) }, (_, i) => {
-                                        let p = i;
-                                        if (paginacao.totalPages > 5 && paginacao.page > 2) {
-                                            p = paginacao.page - 2 + i;
-                                            if (p >= paginacao.totalPages) p = i;
-                                        }
+                                    {Array.from(
+                                        {
+                                            length: Math.min(
+                                                5,
+                                                paginacao.totalPages,
+                                            ),
+                                        },
+                                        (_, i) => {
+                                            let p = i;
+                                            if (
+                                                paginacao.totalPages > 5 &&
+                                                paginacao.page > 2
+                                            ) {
+                                                p = paginacao.page - 2 + i;
+                                                if (p >= paginacao.totalPages)
+                                                    p = i;
+                                            }
 
-                                        if (p < paginacao.totalPages)
-                                            return (
-                                                <button
-                                                    key={p}
-                                                    onClick={() => handleMudarPagina(p)}
-                                                    className={`w-10 h-10 rounded-lg font-medium transition ${
-                                                        paginacao.page === p
-                                                            ? 'bg-[#2071b3] text-white'
-                                                            : 'bg-white text-gray-600 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    {p + 1}
-                                                </button>
-                                            );
-                                        return null;
-                                    })}
+                                            if (p < paginacao.totalPages)
+                                                return (
+                                                    <button
+                                                        key={p}
+                                                        onClick={() =>
+                                                            handleMudarPagina(p)
+                                                        }
+                                                        className={`h-10 w-10 rounded-lg font-medium transition ${
+                                                            paginacao.page === p
+                                                                ? 'bg-[#2071b3] text-white'
+                                                                : 'bg-white text-gray-600 hover:bg-gray-100'
+                                                        }`}
+                                                    >
+                                                        {p + 1}
+                                                    </button>
+                                                );
+                                            return null;
+                                        },
+                                    )}
                                 </div>
 
                                 <button
-                                    onClick={() => handleMudarPagina(paginacao.page + 1)}
-                                    disabled={paginacao.page === paginacao.totalPages - 1}
+                                    onClick={() =>
+                                        handleMudarPagina(paginacao.page + 1)
+                                    }
+                                    disabled={
+                                        paginacao.page ===
+                                        paginacao.totalPages - 1
+                                    }
                                     className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    <FaChevronRight />
+                                    <ChevronRight />
                                 </button>
                             </div>
                         )}

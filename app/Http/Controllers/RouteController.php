@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Models\Compra;
+use App\Models\Pacote;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,27 +15,52 @@ class RouteController extends Controller
 {
     public function index(Request $request): Response
     {
+        $pacotes = Pacote::with(['fotos_do_pacote', 'tags', 'ofertas.hotel.cidade.estado'])
+            ->latest()
+            ->paginate(12);
+
         return Inertia::render('Index', [
-            'pacotes' => [],
-            'totalPaginas' => 1,
-            'paginaAtual' => (int) $request->get('page', 0),
+            'pacotes' => $pacotes->items(),
+            'totalPaginas' => $pacotes->lastPage(),
+            'paginaAtual' => $pacotes->currentPage() - 1,
         ]);
     }
 
     public function buscar(Request $request): Response
     {
+        $termo = $request->get('termo', '');
+        $precoMax = (int) $request->get('precoMax', 0);
+        $size = (int) $request->get('size', 12);
+
+        $query = Pacote::with(['fotos_do_pacote', 'tags', 'ofertas.hotel.cidade.estado']);
+
+        if ($termo) {
+            $query->where(function ($q) use ($termo) {
+                $q->where('nome', 'like', "%{$termo}%")
+                    ->orWhere('descricao', 'like', "%{$termo}%");
+            });
+        }
+
+        if ($precoMax > 0) {
+            $query->whereHas('ofertas', function ($q) use ($precoMax) {
+                $q->where('preco', '<=', $precoMax);
+            });
+        }
+
+        $pacotes = $query->latest()->paginate($size);
+
         return Inertia::render('Buscar', [
-            'pacotes' => [],
+            'pacotes' => $pacotes->items(),
             'filters' => [
-                'termo' => $request->get('termo', ''),
-                'precoMax' => (int) $request->get('precoMax', 0),
-                'page' => (int) $request->get('page', 0),
-                'size' => (int) $request->get('size', 12),
+                'termo' => $termo,
+                'precoMax' => $precoMax,
+                'page' => $pacotes->currentPage() - 1,
+                'size' => $size,
             ],
             'paginacao' => [
-                'page' => (int) $request->get('page', 0),
-                'totalPages' => 1,
-                'totalElements' => 0,
+                'page' => $pacotes->currentPage() - 1,
+                'totalPages' => $pacotes->lastPage(),
+                'totalElements' => $pacotes->total(),
             ],
         ]);
     }
@@ -114,18 +141,37 @@ class RouteController extends Controller
 
     public function pacote(string $nome): Response
     {
+        $pacote = Pacote::where('nome', $nome)->with([
+            'fotos_do_pacote.fotos',
+            'tags',
+            'ofertas' => function ($query) {
+                $query->where('is_available', true)
+                    ->with(['hotel.cidade.estado', 'transporte']);
+            },
+        ])->firstOrFail();
+
         return Inertia::render('Pacote/Detalhes', [
-            'nome' => $nome,
-            'pacote' => null, // Placeholder
+            'pacote' => $pacote,
         ]);
     }
 
-    public function usuarioViagemListar(Request $request, string $usuario): Response
+    public function usuarioViagemListar(Request $request, User $user): Response
     {
         $view = $request->query('view', 'andamento');
-        $user = auth()->user();
+        $auth = auth()->user();
 
-        $query = Compra::with(['oferta.pacote.fotosDoPacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
+        // Authorization logic
+        if ($auth->id !== $user->id) {
+            if ($auth->role === UserRole::USUARIO) {
+                abort(403, 'Acesso negado.');
+            }
+            if ($auth->role === UserRole::FUNCIONARIO && $user->role !== UserRole::USUARIO) {
+                abort(403, 'Funcionários só podem visualizar histórico de usuários comuns.');
+            }
+        }
+
+        $query = Compra::query()
+            ->with(['oferta.pacote.fotos_do_pacote.fotos', 'oferta.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
             ->where('user_id', $user->id);
 
         if ($view === 'concluidas') {
@@ -138,17 +184,35 @@ class RouteController extends Controller
             });
         }
 
+        $compras = $query->latest('data_compra')->get();
+
         return Inertia::render('Usuario/Viagem/Listar', [
-            'compras' => $query->get(),
+            'compras' => $compras,
             'view' => $view,
+            'targetUser' => $user->only(['id', 'nome', 'email']),
         ]);
     }
 
-    public function usuarioViagemListarId(string $usuario, string $id): Response
+    public function usuarioViagemListarId(User $user, Compra $compra): Response
     {
-        $compra = Compra::with(['oferta.pacote.fotosDoPacote.fotos', 'oferta.pacote.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags'])
-            ->where('user_id', auth()->id())
-            ->findOrFail($id);
+        $auth = auth()->user();
+
+        // Authorization logic
+        if ($auth->id !== $user->id) {
+            if ($auth->role === UserRole::USUARIO) {
+                abort(403, 'Acesso negado.');
+            }
+            if ($auth->role === UserRole::FUNCIONARIO && $user->role !== UserRole::USUARIO) {
+                abort(403, 'Funcionários só podem visualizar detalhes de viagens de usuários comuns.');
+            }
+        }
+
+        // Security check: ensure the purchase belongs to the user
+        if ($compra->user_id !== $user->id) {
+            abort(404);
+        }
+
+        $compra->load(['oferta.pacote.fotos_do_pacote.fotos', 'oferta.hotel.cidade.estado', 'oferta.transporte', 'oferta.pacote.tags']);
 
         return Inertia::render('Usuario/Viagem/Detalhes', [
             'compra' => $compra,

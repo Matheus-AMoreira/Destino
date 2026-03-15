@@ -3,8 +3,7 @@ import GuestLayout from '@/layouts/GuestLayout';
 import { Pacote } from '@/types/Pacote';
 import { router } from '@inertiajs/react';
 import React, { useState } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { MdOutlineTravelExplore } from 'react-icons/md';
+import { MapPinned, ArrowLeft, ChevronRight } from 'lucide-react';
 
 interface IndexProps {
     pacotes: Pacote[];
@@ -79,7 +78,7 @@ export default function Index({
 
                     <div className="mx-auto mb-8 max-w-2xl px-4">
                         <div className="mb-2 flex items-center justify-center space-x-2 text-lg font-semibold text-gray-700">
-                            <MdOutlineTravelExplore className="text-xl" />
+                            <MapPinned className="text-xl" />
                             <span>Procurar Viagens</span>
                         </div>
 
@@ -116,7 +115,7 @@ export default function Index({
                                     title={pacote.nome}
                                     description={pacote.descricao}
                                     imageUrl={
-                                        pacote.fotosDoPacote?.fotoDoPacote ||
+                                        pacote.fotos_do_pacote?.foto_capa ||
                                         'placeholder'
                                     }
                                     detalharHref={`/pacote/${pacote.nome}`}
@@ -140,7 +139,7 @@ export default function Index({
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
                                 }`}
                             >
-                                <FaChevronLeft />
+                                <ArrowLeft />
                             </button>
 
                             <span className="text-lg font-medium text-gray-700">
@@ -156,7 +155,7 @@ export default function Index({
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
                                 }`}
                             >
-                                <FaChevronRight />
+                                <ChevronRight />
                             </button>
                         </div>
                     )}

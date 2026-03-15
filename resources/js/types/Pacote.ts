@@ -4,14 +4,15 @@ export interface Pacote {
     descricao: string;
     funcionario_id: number;
     pacote_foto_id?: number | null;
-    fotosDoPacote?: {
+    fotos_do_pacote?: {
         id: number;
         nome: string;
-        fotoDoPacote: string;
+        foto_capa: string;
         fotos?: Array<{
             id: number;
             nome: string;
-            url: string;
+            caminho: string;
+            is_url: boolean;
         }>;
     };
     tags?: Array<{

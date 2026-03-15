@@ -21,7 +21,7 @@ class CheckoutController extends Controller
     public function index(Request $request): Response
     {
         $ofertaId = $request->query('ofertaId');
-        $oferta = Oferta::with(['pacote.fotos', 'pacote.hotel.cidade.estado'])->findOrFail($ofertaId);
+        $oferta = Oferta::with(['pacote.fotos_do_pacote', 'hotel.cidade.estado'])->findOrFail($ofertaId);
 
         return Inertia::render('Checkout/Index', [
             'oferta' => $oferta,
@@ -36,6 +36,7 @@ class CheckoutController extends Controller
         $request->validate([
             'oferta_id' => 'required|exists:ofertas,id',
             'metodo' => 'required|string',
+            'processador' => 'required|string',
             'parcelas' => 'required|integer|min:1|max:12',
         ]);
 
@@ -43,15 +44,15 @@ class CheckoutController extends Controller
 
         // --- Mock API Payment Simulation ---
         // In a real application, you would connect to a payment gateway here (Stripe, PayPal, etc.)
-        $paymentApproved = true; 
+        $paymentApproved = true;
         // ------------------------------------
 
         if ($paymentApproved) {
             $compra = Compra::create([
                 'data_compra' => now(),
-                'status' => StatusCompra::CONCLUIDO,
+                'status' => StatusCompra::ACEITO,
                 'metodo' => Metodo::from($request->metodo),
-                'processador_pagamento' => Processador::STRIPE, // Mock processor
+                'processador_pagamento' => Processador::tryFrom($request->processador) ?? Processador::VISA,
                 'parcelas' => $request->parcelas,
                 'valor_final' => $oferta->preco,
                 'user_id' => Auth::id(),
@@ -69,7 +70,7 @@ class CheckoutController extends Controller
      */
     public function confirmacao(string $compraId): Response
     {
-        $compra = Compra::with(['oferta.pacote.fotos', 'oferta.pacote.hotel.cidade.estado'])->findOrFail($compraId);
+        $compra = Compra::with(['oferta.pacote.fotos_do_pacote.fotos', 'oferta.hotel.cidade.estado'])->findOrFail($compraId);
 
         // Security check: ensure the purchase belongs to the authenticated user
         if ($compra->user_id !== Auth::id()) {
