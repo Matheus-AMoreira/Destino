@@ -25,7 +25,7 @@ export default function Modal({ modalData, setModal }: CustomModalProps) {
     }
 
     return (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+        <div className="bg-opacity-50 fixed z-50 flex items-center justify-center rounded-xl border-2 border-gray-600">
             <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
                 <div className="mb-4 text-center">
                     <p className="text-lg font-medium whitespace-pre-line text-gray-800">

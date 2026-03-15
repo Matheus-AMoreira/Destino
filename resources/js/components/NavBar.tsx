@@ -8,6 +8,7 @@ import {
     LogOut,
     PackageSearch,
     MailCheck,
+    CircleArrowRight,
 } from 'lucide-react';
 
 export default function Navbar() {
