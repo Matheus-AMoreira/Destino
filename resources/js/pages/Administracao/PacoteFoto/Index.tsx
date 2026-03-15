@@ -5,7 +5,9 @@ import { Camera, Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 interface PacoteFotoData {
     id: number;
     nome: string;
-    foto_do_pacote: string | null;
+    foto_capa: string | null;
+    storage_type: 'local' | 'cloud';
+    items_count: number;
 }
 
 interface Props {
@@ -49,10 +51,10 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                 {pacoteFotos.length > 0 ? (
                     pacoteFotos.map((album) => (
                         <div key={album.id} className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-                            <div className="aspect-video w-full overflow-hidden bg-gray-100">
-                                {album.foto_do_pacote ? (
+                            <div className="aspect-video w-full overflow-hidden bg-gray-100 relative">
+                                {album.foto_capa ? (
                                     <img 
-                                        src={album.foto_do_pacote} 
+                                        src={album.foto_capa} 
                                         alt={album.nome}
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
@@ -61,6 +63,14 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                                         <ImageIcon size={48} />
                                     </div>
                                 )}
+                                <div className="absolute top-2 left-2 flex gap-2">
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${album.storage_type === 'cloud' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}>
+                                        {album.storage_type}
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-600 text-white">
+                                        {album.items_count} Fotos
+                                    </span>
+                                </div>
                             </div>
                             <div className="p-4">
                                 <h3 className="mb-3 font-bold text-gray-900 truncate">{album.nome}</h3>
