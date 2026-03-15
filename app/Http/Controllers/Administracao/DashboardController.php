@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Administracao;
 
 use App\Http\Controllers\Controller;
 use App\Models\Compra;
+use App\Models\Estado;
 use App\Models\Hotel;
 use App\Models\Oferta;
 use App\Models\Pacote;
+use App\Models\Regiao;
 use App\Models\Transporte;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -60,10 +62,49 @@ class DashboardController extends Controller
                 return $item;
             });
 
+        // Estatísticas de Destinos Populares
+        $regiaoId = $request->get('regiao_id');
+        $estadoId = $request->get('estado_id');
+
+        $queryDestinos = DB::table('compras')
+            ->join('ofertas', 'compras.oferta_id', '=', 'ofertas.id')
+            ->join('hotels', 'ofertas.hotel_id', '=', 'hotels.id')
+            ->join('cidades', 'hotels.cidade_id', '=', 'cidades.id')
+            ->join('estados', 'cidades.estado_id', '=', 'estados.id')
+            ->join('regiaos', 'estados.regiao_id', '=', 'regiaos.id')
+            ->select(
+                'cidades.nome as cidade',
+                'estados.sigla as estado',
+                DB::raw('count(compras.id) as total')
+            )
+            ->where('compras.status', '=', 'ACEITO')
+            ->whereRaw("CAST($yearSql AS INTEGER) = ?", [$ano]);
+
+        if ($regiaoId) {
+            $queryDestinos->where('regiaos.id', $regiaoId);
+        }
+
+        if ($estadoId) {
+            $queryDestinos->where('estados.id', $estadoId);
+        }
+
+        $destinosPopulares = $queryDestinos
+            ->groupBy('cidades.id', 'cidades.nome', 'estados.sigla')
+            ->orderBy('total', 'desc')
+            ->limit(10)
+            ->get();
+
         return Inertia::render('Administracao/Dashboard/Estatisticas', [
             'dados' => $dados,
+            'destinosPopulares' => $destinosPopulares,
             'ano' => $ano,
             'anosDisponiveis' => $anosDisponiveis,
+            'regioes' => Regiao::all(),
+            'estados' => Estado::all(),
+            'filtros' => [
+                'regiao_id' => $regiaoId,
+                'estado_id' => $estadoId,
+            ],
         ]);
     }
 }
