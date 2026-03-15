@@ -6,10 +6,9 @@ import {
     ShieldUser,
     ChevronDown,
     LogOut,
+    PackageSearch,
+    MailCheck,
 } from 'lucide-react';
-import { BiSolidLogInCircle } from 'react-icons/bi';
-import { LuPackageSearch } from 'react-icons/lu';
-import { MdContactMail } from 'react-icons/md';
 
 export default function Navbar() {
     const { auth } = usePage().props as any;
@@ -32,14 +31,14 @@ export default function Navbar() {
                         data={{ termo: '', precoMax: 0, page: 0, size: 12 }}
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
-                        <LuPackageSearch className="text-xl" />
+                        <PackageSearch className="text-xl" />
                         <span>Buscar Pacotes</span>
                     </Link>
                     <Link
                         href="/contato"
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
-                        <MdContactMail className="text-xl" />
+                        <MailCheck className="text-xl" />
                         <span>Contato</span>
                     </Link>
                     {auth?.user ? (
@@ -76,7 +75,7 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        usuario: auth.user.nome,
+                                        user: auth.user.id,
                                         view: 'andamento',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
@@ -87,13 +86,21 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        usuario: auth.user.nome,
+                                        user: auth.user.id,
                                         view: 'concluidas',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <History />
                                     <span>Histórico de Compra</span>
+                                </Link>
+
+                                <Link
+                                    href={route('usuario.perfil.edit')}
+                                    className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                                >
+                                    <User size={18} />
+                                    <span>Editar Perfil</span>
                                 </Link>
 
                                 <div className="mt-1 border-t border-gray-50 pt-1">
@@ -114,7 +121,7 @@ export default function Navbar() {
                             href="/entrar"
                             className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                         >
-                            <BiSolidLogInCircle />
+                            <CircleArrowRight />
                             <span>Conecte-se</span>
                         </Link>
                     )}

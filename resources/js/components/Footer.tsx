@@ -1,10 +1,14 @@
 import { Link } from '@inertiajs/react';
-import React from 'react';
-import { BsFillTelephoneFill } from 'react-icons/bs';
-import { FaFacebookSquare } from 'react-icons/fa';
-import { MdContactMail, MdEmail, MdPlace } from 'react-icons/md';
-import { PiInstagramLogoFill, PiMapPinAreaFill } from 'react-icons/pi';
-import { RiUserFollowFill } from 'react-icons/ri';
+import {
+    Facebook,
+    Instagram,
+    Mail,
+    MailCheck,
+    MapPin,
+    MapPinned,
+    Phone,
+    UserCheck,
+} from 'lucide-react';
 
 export default function Footer() {
     return (
@@ -14,33 +18,45 @@ export default function Footer() {
                     <img
                         src="/logo.png"
                         alt="Logo"
-                        className="w-65 mb-4 select-none pl-15 pt-4"
+                        className="mb-4 w-65 pt-4 pl-15 select-none"
                     />
                 </div>
 
                 <div>
                     <h3 className="mb-4 flex items-center space-x-2 text-xl font-bold text-blue-700">
-                        <PiMapPinAreaFill className="text-2xl" />
+                        <MapPinned className="text-2xl" />
                         <span>Navegação</span>
                     </h3>
                     <ul className="space-y-2">
                         <li>
-                            <Link href="/" className="text-white drop-shadow-md transition hover:text-[#2071b3]">
+                            <Link
+                                href="/"
+                                className="text-white drop-shadow-md transition hover:text-[#2071b3]"
+                            >
                                 Início
                             </Link>
                         </li>
                         <li>
-                            <Link href="/buscar" className="text-white drop-shadow-md transition hover:text-[#2071b3]">
+                            <Link
+                                href="/buscar"
+                                className="text-white drop-shadow-md transition hover:text-[#2071b3]"
+                            >
                                 Pacotes
                             </Link>
                         </li>
                         <li>
-                            <Link href="/entrar" className="text-white drop-shadow-md transition hover:text-[#2071b3]">
+                            <Link
+                                href="/entrar"
+                                className="text-white drop-shadow-md transition hover:text-[#2071b3]"
+                            >
                                 Login
                             </Link>
                         </li>
                         <li>
-                            <Link href="/cadastro" className="text-white drop-shadow-md transition hover:text-[#2071b3]">
+                            <Link
+                                href="/cadastro"
+                                className="text-white drop-shadow-md transition hover:text-[#2071b3]"
+                            >
                                 Cadastro
                             </Link>
                         </li>
@@ -49,20 +65,20 @@ export default function Footer() {
 
                 <div>
                     <h3 className="mb-4 flex items-center space-x-2 text-xl font-bold text-blue-700">
-                        <MdContactMail className="text-2xl" />
+                        <MailCheck className="text-2xl" />
                         <span>Contato</span>
                     </h3>
                     <ul className="space-y-2 text-white drop-shadow-md">
                         <li className="flex items-center space-x-2">
-                            <BsFillTelephoneFill className="text-xl" />
+                            <Phone className="text-xl" />
                             <span>(11) 4002-8922</span>
                         </li>
                         <li className="flex items-center space-x-2">
-                            <MdEmail className="text-xl" />
+                            <Mail className="text-xl" />
                             <span>contato@destinoviagens.com</span>
                         </li>
                         <li className="flex items-center space-x-2">
-                            <MdPlace className="text-xl" />
+                            <MapPin className="text-xl" />
                             <span>São Paulo - Lorena</span>
                         </li>
                     </ul>
@@ -70,16 +86,22 @@ export default function Footer() {
 
                 <div>
                     <h3 className="mb-4 flex items-center space-x-2 text-xl font-bold text-blue-700">
-                        <RiUserFollowFill className="text-2xl" />
+                        <UserCheck className="text-2xl" />
                         <span>Siga-nos</span>
                     </h3>
                     <div className="flex space-x-4">
-                        <a href="#" className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]">
-                            <FaFacebookSquare className="text-2xl" />
+                        <a
+                            href="#"
+                            className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
+                        >
+                            <Facebook className="text-2xl" />
                             <span>Facebook</span>
                         </a>
-                        <a href="#" className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]">
-                            <PiInstagramLogoFill className="text-2xl" />
+                        <a
+                            href="#"
+                            className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
+                        >
+                            <Instagram className="text-2xl" />
                             <span>Instagram</span>
                         </a>
                     </div>
