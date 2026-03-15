@@ -16,7 +16,13 @@ export default function Sidebar() {
     const { url } = usePage();
     const [isAdminOpen, setIsAdminOpen] = useState(true);
 
-    const isActive = (path: string) => url.startsWith(path);
+    const isActive = (path: string) => {
+        if (path === '/administracao/dashboard') {
+            return url === path;
+        }
+        // Ensure /administracao/pacote doesn't match /administracao/pacotedefoto
+        return url === path || url.startsWith(`${path}/`);
+    };
 
     const linkClass = (path: string, isSubItem = false) => `
         flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition-colors mb-1
