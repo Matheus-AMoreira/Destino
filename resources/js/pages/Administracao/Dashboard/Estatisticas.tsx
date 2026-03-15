@@ -31,6 +31,11 @@ interface DestinoPopular {
     total: number;
 }
 
+interface UserCrescimento {
+    ano: number;
+    total: number;
+}
+
 interface Regiao {
     id: string;
     nome: string;
@@ -46,6 +51,7 @@ interface Estado {
 interface Props {
     dados: DadoCompra[];
     destinosPopulares: DestinoPopular[];
+    crescimentoUsuarios: UserCrescimento[];
     ano: number;
     anosDisponiveis: number[];
     regioes: Regiao[];
@@ -56,11 +62,12 @@ interface Props {
     };
 }
 
-type TabType = 'vendas' | 'destinos';
+type TabType = 'vendas' | 'destinos' | 'usuarios';
 
 export default function Estatisticas({
     dados,
     destinosPopulares,
+    crescimentoUsuarios,
     ano,
     anosDisponiveis,
     regioes,
@@ -70,8 +77,11 @@ export default function Estatisticas({
     const [activeTab, setActiveTab] = useState<TabType>('vendas');
     const chartRef = useRef<HTMLCanvasElement>(null);
     const destinosChartRef = useRef<HTMLCanvasElement>(null);
+    const usersChartRef = useRef<HTMLCanvasElement>(null);
+
     const chartInstance = useRef<Chart | null>(null);
     const destinosChartInstance = useRef<Chart | null>(null);
+    const usersChartInstance = useRef<Chart | null>(null);
 
     const labels = [
         'Jan',
@@ -142,30 +152,56 @@ export default function Estatisticas({
         };
     }, [destinosPopulares]);
 
+    const usersChartData = useMemo(() => {
+        return {
+            labels: crescimentoUsuarios.map((u) => u.ano.toString()),
+            datasets: [
+                {
+                    label: 'Usuários Cadastrados',
+                    data: crescimentoUsuarios.map((u) => u.total),
+                    backgroundColor: '#8b5cf6', // Violet 500
+                    borderRadius: 8,
+                    barThickness: 48,
+                },
+            ],
+        };
+    }, [crescimentoUsuarios]);
+
     useEffect(() => {
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1f2937',
+                    padding: 12,
+                    cornerRadius: 8,
+                },
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f3f4f6' },
+                    ticks: { stepSize: 1 },
+                },
+            },
+        };
+
         if (activeTab === 'vendas' && chartRef.current) {
-            if (chartInstance.current) chartInstance.current.destroy();
+            chartInstance.current?.destroy();
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
                     data: chartData,
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false,
-                            },
-                        },
+                        ...chartOptions,
                         scales: {
-                            x: { stacked: true, grid: { display: false } },
-                            y: {
-                                stacked: true,
-                                beginAtZero: true,
-                                grid: { color: '#f3f4f6' },
-                                ticks: { stepSize: 1 },
-                            },
+                            ...chartOptions.scales,
+                            x: { ...chartOptions.scales.x, stacked: true },
+                            y: { ...chartOptions.scales.y, stacked: true },
                         },
                     },
                 });
@@ -173,34 +209,25 @@ export default function Estatisticas({
         }
 
         if (activeTab === 'destinos' && destinosChartRef.current) {
-            if (destinosChartInstance.current)
-                destinosChartInstance.current.destroy();
+            destinosChartInstance.current?.destroy();
             const ctx = destinosChartRef.current.getContext('2d');
             if (ctx) {
                 destinosChartInstance.current = new Chart(ctx, {
                     type: 'bar',
                     data: destinosChartData,
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#1f2937',
-                                padding: 12,
-                                cornerRadius: 8,
-                            },
-                        },
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                grid: { color: '#f3f4f6' },
-                                ticks: { stepSize: 1 },
-                            },
-                            y: { grid: { display: false } },
-                        },
-                    },
+                    options: chartOptions,
+                });
+            }
+        }
+
+        if (activeTab === 'usuarios' && usersChartRef.current) {
+            usersChartInstance.current?.destroy();
+            const ctx = usersChartRef.current.getContext('2d');
+            if (ctx) {
+                usersChartInstance.current = new Chart(ctx, {
+                    type: 'bar',
+                    data: usersChartData,
+                    options: chartOptions,
                 });
             }
         }
@@ -208,20 +235,13 @@ export default function Estatisticas({
         return () => {
             chartInstance.current?.destroy();
             destinosChartInstance.current?.destroy();
+            usersChartInstance.current?.destroy();
         };
-    }, [activeTab, chartData, destinosChartData]);
+    }, [activeTab, chartData, destinosChartData, usersChartData]);
 
     const totalVendas = useMemo(
         () => dados.reduce((acc, curr) => acc + curr.total, 0),
         [dados],
-    );
-    const totalDestinos = useMemo(
-        () =>
-            destinosPopulares.reduce(
-                (acc, curr) => acc + Number(curr.total),
-                0,
-            ),
-        [destinosPopulares],
     );
 
     const handleFilterChange = (key: string, value: any) => {
@@ -260,7 +280,7 @@ export default function Estatisticas({
                         Estatísticas do Sistema
                     </h1>
                     <p className="mt-1 font-medium text-gray-500">
-                        Análise detalhada de vendas e destinos em {ano}.
+                        Análise detalhada de vendas, destinos e usuários.
                     </p>
                 </div>
 
@@ -284,32 +304,28 @@ export default function Estatisticas({
 
             {/* Browser-like Tabs */}
             <div className="mb-0 ml-4 flex w-fit items-center gap-1 rounded-t-3xl border-x border-t border-gray-200 bg-gray-100/50 p-1.5">
-                <button
-                    onClick={() => setActiveTab('vendas')}
-                    className={`flex items-center gap-2 rounded-2xl px-6 py-2.5 text-sm font-bold transition-all ${
-                        activeTab === 'vendas'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-200/50 hover:text-gray-700'
-                    }`}
-                >
-                    <TrendingUp size={18} />
-                    Volume de Vendas
-                </button>
-                <button
-                    onClick={() => setActiveTab('destinos')}
-                    className={`flex items-center gap-2 rounded-2xl px-6 py-2.5 text-sm font-bold transition-all ${
-                        activeTab === 'destinos'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-500 hover:bg-gray-200/50 hover:text-gray-700'
-                    }`}
-                >
-                    <MapPin size={18} />
-                    Destinos Populares
-                </button>
+                <TabButton 
+                    active={activeTab === 'vendas'} 
+                    onClick={() => setActiveTab('vendas')} 
+                    icon={TrendingUp} 
+                    label="Vendas" 
+                />
+                <TabButton 
+                    active={activeTab === 'destinos'} 
+                    onClick={() => setActiveTab('destinos')} 
+                    icon={MapPin} 
+                    label="Destinos" 
+                />
+                <TabButton 
+                    active={activeTab === 'usuarios'} 
+                    onClick={() => setActiveTab('usuarios')} 
+                    icon={Users} 
+                    label="Usuários" 
+                />
             </div>
 
             <div className="relative z-10 mb-8 rounded-tr-[40px] rounded-b-[40px] border border-gray-200 bg-white p-8 shadow-2xl shadow-blue-100/50 transition-all">
-                {activeTab === 'vendas' ? (
+                {activeTab === 'vendas' && (
                     <div>
                         <div className="mb-8 flex items-center justify-between">
                             <div>
@@ -321,18 +337,9 @@ export default function Estatisticas({
                                 </p>
                             </div>
                             <div className="flex items-center gap-4 sm:flex">
-                                <LegendItem
-                                    color="bg-emerald-500"
-                                    label="Concluído"
-                                />
-                                <LegendItem
-                                    color="bg-amber-500"
-                                    label="Em Andamento"
-                                />
-                                <LegendItem
-                                    color="bg-red-500"
-                                    label="Cancelado"
-                                />
+                                <LegendItem color="bg-emerald-500" label="Concluído" />
+                                <LegendItem color="bg-amber-500" label="Em Andamento" />
+                                <LegendItem color="bg-red-500" label="Cancelado" />
                             </div>
                         </div>
 
@@ -340,14 +347,13 @@ export default function Estatisticas({
                             {totalVendas > 0 ? (
                                 <canvas ref={chartRef}></canvas>
                             ) : (
-                                <EmptyState
-                                    icon={BarChart3}
-                                    message="Sem vendas registradas neste ano"
-                                />
+                                <EmptyState icon={BarChart3} message="Sem vendas registradas neste ano" />
                             )}
                         </div>
                     </div>
-                ) : (
+                )}
+
+                {activeTab === 'destinos' && (
                     <div>
                         <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                             <div>
@@ -355,63 +361,25 @@ export default function Estatisticas({
                                     Destinos Mais Procurados
                                 </h3>
                                 <p className="mt-1 text-sm text-gray-500">
-                                    Cidades com maior volume de compras
-                                    aprovadas
+                                    Top cidades com vendas aprovadas
                                 </p>
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
-                                <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
-                                    <Globe
-                                        size={16}
-                                        className="ml-2 text-gray-400"
-                                    />
-                                    <select
-                                        value={filtros.regiao_id || ''}
-                                        onChange={(e) =>
-                                            handleFilterChange(
-                                                'regiao_id',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="cursor-pointer border-none bg-transparent pr-8 text-xs font-bold text-gray-600 focus:ring-0"
-                                    >
-                                        <option value="">
-                                            Todas as Regiões
-                                        </option>
-                                        {regioes.map((r) => (
-                                            <option key={r.id} value={r.id}>
-                                                {r.nome}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
-                                    <Building2
-                                        size={16}
-                                        className="ml-2 text-gray-400"
-                                    />
-                                    <select
-                                        value={filtros.estado_id || ''}
-                                        onChange={(e) =>
-                                            handleFilterChange(
-                                                'estado_id',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="cursor-pointer border-none bg-transparent pr-8 text-xs font-bold text-gray-600 focus:ring-0"
-                                    >
-                                        <option value="">
-                                            Todos os Estados
-                                        </option>
-                                        {estadosFiltrados.map((e) => (
-                                            <option key={e.id} value={e.id}>
-                                                {e.nome}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <FilterSelect 
+                                    icon={Globe} 
+                                    value={filtros.regiao_id || ''} 
+                                    onChange={(v) => handleFilterChange('regiao_id', v)}
+                                    options={regioes.map(r => ({ value: r.id, label: r.nome }))}
+                                    placeholder="Todas as Regiões"
+                                />
+                                <FilterSelect 
+                                    icon={Building2} 
+                                    value={filtros.estado_id || ''} 
+                                    onChange={(v) => handleFilterChange('estado_id', v)}
+                                    options={estadosFiltrados.map(e => ({ value: e.id, label: e.nome }))}
+                                    placeholder="Todos os Estados"
+                                />
                             </div>
                         </div>
 
@@ -419,16 +387,70 @@ export default function Estatisticas({
                             {destinosPopulares.length > 0 ? (
                                 <canvas ref={destinosChartRef}></canvas>
                             ) : (
-                                <EmptyState
-                                    icon={MapPin}
-                                    message="Nenhum destino encontrado para estes filtros"
-                                />
+                                <EmptyState icon={MapPin} message="Nenhum destino encontrado" />
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'usuarios' && (
+                    <div>
+                        <div className="mb-8">
+                            <h3 className="text-xl font-bold text-gray-900">
+                                Evolução de Usuários Cadastrados
+                            </h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Crescimento da base de usuários ao longo do tempo
+                            </p>
+                        </div>
+
+                        <div className="h-112.5 w-full">
+                            {crescimentoUsuarios.length > 0 ? (
+                                <canvas ref={usersChartRef}></canvas>
+                            ) : (
+                                <EmptyState icon={Users} message="Dados de usuários indisponíveis" />
                             )}
                         </div>
                     </div>
                 )}
             </div>
         </AdminLayout>
+    );
+}
+
+function TabButton({ active, onClick, icon: Icon, label }: { active: boolean, onClick: () => void, icon: any, label: string }) {
+    return (
+        <button
+            onClick={onClick}
+            className={`flex items-center gap-2 rounded-2xl px-6 py-2.5 text-sm font-bold transition-all ${
+                active
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:bg-gray-200/50 hover:text-gray-700'
+            }`}
+        >
+            <Icon size={18} />
+            {label}
+        </button>
+    );
+}
+
+function FilterSelect({ icon: Icon, value, onChange, options, placeholder }: { icon: any, value: string, onChange: (v: string) => void, options: { value: string, label: string }[], placeholder: string }) {
+    return (
+        <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
+            <Icon size={16} className="ml-2 text-gray-400" />
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="cursor-pointer border-none bg-transparent pr-8 text-xs font-bold text-gray-600 focus:ring-0"
+            >
+                <option value="">{placeholder}</option>
+                {options.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                    </option>
+                ))}
+            </select>
+        </div>
     );
 }
 

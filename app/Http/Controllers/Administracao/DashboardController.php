@@ -94,9 +94,17 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
+        // Crescimento de Usuários por Ano
+        $userYearSql = $isPgsql ? 'EXTRACT(YEAR FROM created_at)' : 'YEAR(created_at)';
+        $crescimentoUsuarios = User::selectRaw("CAST($userYearSql AS INTEGER) as ano, count(*) as total")
+            ->groupBy('ano')
+            ->orderBy('ano', 'asc')
+            ->get();
+
         return Inertia::render('Administracao/Dashboard/Estatisticas', [
             'dados' => $dados,
             'destinosPopulares' => $destinosPopulares,
+            'crescimentoUsuarios' => $crescimentoUsuarios,
             'ano' => $ano,
             'anosDisponiveis' => $anosDisponiveis,
             'regioes' => Regiao::all(),
