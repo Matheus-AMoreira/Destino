@@ -32,6 +32,7 @@ class ImportIbgeData extends Command
     {
         if (Cidade::count() > 0) {
             $this->info('Dados de localização já existem no banco.');
+
             return;
         }
 
@@ -82,8 +83,8 @@ class ImportIbgeData extends Command
             $this->info('Carga de dados concluída com sucesso!');
 
         } catch (\Exception $e) {
-            $this->error('Erro ao carregar dados do IBGE: ' . $e->getMessage());
-            Log::error('Erro ao carregar dados do IBGE: ' . $e->getMessage());
+            $this->error('Erro ao carregar dados do IBGE: '.$e->getMessage());
+            Log::error('Erro ao carregar dados do IBGE: '.$e->getMessage());
         }
     }
 }
