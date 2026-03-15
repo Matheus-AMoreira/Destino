@@ -19,7 +19,7 @@ class PacoteController extends Controller
     public function index(): Response
     {
         return Inertia::render('Administracao/Pacote/Index', [
-            'pacotes' => Pacote::with(['funcionario', 'fotosDoPacote'])->get(),
+            'pacotes' => Pacote::with(['funcionario', 'fotos_do_pacote'])->get(),
         ]);
     }
 
