@@ -1,4 +1,3 @@
-import AdminLayout from '@/layouts/AdminLayout';
 import { Head, router, Link } from '@inertiajs/react';
 import { Chart, registerables } from 'chart.js';
 import {
@@ -6,16 +5,13 @@ import {
     ChevronLeft,
     TrendingUp,
     BarChart3,
-    PieChart,
-    ArrowUpRight,
     Users,
-    Package,
     MapPin,
     Globe,
     Building2,
-    Filter,
 } from 'lucide-react';
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
+import AdminLayout from '@/layouts/AdminLayout';
 
 Chart.register(...registerables);
 
@@ -107,6 +103,7 @@ export default function Estatisticas({
 
         dados.forEach((d) => {
             const status = d.status as keyof typeof datasets;
+
             if (datasets[status]) {
                 datasets[status][d.mes - 1] = d.total;
             }
@@ -192,6 +189,7 @@ export default function Estatisticas({
         if (activeTab === 'vendas' && chartRef.current) {
             chartInstance.current?.destroy();
             const ctx = chartRef.current.getContext('2d');
+
             if (ctx) {
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -211,6 +209,7 @@ export default function Estatisticas({
         if (activeTab === 'destinos' && destinosChartRef.current) {
             destinosChartInstance.current?.destroy();
             const ctx = destinosChartRef.current.getContext('2d');
+
             if (ctx) {
                 destinosChartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -223,6 +222,7 @@ export default function Estatisticas({
         if (activeTab === 'usuarios' && usersChartRef.current) {
             usersChartInstance.current?.destroy();
             const ctx = usersChartRef.current.getContext('2d');
+
             if (ctx) {
                 usersChartInstance.current = new Chart(ctx, {
                     type: 'bar',
@@ -258,6 +258,7 @@ export default function Estatisticas({
 
     const estadosFiltrados = useMemo(() => {
         if (!filtros.regiao_id) return estados;
+
         return estados.filter((e) => e.regiao_id === filtros.regiao_id);
     }, [estados, filtros.regiao_id]);
 
@@ -304,23 +305,23 @@ export default function Estatisticas({
 
             {/* Browser-like Tabs */}
             <div className="mb-0 ml-4 flex w-fit items-center gap-1 rounded-t-3xl border-x border-t border-gray-200 bg-gray-100/50 p-1.5">
-                <TabButton 
-                    active={activeTab === 'vendas'} 
-                    onClick={() => setActiveTab('vendas')} 
-                    icon={TrendingUp} 
-                    label="Vendas" 
+                <TabButton
+                    active={activeTab === 'vendas'}
+                    onClick={() => setActiveTab('vendas')}
+                    icon={TrendingUp}
+                    label="Vendas"
                 />
-                <TabButton 
-                    active={activeTab === 'destinos'} 
-                    onClick={() => setActiveTab('destinos')} 
-                    icon={MapPin} 
-                    label="Destinos" 
+                <TabButton
+                    active={activeTab === 'destinos'}
+                    onClick={() => setActiveTab('destinos')}
+                    icon={MapPin}
+                    label="Destinos"
                 />
-                <TabButton 
-                    active={activeTab === 'usuarios'} 
-                    onClick={() => setActiveTab('usuarios')} 
-                    icon={Users} 
-                    label="Usuários" 
+                <TabButton
+                    active={activeTab === 'usuarios'}
+                    onClick={() => setActiveTab('usuarios')}
+                    icon={Users}
+                    label="Usuários"
                 />
             </div>
 
@@ -337,9 +338,18 @@ export default function Estatisticas({
                                 </p>
                             </div>
                             <div className="flex items-center gap-4 sm:flex">
-                                <LegendItem color="bg-emerald-500" label="Concluído" />
-                                <LegendItem color="bg-amber-500" label="Em Andamento" />
-                                <LegendItem color="bg-red-500" label="Cancelado" />
+                                <LegendItem
+                                    color="bg-emerald-500"
+                                    label="Concluído"
+                                />
+                                <LegendItem
+                                    color="bg-amber-500"
+                                    label="Em Andamento"
+                                />
+                                <LegendItem
+                                    color="bg-red-500"
+                                    label="Cancelado"
+                                />
                             </div>
                         </div>
 
@@ -347,7 +357,10 @@ export default function Estatisticas({
                             {totalVendas > 0 ? (
                                 <canvas ref={chartRef}></canvas>
                             ) : (
-                                <EmptyState icon={BarChart3} message="Sem vendas registradas neste ano" />
+                                <EmptyState
+                                    icon={BarChart3}
+                                    message="Sem vendas registradas neste ano"
+                                />
                             )}
                         </div>
                     </div>
@@ -366,18 +379,28 @@ export default function Estatisticas({
                             </div>
 
                             <div className="flex flex-wrap items-center gap-3">
-                                <FilterSelect 
-                                    icon={Globe} 
-                                    value={filtros.regiao_id || ''} 
-                                    onChange={(v) => handleFilterChange('regiao_id', v)}
-                                    options={regioes.map(r => ({ value: r.id, label: r.nome }))}
+                                <FilterSelect
+                                    icon={Globe}
+                                    value={filtros.regiao_id || ''}
+                                    onChange={(v) =>
+                                        handleFilterChange('regiao_id', v)
+                                    }
+                                    options={regioes.map((r) => ({
+                                        value: r.id,
+                                        label: r.nome,
+                                    }))}
                                     placeholder="Todas as Regiões"
                                 />
-                                <FilterSelect 
-                                    icon={Building2} 
-                                    value={filtros.estado_id || ''} 
-                                    onChange={(v) => handleFilterChange('estado_id', v)}
-                                    options={estadosFiltrados.map(e => ({ value: e.id, label: e.nome }))}
+                                <FilterSelect
+                                    icon={Building2}
+                                    value={filtros.estado_id || ''}
+                                    onChange={(v) =>
+                                        handleFilterChange('estado_id', v)
+                                    }
+                                    options={estadosFiltrados.map((e) => ({
+                                        value: e.id,
+                                        label: e.nome,
+                                    }))}
                                     placeholder="Todos os Estados"
                                 />
                             </div>
@@ -387,7 +410,10 @@ export default function Estatisticas({
                             {destinosPopulares.length > 0 ? (
                                 <canvas ref={destinosChartRef}></canvas>
                             ) : (
-                                <EmptyState icon={MapPin} message="Nenhum destino encontrado" />
+                                <EmptyState
+                                    icon={MapPin}
+                                    message="Nenhum destino encontrado"
+                                />
                             )}
                         </div>
                     </div>
@@ -400,7 +426,8 @@ export default function Estatisticas({
                                 Evolução de Usuários Cadastrados
                             </h3>
                             <p className="mt-1 text-sm text-gray-500">
-                                Crescimento da base de usuários ao longo do tempo
+                                Crescimento da base de usuários ao longo do
+                                tempo
                             </p>
                         </div>
 
@@ -408,7 +435,10 @@ export default function Estatisticas({
                             {crescimentoUsuarios.length > 0 ? (
                                 <canvas ref={usersChartRef}></canvas>
                             ) : (
-                                <EmptyState icon={Users} message="Dados de usuários indisponíveis" />
+                                <EmptyState
+                                    icon={Users}
+                                    message="Dados de usuários indisponíveis"
+                                />
                             )}
                         </div>
                     </div>
@@ -418,7 +448,17 @@ export default function Estatisticas({
     );
 }
 
-function TabButton({ active, onClick, icon: Icon, label }: { active: boolean, onClick: () => void, icon: any, label: string }) {
+function TabButton({
+    active,
+    onClick,
+    icon: Icon,
+    label,
+}: {
+    active: boolean;
+    onClick: () => void;
+    icon: any;
+    label: string;
+}) {
     return (
         <button
             onClick={onClick}
@@ -434,7 +474,19 @@ function TabButton({ active, onClick, icon: Icon, label }: { active: boolean, on
     );
 }
 
-function FilterSelect({ icon: Icon, value, onChange, options, placeholder }: { icon: any, value: string, onChange: (v: string) => void, options: { value: string, label: string }[], placeholder: string }) {
+function FilterSelect({
+    icon: Icon,
+    value,
+    onChange,
+    options,
+    placeholder,
+}: {
+    icon: any;
+    value: string;
+    onChange: (v: string) => void;
+    options: { value: string; label: string }[];
+    placeholder: string;
+}) {
     return (
         <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1.5">
             <Icon size={16} className="ml-2 text-gray-400" />
@@ -467,7 +519,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
 
 function EmptyState({ icon: Icon, message }: { icon: any; message: string }) {
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-gray-100 bg-gray-50/30 text-gray-400">
+        <div className="flex h-full w-full flex-col items-center justify-center rounded-4xl border-2 border-dashed border-gray-100 bg-gray-50/30 text-gray-400">
             <Icon size={48} className="mb-4 opacity-20" />
             <p className="text-[10px] font-bold tracking-widest uppercase">
                 {message}

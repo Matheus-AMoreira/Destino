@@ -1,5 +1,7 @@
+import Icon from '@/components/Icon';
 import GuestLayout from '@/layouts/GuestLayout';
-import { Phone, Mail, MapPin, Facebook, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
+import Image from '@/components/Image';
 
 export default function Contato() {
     return (
@@ -37,7 +39,11 @@ export default function Contato() {
                                 className="text-gray-900 drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 <div className="flex items-center space-x-2">
-                                    <Facebook />
+                                    <Icon
+                                        name={'facebook'}
+                                        alt={'facebook link'}
+                                        size={'24px'}
+                                    />
                                     <span>Facebook</span>
                                 </div>
                             </a>
@@ -46,7 +52,11 @@ export default function Contato() {
                                 className="text-gray-800 drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 <div className="flex items-center space-x-2">
-                                    <Instagram />
+                                    <Icon
+                                        name={'instagram'}
+                                        alt={'instagram link'}
+                                        size={'24px'}
+                                    />
                                     <span>Instagram</span>
                                 </div>
                             </a>
@@ -54,10 +64,10 @@ export default function Contato() {
                     </div>
 
                     <div className="flex justify-center md:w-1/2">
-                        <img
-                            src="/iconcor.png"
-                            alt="Logo"
-                            className="max-w-87.5 rounded-xl object-contain p-2 shadow-lg"
+                        <Image
+                            name={'logo_cor'}
+                            alt={'Link para a landingpage'}
+                            style="max-w-87.5 rounded-xl object-contain p-2 shadow-lg"
                         />
                     </div>
                 </section>

@@ -11,6 +11,8 @@ import {
     CircleArrowRight,
 } from 'lucide-react';
 
+import Image from '@/components/Image';
+
 export default function Navbar() {
     const { auth } = usePage().props as any;
 
@@ -19,10 +21,10 @@ export default function Navbar() {
             <div className="mx-auto flex max-w-7xl items-center justify-between">
                 <Link href="/" className="pl-0 font-bold text-white">
                     <div className="flex flex-col items-start">
-                        <img
-                            src="/logo.png"
-                            alt="Logo"
-                            className="w-25 select-none"
+                        <Image
+                            name={'logo'}
+                            alt={'Link para a landingpage'}
+                            style="w-25 select-none"
                         />
                     </div>
                 </Link>

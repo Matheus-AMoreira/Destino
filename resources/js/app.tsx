@@ -1,23 +1,33 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import '../css/app.css';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'App';
+
+const pages = import.meta.glob('./pages/**/*.tsx');
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.tsx`,
-            import.meta.glob('./pages/**/*.tsx'),
-        ),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
+    strictMode: true,
 
-        root.render(<App {...props} />);
+    resolve: async (name): Promise<ReactComponent> => {
+        const mod = (await pages[`./pages/${name}.tsx`]?.()) as
+            | { default: ReactComponent }
+            | undefined;
+
+        if (!mod) {
+            throw new Error(`Página não encontrada: ${name}`);
+        }
+
+        return mod.default;
     },
-    progress: {
-        color: '#4B5563',
+
+    setup({ el, App, props }) {
+        if (!el) {
+            throw new Error('Root element not found');
+        }
+
+        createRoot(el).render(<App {...props} />);
     },
+
+    progress: { color: '#4B5563' },
 });

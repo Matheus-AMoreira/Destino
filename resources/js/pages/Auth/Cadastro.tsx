@@ -1,11 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import { z } from 'zod';
 import AuthLogo from '@/components/auth/AuthLogo';
 import CampoInput from '@/components/auth/CampoInput';
+import RequisitosSenha from '@/components/auth/RequisitosSenha';
 import type { ModalData } from '@/components/Modal';
 import CustomModal from '@/components/Modal';
-import { useState } from 'react';
-import RequisitosSenha from '@/components/auth/RequisitosSenha';
 
 const formatarCPF = (val: string) =>
     val
@@ -28,9 +28,7 @@ const schemaCadastro = z
             .string()
             .min(3, 'Mínimo 3 caracteres')
             .regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-        cpf: z
-            .string()
-            .length(11, 'CPF deve ter 11 dígitos'),
+        cpf: z.string().length(11, 'CPF deve ter 11 dígitos'),
         telefone: z
             .string()
             .min(10, 'Telefone inválido')
@@ -42,7 +40,10 @@ const schemaCadastro = z
             .regex(/[A-Z]/, 'Uma letra maiúscula é obrigatória')
             .regex(/[a-z]/, 'Uma letra minúscula é obrigatória')
             .regex(/\d/, 'Um número é obrigatório')
-            .regex(/[@$!%*?&#\-_]/, 'Um caractere especial (@$!%*?&#-_) é obrigatório'),
+            .regex(
+                /[@$!%*?&#\-_]/,
+                'Um caractere especial (@$!%*?&#-_) é obrigatório',
+            ),
         password_confirmation: z.string(),
     })
     .refine((data) => data.password === data.password_confirmation, {
@@ -81,7 +82,7 @@ export default function Cadastro() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
 
         const result = schemaCadastro.safeParse(data);
@@ -117,7 +118,6 @@ export default function Cadastro() {
             },
         });
     };
-
 
     return (
         <div className="flex min-h-screen w-full items-center justify-center overflow-y-auto bg-linear-to-br from-[#fff6ea] via-[#ffffff] to-[#fff6ea] py-8">
