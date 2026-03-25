@@ -1,6 +1,6 @@
-import { Pacote } from '@/types/Pacote';
 import { Link } from '@inertiajs/react';
 import { LocateFixed, Banknote } from 'lucide-react';
+import type { Pacote } from '@/types/Pacote';
 
 const formatarValor = (valor: number) => {
     return new Intl.NumberFormat('pt-BR', {

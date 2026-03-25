@@ -4,6 +4,7 @@ import { Pacote } from '@/types/Pacote';
 import { router } from '@inertiajs/react';
 import React, { useState } from 'react';
 import { MapPinned, ArrowLeft, ChevronRight } from 'lucide-react';
+import Image from '@/components/Image';
 
 interface IndexProps {
     pacotes: Pacote[];
@@ -36,7 +37,7 @@ export default function Index({
     };
 
     return (
-        <GuestLayout title="O Mundo Todo em Suas Mãos">
+        <GuestLayout title="PAULA VIAGENS E TURISMO">
             <main className="grow p-4 md:p-8">
                 <section className="flex flex-wrap items-center gap-8 pt-4">
                     <div className="mb-4 flex w-full flex-col xl:w-[48%]">
@@ -61,10 +62,10 @@ export default function Index({
                         </div>
                     </div>
                     <div className="mt-8 flex w-full justify-center xl:mt-0 xl:w-[48%]">
-                        <img
-                            className="max-w-xgg w-full rounded-3xl shadow-xl"
-                            src="/destaque.jpg"
-                            alt="Destaque"
+                        <Image
+                            name={'destaque'}
+                            alt={'Imagem de destaque'}
+                            style="max-w-xgg w-full rounded-3xl shadow-xl"
                         />
                     </div>
                 </section>

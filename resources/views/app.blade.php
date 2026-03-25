@@ -4,19 +4,16 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <link rel="icon" type="image/png" href="/assets/images/logo_cor.png">
 
-        <link rel="icon" href="/logo_cor.png" sizes="any">
-
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
-        @viteReactRefresh
-        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @routes
-        @inertiaHead
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        <x-inertia::head>
+            <title>{{ config('app.name', 'Laravel') }}</title>
+        </x-inertia::head>
     </head>
     <body class="font-sans antialiased">
-        @inertia
+        <x-inertia::app />
     </body>
 </html>

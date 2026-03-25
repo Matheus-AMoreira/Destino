@@ -23,11 +23,15 @@ export default function Entrar() {
         url: null,
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
         post(route('login'), {
             onError: (err) => {
-                const message = err.email || err.password || err.login || 'Erro ao realizar login.';
+                const message =
+                    err.email ||
+                    err.password ||
+                    err.login ||
+                    'Erro ao realizar login.';
                 setModal({
                     show: true,
                     mensagem: message,
@@ -37,7 +41,7 @@ export default function Entrar() {
         });
     };
 
-    const handleRecovery = (e: React.FormEvent) => {
+    const handleRecovery = (e: React.SubmitEvent) => {
         e.preventDefault();
         recoveryForm.post(route('password.recover'), {
             onSuccess: () => {
@@ -45,16 +49,16 @@ export default function Entrar() {
                 setModal({
                     show: true,
                     mensagem: 'Uma nova senha foi enviada para o seu e-mail.',
-                    url: null
+                    url: null,
                 });
             },
             onError: (err) => {
                 setModal({
                     show: true,
                     mensagem: err.email || 'Erro ao recuperar senha.',
-                    url: null
+                    url: null,
                 });
-            }
+            },
         });
     };
 
@@ -73,7 +77,9 @@ export default function Entrar() {
                                 label="E-mail"
                                 type="email"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) =>
+                                    setData('email', e.target.value)
+                                }
                                 required
                                 maxLength={100}
                             />
@@ -81,7 +87,9 @@ export default function Entrar() {
                                 label="Senha"
                                 type="password"
                                 value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
+                                onChange={(e) =>
+                                    setData('password', e.target.value)
+                                }
                                 required
                                 maxLength={100}
                             />
@@ -98,7 +106,9 @@ export default function Entrar() {
 
                             <button
                                 className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
-                                    processing ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                                    processing
+                                        ? 'cursor-not-allowed opacity-70'
+                                        : 'cursor-pointer'
                                 }`}
                                 type="submit"
                                 disabled={processing}
@@ -109,13 +119,19 @@ export default function Entrar() {
                     ) : (
                         <form onSubmit={handleRecovery}>
                             <p className="mb-6 text-sm text-gray-500">
-                                Digite seu e-mail para receber uma nova senha de acesso.
+                                Digite seu e-mail para receber uma nova senha de
+                                acesso.
                             </p>
                             <CampoInput
                                 label="E-mail"
                                 type="email"
                                 value={recoveryForm.data.email}
-                                onChange={(e) => recoveryForm.setData('email', e.target.value)}
+                                onChange={(e) =>
+                                    recoveryForm.setData(
+                                        'email',
+                                        e.target.value,
+                                    )
+                                }
                                 required
                                 maxLength={100}
                             />
@@ -123,12 +139,16 @@ export default function Entrar() {
                             <div className="flex flex-col gap-3">
                                 <button
                                     className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
-                                        recoveryForm.processing ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                                        recoveryForm.processing
+                                            ? 'cursor-not-allowed opacity-70'
+                                            : 'cursor-pointer'
                                     }`}
                                     type="submit"
                                     disabled={recoveryForm.processing}
                                 >
-                                    {recoveryForm.processing ? 'Enviando...' : 'Recuperar Senha'}
+                                    {recoveryForm.processing
+                                        ? 'Enviando...'
+                                        : 'Recuperar Senha'}
                                 </button>
                                 <button
                                     type="button"
@@ -144,7 +164,7 @@ export default function Entrar() {
                     <p className="mt-6 text-sm text-[#666]">
                         Não possui uma conta?
                         <Link
-                            href="/cadastro"
+                            href={route('cadastro')}
                             className="ml-1 font-bold text-[#007bff] no-underline hover:underline"
                         >
                             Cadastre-se
@@ -154,7 +174,7 @@ export default function Entrar() {
                     <p className="mt-6 text-sm text-[#666]">
                         Voltar para a
                         <Link
-                            href="/"
+                            href={route('home')}
                             className="ml-1 font-bold text-[#007bff] no-underline hover:underline"
                         >
                             Tela Inicial

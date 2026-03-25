@@ -16,6 +16,9 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\Usuario\PerfilController;
+use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RouteController::class, 'index'])->name('home');
@@ -29,7 +32,7 @@ Route::middleware('guest')->group(function () {
     Route::post('recuperar-senha', [PasswordRecoveryController::class, 'recover'])->name('password.recover');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware([Authenticate::class])->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -48,7 +51,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
-Route::group(['prefix' => 'administracao', 'as' => 'administracao.', 'middleware' => ['auth', 'verified', 'admin']], function () {
+Route::middleware([Authenticate::class, EnsureEmailIsVerified::class, AdminMiddleware::class]) -> prefix(('administracao')) -> name('administracao.') ->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas');
     Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
@@ -67,7 +70,7 @@ Route::group(['prefix' => 'administracao', 'as' => 'administracao.', 'middleware
     Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar');
     Route::post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');
     Route::get('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'edit'])->name('pacotedefoto.edit');
-    Route::post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update'); // Using POST for file upload spoofing
+    Route::post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update');
     Route::delete('/pacotedefoto/{pacotedefoto}', [PacoteFotoController::class, 'destroy'])->name('pacotedefoto.destroy');
 
     Route::get('/oferta/listar', [OfertaController::class, 'index'])->name('oferta.listar');

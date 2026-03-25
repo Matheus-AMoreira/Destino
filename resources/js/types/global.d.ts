@@ -6,11 +6,9 @@ declare global {
 }
 
 declare module '@inertiajs/core' {
-    export interface InertiaConfig {
-        sharedPageProps: {
-            auth: Auth;
-            ziggy: any;
-            [key: string]: unknown;
-        };
+    interface PageProps {
+        auth: Auth;
+        ziggy: ReturnType<typeof ziggyRoute> & { location: string };
+        [key: string]: unknown;
     }
 }

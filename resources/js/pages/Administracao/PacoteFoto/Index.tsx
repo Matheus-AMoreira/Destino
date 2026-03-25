@@ -1,6 +1,6 @@
-import AdminLayout from '@/layouts/AdminLayout';
 import { Link, router } from '@inertiajs/react';
 import { Camera, Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
+import AdminLayout from '@/layouts/AdminLayout';
 
 interface PacoteFotoData {
     id: number;
@@ -26,14 +26,16 @@ export default function Index({ pacoteFotos = [], success }: Props) {
         <AdminLayout title="Álbuns de Fotos">
             <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="bg-purple-600 p-2 rounded-lg text-white">
+                    <div className="rounded-lg bg-purple-600 p-2 text-white">
                         <Camera size={24} />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Álbuns de Fotos</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Álbuns de Fotos
+                    </h1>
                 </div>
-                
+
                 <Link
-                    href="/administracao/pacotedefoto/registrar"
+                    href={route('administracao.pacotedefoto.registrar')}
                     className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-purple-700"
                 >
                     <Plus size={20} />
@@ -50,11 +52,14 @@ export default function Index({ pacoteFotos = [], success }: Props) {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {pacoteFotos.length > 0 ? (
                     pacoteFotos.map((album) => (
-                        <div key={album.id} className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-                            <div className="aspect-video w-full overflow-hidden bg-gray-100 relative">
+                        <div
+                            key={album.id}
+                            className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md"
+                        >
+                            <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
                                 {album.foto_capa ? (
-                                    <img 
-                                        src={album.foto_capa} 
+                                    <img
+                                        src={album.foto_capa}
                                         alt={album.nome}
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
@@ -64,16 +69,20 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                                     </div>
                                 )}
                                 <div className="absolute top-2 left-2 flex gap-2">
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${album.storage_type === 'cloud' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}>
+                                    <span
+                                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${album.storage_type === 'cloud' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`}
+                                    >
                                         {album.storage_type}
                                     </span>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-600 text-white">
+                                    <span className="rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase">
                                         {album.items_count} Fotos
                                     </span>
                                 </div>
                             </div>
                             <div className="p-4">
-                                <h3 className="mb-3 font-bold text-gray-900 truncate">{album.nome}</h3>
+                                <h3 className="mb-3 truncate font-bold text-gray-900">
+                                    {album.nome}
+                                </h3>
                                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                                     <Link
                                         href={`/administracao/pacotedefoto/editar/${album.id}`}

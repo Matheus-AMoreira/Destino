@@ -1,7 +1,5 @@
 import { Link } from '@inertiajs/react';
 import {
-    Facebook,
-    Instagram,
     Mail,
     MailCheck,
     MapPin,
@@ -9,16 +7,17 @@ import {
     Phone,
     UserCheck,
 } from 'lucide-react';
-
+import Icon from '@/components/Icon';
+import Image from '@/components/Image';
 export default function Footer() {
     return (
         <footer className="w-full bg-[#ff944d] px-8 py-10 text-blue-900">
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 text-lg md:grid-cols-4">
                 <div className="flex flex-col items-start">
-                    <img
-                        src="/logo.png"
-                        alt="Logo"
-                        className="mb-4 w-65 pt-4 pl-15 select-none"
+                    <Image
+                        name={'logo_cor'}
+                        alt={'Link para a landingpage'}
+                        style="mb-4 w-65 pt-4 pl-15 select-none"
                     />
                 </div>
 
@@ -94,14 +93,22 @@ export default function Footer() {
                             href="#"
                             className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
                         >
-                            <Facebook className="text-2xl" />
+                            <Icon
+                                name={'facebook_white'}
+                                alt={'facebook link'}
+                                size={'24px'}
+                            />
                             <span>Facebook</span>
                         </a>
                         <a
                             href="#"
                             className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
                         >
-                            <Instagram className="text-2xl" />
+                            <Icon
+                                name={'instagram_white'}
+                                alt={'instagram link'}
+                                size={'24px'}
+                            />
                             <span>Instagram</span>
                         </a>
                     </div>

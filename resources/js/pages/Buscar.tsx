@@ -1,6 +1,3 @@
-import PacoteCard from '@/components/busca/PacoteCard';
-import GuestLayout from '@/layouts/GuestLayout';
-import { Pacote } from '@/types/Pacote';
 import { router } from '@inertiajs/react';
 import {
     ChevronLeft,
@@ -10,6 +7,10 @@ import {
     Package,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import PacoteCard from '@/components/busca/PacoteCard';
+import Image from '@/components/Image';
+import GuestLayout from '@/layouts/GuestLayout';
+import type { Pacote } from '@/types/Pacote';
 
 interface BuscarProps {
     pacotes: Pacote[];
@@ -77,10 +78,10 @@ export default function Buscar({
                 {/* Sidebar de Filtros */}
                 <aside className="z-10 w-full shrink-0 bg-white p-6 shadow-lg lg:w-80">
                     <div className="mb-8 flex justify-center">
-                        <img
-                            src="/logo.png"
-                            alt="Logo"
-                            className="w-32 object-contain"
+                        <Image
+                            name={'logo_cor'}
+                            alt={'Paula viagens logo'}
+                            style="w-32 object-contain"
                         />
                     </div>
 
@@ -202,16 +203,19 @@ export default function Buscar({
                                         },
                                         (_, i) => {
                                             let p = i;
+
                                             if (
                                                 paginacao.totalPages > 5 &&
                                                 paginacao.page > 2
                                             ) {
                                                 p = paginacao.page - 2 + i;
-                                                if (p >= paginacao.totalPages)
+
+                                                if (p >= paginacao.totalPages) {
                                                     p = i;
+                                                }
                                             }
 
-                                            if (p < paginacao.totalPages)
+                                            if (p < paginacao.totalPages) {
                                                 return (
                                                     <button
                                                         key={p}
@@ -227,6 +231,8 @@ export default function Buscar({
                                                         {p + 1}
                                                     </button>
                                                 );
+                                            }
+
                                             return null;
                                         },
                                     )}

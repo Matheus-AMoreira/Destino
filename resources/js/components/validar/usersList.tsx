@@ -1,27 +1,28 @@
-import { ValidarUsuario, type Usuario } from "@/utils/auth/authFunctions";
+import { ValidarUsuario } from '@/utils/auth/authFunctions';
+import type { Usuario } from '@/utils/auth/authFunctions';
 
 interface UsersListProps {
-  user: Usuario;
+    user: Usuario;
 }
 
 export default function UsersList({ user }: UsersListProps) {
-  return (
-    <>
-      <div>
-        <p>{user.nome}</p>
-        <p>{user.cpf}</p>
-        <p>{user.email}</p>
-        <p>{user.telefone}</p>
-        <p>{user.cadastro}</p>
-        <button
-          className="cursor-pointer"
-          onClick={() => {
-            ValidarUsuario(user.id);
-          }}
-        >
-          Validar
-        </button>
-      </div>
-    </>
-  );
+    return (
+        <>
+            <div>
+                <p>{user.nome}</p>
+                <p>{user.cpf}</p>
+                <p>{user.email}</p>
+                <p>{user.telefone}</p>
+                <p>{user.cadastro}</p>
+                <button
+                    className="cursor-pointer"
+                    onClick={() => {
+                        ValidarUsuario(user.id);
+                    }}
+                >
+                    Validar
+                </button>
+            </div>
+        </>
+    );
 }

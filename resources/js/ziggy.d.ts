@@ -6,6 +6,7 @@ declare module 'ziggy-js' {
     "cadastro": [],
     "entrar": [],
     "login": [],
+    "password.recover": [],
     "verification.notice": [],
     "verification.verify": [
         {
@@ -22,6 +23,7 @@ declare module 'ziggy-js' {
     "buscar": [],
     "contato": [],
     "administracao.dashboard": [],
+    "administracao.dashboard.estatisticas": [],
     "administracao.hotel.listar": [],
     "administracao.hotel.registrar": [],
     "administracao.hotel.store": [],
@@ -143,6 +145,13 @@ declare module 'ziggy-js' {
         }
     ],
     "administracao.usuario.listar": [],
+    "administracao.usuario.show": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.usuario.aprovar": [
         {
             "name": "user",
@@ -158,6 +167,13 @@ declare module 'ziggy-js' {
         }
     ],
     "administracao.usuario.update-access": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.perfil-update": [
         {
             "name": "user",
             "required": true,
@@ -204,6 +220,9 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "usuario.perfil.edit": [],
+    "usuario.perfil.update": [],
+    "usuario.perfil.password": [],
     "storage.local": [
         {
             "name": "path",

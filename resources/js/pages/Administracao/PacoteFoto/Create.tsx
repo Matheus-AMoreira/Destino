@@ -1,7 +1,7 @@
-import { Link, useForm } from '@inertiajs/react';
+import { Form, Link, useForm } from '@inertiajs/react';
 import { Save, X, Type, Upload, Image as ImageIcon } from 'lucide-react';
 import type { ChangeEvent, DragEvent } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -10,7 +10,7 @@ export default function Create() {
     const [isDragging, setIsDragging] = useState(false);
     const { data, setData, post, processing, errors } = useForm({
         nome: '',
-        storage_type: 'local' as 'local' | 'cloud',
+        storage_type: '',
         is_url: false,
         foto_capa: null as File | string | null,
     });
@@ -25,7 +25,9 @@ export default function Create() {
         const file = files[0];
 
         if (file.size > MAX_FILE_SIZE) {
-            alert(`O arquivo é muito grande! O limite é ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+            alert(
+                `O arquivo é muito grande! O limite é ${MAX_FILE_SIZE / (1024 * 1024)}MB.`,
+            );
             return;
         }
 
@@ -40,10 +42,10 @@ export default function Create() {
     };
 
     const toggleMediaType = (isUrl: boolean) => {
-        setData(prev => ({
+        setData((prev) => ({
             ...prev,
             is_url: isUrl,
-            foto_capa: null
+            foto_capa: null,
         }));
         setPreview(null);
     };
@@ -70,7 +72,6 @@ export default function Create() {
 
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        post('/administracao/pacotedefoto/registrar');
     };
 
     const inputClasses =
@@ -95,7 +96,7 @@ export default function Create() {
                     </div>
                 </div>
 
-                <form
+                <Form
                     onSubmit={handleSubmit}
                     className="space-y-6 rounded-2xl border border-gray-100 bg-white p-8 shadow-sm"
                 >
@@ -124,20 +125,17 @@ export default function Create() {
                         <div>
                             <label className={labelClasses}>
                                 <Save size={16} className="text-purple-500" />
-                                Local de Armazenamento
+                                Método
                             </label>
                             <select
                                 value={data.storage_type}
                                 onChange={(e) =>
-                                    setData(
-                                        'storage_type',
-                                        e.target.value as 'local' | 'cloud',
-                                    )
+                                    setData('storage_type', e.target.value)
                                 }
                                 className={inputClasses}
                             >
-                                <option value="local">Local (Servidor)</option>
-                                <option value="cloud">Nuvem (AWS S3)</option>
+                                <option value="url">URL</option>
+                                <option value="nuvem">Nuvem</option>
                             </select>
                             {errors.storage_type && (
                                 <p className="mt-1 text-xs text-red-500">
@@ -207,7 +205,7 @@ export default function Create() {
 
                     <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
                         <Link
-                            href="/administracao/pacotedefoto/listar"
+                            href={route('administracao.pacotedefoto.listar')}
                             className="rounded-lg px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-100"
                         >
                             Cancelar
@@ -223,7 +221,7 @@ export default function Create() {
                             </span>
                         </button>
                     </div>
-                </form>
+                </Form>
             </div>
         </AdminLayout>
     );

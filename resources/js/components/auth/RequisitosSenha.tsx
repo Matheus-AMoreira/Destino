@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface Props {
     senha: string;
 }
@@ -16,7 +14,9 @@ export default function RequisitosSenha({ senha }: Props) {
         },
     ];
 
-    if (senha.length === 0) return null;
+    if (senha.length === 0) {
+        return null;
+    }
 
     return (
         <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-3 text-left">
