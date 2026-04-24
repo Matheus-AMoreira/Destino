@@ -1,52 +1,102 @@
-# Destino - Sistema de Pacotes de Viagem
+<p align="center">
+    <img src="public/favicon.svg" width="200" alt="Destino Logo">
+</p>
 
-Este é um projeto Laravel 12 com Inertia.js v2, React 19 e Tailwind CSS v4 para gerenciamento de pacotes de viagem e álbuns de fotos.
+<h1 align="center">Destino</h1>
 
-## Desenvolvimento
-Para a aplicação vereficaro funcionamento da aplicação você deve usar php artisan serve junto ao pnpm run dev, isso fará com que o node cuidade de renderizar a página que o laravel vai entregar na requisição
+<p align="center">
+    Projeto Integrador da equipe Tech6 do 5 ADS do primeiro semestre de 2026 da Fatec Guaratinguetá
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.5+-8892BF?style=for-the-badge&logo=php&logoColor=white" alt="PHP" />
+  <img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/PostgreSQL-18-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+</p>
+
+---
 
 ## 🚀 Guia de Início Rápido
 
-Para rodar o projeto localmente usando Docker, siga os passos abaixo:
+Siga os passos abaixo para configurar o projeto em seu ambiente local.
 
-### 1. Clonar o Repositório e Configurar Env
-```bash
-git clone https://github.com/Matheus-AMoreira/Destino.git
-cd Destino
-cp .env.example .env
-```
+### 1. Instalação de Dependências
 
-### 2. Subir os Containers
-```bash
-docker-compose up -d
-```
-O projeto estará disponível em `http://localhost:8000`.
+Primeiro, instale as dependências do PHP (Composer) e do Node.js (pnpm):
 
-### 3. Instalar Dependências e Gerar Chave
 ```bash
-docker-compose exec app composer install
-docker-compose exec app php artisan key:generate
+composer install
 pnpm install
+pnpm run build
 ```
 
-### 4. Bancos de Dados e Migrações
+### 2. Configuração do Ambiente (`.env`)
+
+Crie o seu arquivo de configuração e gere a chave da aplicação.
+
+> [!IMPORTANT]
+> **Nunca utilize a conexão do banco de dados de produção localmente.**
+> As chaves de criptografia serão diferentes e as senhas existentes no banco de produção não coincidirão com a sua chave local.
+
 ```bash
-docker-compose exec app php artisan migrate
+cp .env.example .env
+php artisan key:generate
 ```
 
-### 5. Carga de Dados Geográficos (IBGE)
-Para preencher as tabelas de Regiões, Estados e Cidades, utilize o comando customizado:
+*   **Ambiente Local:** Utilize o arquivo `.env`.
+*   **Containers:** O Docker Compose utiliza o arquivo `.env.docker` automaticamente.
+
+### 3. Migrações e Dados Geográficos
+
+Prepare o banco de dados e importe as tabelas do IBGE:
+
 ```bash
-docker-compose exec app php artisan app:import-ibge
+php artisan migrate
+php artisan app:import-ibge
 ```
 
-## 📚 Tecnologias Utilizadas (Stack)
+---
 
-- **Backend**: PHP 8.5.4, Laravel 13
-- **Frontend**: React 19, Inertia v3
+## 🛠 Desenvolvimento
+
+Você pode rodar a aplicação de duas formas:
+
+### ⚡ Modo Local (PHP Artisan)
+Ideal para desenvolvimento rápido com SSR habilitado. Abra dois terminais:
+
+```bash
+# Terminal 1: Servidor Web
+php artisan serve
+
+# Terminal 2: SSR Render
+php artisan inertia:start-ssr
+```
+
+### 🐳 Modo Container (Docker/Podman)
+Recomendado para validar o build final e orquestração com Nginx.
+
+```bash
+# Com Docker
+docker compose up -d
+
+# Com Podman
+podman compose build
+podman compose up -d
+```
+
+---
+
+## 🏗 Stack Tecnológica
+
+O **Destino** utiliza as tecnologias mais recentes para garantir performance e manutenibilidade:
+
+- **Core**: PHP 8.5+, Laravel 13
+- **Frontend**: React 19, Inertia.js v3 (SSR)
 - **Estilização**: Tailwind CSS v4
-- **Ícones**: Lucide React
-- **Roteamento Frontend**: Laravel Wayfinder
-- **Banco de Dados**: PostgreSQL
+- **Interface**: Lucide React Icons
+- **Roteamento**: Ziggy & Laravel Wayfinder
+- **Banco de Dados**: PostgreSQL 18
 - **Testes**: Pest PHP 4
-- **Bundler**: Vite
+- **Build Tool**: Vite 8 & Composer 2

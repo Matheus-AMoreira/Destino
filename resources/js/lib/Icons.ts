@@ -1,5 +1,5 @@
-const BASE_IMAGE = '/assets/images';
-const BASE_ICON = '/assets/icons';
+const BASE_IMAGE = '/images';
+const BASE_ICON = '/icons';
 
 export const ASSETS = {
     ICONS: {

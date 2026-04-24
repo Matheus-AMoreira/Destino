@@ -3,10 +3,11 @@ services:
     build:
       context: .
       target: runtime_php
+    command: php-fpm
     container_name: destino_laravel
     env_file: .env.docker
-    ports:
-      - '8000:8000'
+    volumes:
+      - ./public/build:/app/public/build 
 
   node:
     build:
@@ -14,7 +15,13 @@ services:
       target: runtime_node
     container_name: destino_node
     working_dir: /app
-    ports:
-      - '13714:13714'
     depends_on:
       - laravel
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '8000:80'
+    volumes:
+        - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+        - ./public:/app/public

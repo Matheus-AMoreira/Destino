@@ -54,6 +54,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Argon2Id Options
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the configuration options that should be used when
+    | passwords are hashed using the Argon2Id algorithm. These will allow you
+    | to control the amount of time it takes to hash the given password.
+    |
+    */
+
+    'argon2id' => [
+        'memory' => env('ARGON_MEMORY', 65536),
+        'threads' => env('ARGON_THREADS', 1),
+        'time' => env('ARGON_TIME', 4),
+        'verify' => env('HASH_VERIFY', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Rehash On Login
     |--------------------------------------------------------------------------
     |
