@@ -54,7 +54,7 @@ Prepare o banco de dados e importe as tabelas do IBGE:
 
 ```bash
 php artisan migrate
-php artisan app:import-ibge
+pnpm run dev
 ```
 
 ---

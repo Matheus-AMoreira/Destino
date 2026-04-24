@@ -1,14 +1,14 @@
-import AdminLayout from '@/layouts/AdminLayout';
-import { User, Auth } from '@/types/auth';
 import { Head, Link, router } from '@inertiajs/react';
 import { 
-    Search, 
-    UserCheck, 
+    History, 
     Lock, 
+    Search, 
     Unlock, 
-    History 
+    UserCheck 
 } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import AdminLayout from '@/layouts/AdminLayout';
+import type { Auth, User } from '@/types/auth';
 
 interface Props {
     usuarios: {
@@ -31,13 +31,13 @@ export default function Listar({ usuarios, filters }: Props) {
         router.get(route('administracao.usuario.listar'), { termo: searchTerm }, { preserveState: true });
     };
 
-    const handleAprovar = (id: string) => {
+    const handleAprovar = (id: number) => {
         if (confirm('Deseja aprovar este usuário manualmente?')) {
             router.post(route('administracao.usuario.aprovar', { user: id }));
         }
     };
 
-    const handleToggleBlock = (id: string) => {
+    const handleToggleBlock = (id: number) => {
         router.post(route('administracao.usuario.toggle-block', { user: id }));
     };
 

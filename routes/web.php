@@ -71,6 +71,7 @@ Route::middleware([Authenticate::class, EnsureEmailIsVerified::class, AdminMiddl
     Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
     Route::put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
     Route::delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
+    Route::get('/pacote/{pacote}/compras', [PacoteController::class, 'compras'])->name('pacote.compras');
     Route::get('/pacotedefoto/listar', [PacoteFotoController::class, 'index'])->name('pacotedefoto.listar');
     Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar');
     Route::post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');

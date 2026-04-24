@@ -10,10 +10,11 @@ import {
     ShieldUser,
     User,
 } from 'lucide-react';
-import { route } from 'ziggy-js';
-import Image from '@/components/Image';
+import { useRoute } from 'ziggy-js';
+import Icon from './Icon';
 
 export default function Navbar() {
+    const route = useRoute();
     const { auth } = usePage().props;
 
     return (
@@ -21,17 +22,17 @@ export default function Navbar() {
             <div className="mx-auto flex max-w-7xl items-center justify-between">
                 <Link href="/" className="pl-0 font-bold text-white">
                     <div className="flex flex-col items-start">
-                        <Image
-                            name={'logo'}
+                        <Icon
+                            name={'favicon'}
                             alt={'Link para a landingpage'}
-                            style="w-25 select-none"
+                            size={'80px'}
+                            className="brightness-0 invert"
                         />
                     </div>
                 </Link>
                 <nav className="flex gap-6 pr-0 pl-0 text-lg">
                     <Link
-                        href="/buscar"
-                        data={{ termo: '', precoMax: 0, page: 0, size: 12 }}
+                        href={route('buscar', { termo: '', precoMax: 0, page: 0, size: 12 })}
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
                         <PackageSearch className="text-xl" />

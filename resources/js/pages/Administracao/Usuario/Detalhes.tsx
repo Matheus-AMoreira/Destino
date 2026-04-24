@@ -52,6 +52,18 @@ interface Props {
     auth: Auth;
 }
 
+interface PerfilForm {
+    nome: string;
+    sobre_nome: string;
+    email: string;
+    cpf: string;
+}
+
+interface AcessoForm {
+    role: string;
+    authorities: string[];
+}
+
 export default function Detalhes({ usuario, compras, roles, authorities }: Props) {
     const [activeTab, setActiveTab] = useState<'perfil' | 'acesso' | 'historico'>('historico');
     const [searchTerm, setSearchTerm] = useState('');
@@ -64,17 +76,17 @@ export default function Detalhes({ usuario, compras, roles, authorities }: Props
     });
 
     // Form para Perfil
-    const perfilForm = useForm({
-        nome: usuario.nome as any,
-        sobre_nome: usuario.sobre_nome as any,
-        email: usuario.email as any,
-        cpf: (usuario.cpf as any) || '',
+    const perfilForm = useForm<PerfilForm>({
+        nome: usuario.nome,
+        sobre_nome: usuario.sobre_nome,
+        email: usuario.email,
+        cpf: usuario.cpf || '',
     });
 
     // Form para Acesso
-    const acessoForm = useForm({
+    const acessoForm = useForm<AcessoForm>({
         role: usuario.role,
-        authorities: (usuario.authorities as string[]) || []
+        authorities: usuario.authorities || []
     });
 
     const handleUpdatePerfil = (e: React.FormEvent) => {

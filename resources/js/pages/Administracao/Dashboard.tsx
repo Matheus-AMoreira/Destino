@@ -1,15 +1,15 @@
 import AdminLayout from '@/layouts/AdminLayout';
 import { Link } from '@inertiajs/react';
-import { 
-    Hotel, 
-    Truck, 
-    MapPinned, 
-    Tag, 
+import {
+    Hotel,
+    Truck,
+    MapPinned,
+    Tag,
     Users,
     TrendingUp,
     ArrowUpRight
 } from 'lucide-react';
-import React from 'react';
+import { useRoute } from 'ziggy-js';
 
 interface Stats {
     hoteis: number;
@@ -19,11 +19,20 @@ interface Stats {
     usuarios: number;
 }
 
-interface Props {
-    stats: Stats;
+interface Activity {
+    id: number;
+    description: string;
+    time: string;
+    causer: string;
 }
 
-export default function Dashboard({ stats }: Props) {
+interface Props {
+    stats: Stats;
+    activities: Activity[];
+}
+
+export default function Dashboard({ stats, activities }: Props) {
+    const route = useRoute();
     const cards = [
         { label: 'Pacotes Ativos', value: stats.pacotes, icon: MapPinned, color: 'text-blue-600', bg: 'bg-blue-100' },
         { label: 'Hotéis Parceiros', value: stats.hoteis, icon: Hotel, color: 'text-emerald-600', bg: 'bg-emerald-100' },
@@ -63,17 +72,25 @@ export default function Dashboard({ stats }: Props) {
                         <TrendingUp className="text-gray-400" size={20} />
                     </div>
                     <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
-                                <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold">
-                                    {i}
+                        {activities.length > 0 ? (
+                            activities.map((activity) => (
+                                <div key={activity.id} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
+                                    <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold uppercase">
+                                        {activity.causer.charAt(0)}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-900">
+                                            <span className="font-bold">{activity.causer}</span> {activity.description}
+                                        </p>
+                                        <p className="text-xs text-gray-500">{activity.time}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium text-gray-900">Nova oferta cadastrada para Cancun</p>
-                                    <p className="text-xs text-gray-500">Há {i * 2} horas atrás</p>
-                                </div>
+                            ))
+                        ) : (
+                            <div className="py-8 text-center text-gray-500">
+                                <p>Nenhuma atividade registrada ainda.</p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
 
@@ -83,7 +100,7 @@ export default function Dashboard({ stats }: Props) {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900">Relatórios Detalhados</h3>
                     <p className="mt-2 text-gray-500">Visualize métricas avançadas e tendências de vendas em breve.</p>
-                    <Link 
+                    <Link
                         href={route('administracao.dashboard.estatisticas')}
                         className="mt-6 rounded-xl bg-gray-900 px-6 py-2 text-sm font-bold text-white shadow-lg transition hover:bg-gray-800"
                     >

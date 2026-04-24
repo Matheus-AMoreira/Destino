@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { router } from "@inertiajs/react";
 
 interface DataItem {
   id: number;
@@ -35,14 +35,12 @@ export default function DataList<T extends DataItem>({
   renderValue,
   actions,
 }: DataListProps<T>) {
-  const navigate = useNavigate();
-
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">{pageTitle}</h1>
         <button
-          onClick={() => navigate(registerPath)}
+          onClick={() => router.visit(registerPath)}
           className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
         >
           {buttonText}

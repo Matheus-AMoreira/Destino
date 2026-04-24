@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use Spatie\Activitylog\Models\Activity;
+
 class DashboardController extends Controller
 {
     public function index(): Response
@@ -28,7 +30,58 @@ class DashboardController extends Controller
                 'ofertas' => Oferta::count(),
                 'usuarios' => User::count(),
             ],
+            'activities' => Activity::with(['causer', 'subject'])
+                ->latest()
+                ->limit(10)
+                ->get()
+                ->map(function ($activity) {
+                    return [
+                        'id' => $activity->id,
+                        'description' => $this->formatActivityDescription($activity),
+                        'time' => $activity->created_at->diffForHumans(),
+                        'causer' => $activity->causer ? $activity->causer->nome : 'Sistema',
+                    ];
+                }),
         ]);
+    }
+
+    private function formatActivityDescription(Activity $activity): string
+    {
+        $subjectType = strtolower(class_basename($activity->subject_type));
+        $event = $activity->description; // created, updated, deleted
+
+        $translations = [
+            'created' => 'criou',
+            'updated' => 'atualizou',
+            'deleted' => 'deletou',
+        ];
+
+        $modelNames = [
+            'hotel' => 'o hotel',
+            'pacote' => 'o pacote',
+            'oferta' => 'a oferta',
+            'compra' => 'a compra',
+            'user' => 'o usuário',
+            'pacotefoto' => 'o conjunto de fotos',
+            'pacotefotoitem' => 'uma foto do pacote',
+            'transporte' => 'o transporte',
+            'tag' => 'a tag',
+            'avaliacao' => 'a avaliação',
+            'cidade' => 'a cidade',
+            'estado' => 'o estado',
+            'regiao' => 'a região',
+            'foto' => 'a foto',
+        ];
+
+        $translatedEvent = $translations[$event] ?? $event;
+        $translatedModel = $modelNames[$subjectType] ?? $subjectType;
+
+        $subjectName = '';
+        if ($activity->subject) {
+            $subjectName = $activity->subject->nome ?? $activity->subject->id ?? '';
+        }
+
+        return "{$translatedEvent} {$translatedModel} {$subjectName}";
     }
 
     public function estatisticas(Request $request): Response

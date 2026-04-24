@@ -1,29 +1,16 @@
-import type { ResolvedComponent } from '@inertiajs/react';
 import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createRoot, hydrateRoot } from 'react-dom/client';
-
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import { Ziggy } from './ziggy';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.tsx`,
-            import.meta.glob<ResolvedComponent>('./pages/**/*.tsx'),
-        ),
-    setup({ el, App, props }) {
-        if (!el) {
-            return;
-        }
-
-        if (el.innerHTML) {
-            hydrateRoot(el, <App {...props} />);
-        } else {
-            createRoot(el).render(<App {...props} />);
-        }
+    strictMode: true,
+    pages: {
+        path: './pages',
+        extension: '.tsx',
+        lazy: true,
     },
-    progress: {
-        color: '#4B5563',
+    withApp(app) {
+        globalThis.Ziggy = Ziggy;
+
+        return app;
     },
 });

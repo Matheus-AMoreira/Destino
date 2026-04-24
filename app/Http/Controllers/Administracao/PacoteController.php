@@ -10,6 +10,7 @@ use App\Models\Pacote;
 use App\Models\PacoteFoto;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -96,5 +97,18 @@ class PacoteController extends Controller
 
         return redirect()->route('administracao.pacote.listar')
             ->with('success', 'Pacote excluído com sucesso!');
+    }
+
+    public function compras(Pacote $pacote): JsonResponse
+    {
+        $compras = \App\Models\Compra::query()
+            ->with(['user', 'oferta.hotel.cidade'])
+            ->whereHas('oferta', function ($q) use ($pacote) {
+                $q->where('pacote_id', $pacote->id);
+            })
+            ->latest('data_compra')
+            ->get();
+
+        return response()->json($compras);
     }
 }

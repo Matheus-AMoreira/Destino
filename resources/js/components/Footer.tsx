@@ -7,9 +7,13 @@ import {
     Phone,
     UserCheck,
 } from 'lucide-react';
+import { useRoute } from 'ziggy-js';
 import Icon from '@/components/Icon';
 import Image from '@/components/Image';
+
 export default function Footer() {
+    const route = useRoute();
+    
     return (
         <footer className="w-full bg-[#ff944d] px-8 py-10 text-blue-900">
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 text-lg md:grid-cols-4">
@@ -29,7 +33,7 @@ export default function Footer() {
                     <ul className="space-y-2">
                         <li>
                             <Link
-                                href="/"
+                                href={route('home')}
                                 className="text-white drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 Início
@@ -37,7 +41,7 @@ export default function Footer() {
                         </li>
                         <li>
                             <Link
-                                href="/buscar"
+                                href={route('buscar')}
                                 className="text-white drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 Pacotes
@@ -45,7 +49,7 @@ export default function Footer() {
                         </li>
                         <li>
                             <Link
-                                href="/entrar"
+                                href={route('entrar')}
                                 className="text-white drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 Login
@@ -53,7 +57,7 @@ export default function Footer() {
                         </li>
                         <li>
                             <Link
-                                href="/cadastro"
+                                href={route('cadastro')}
                                 className="text-white drop-shadow-md transition hover:text-[#2071b3]"
                             >
                                 Cadastro
@@ -90,7 +94,7 @@ export default function Footer() {
                     </h3>
                     <div className="flex space-x-4">
                         <a
-                            href="#"
+                            href={route('home')}
                             className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
                         >
                             <Icon
@@ -101,7 +105,7 @@ export default function Footer() {
                             <span>Facebook</span>
                         </a>
                         <a
-                            href="#"
+                            href={route('home')}
                             className="flex items-center space-x-2 text-white drop-shadow-md transition hover:text-[#2071b3]"
                         >
                             <Icon

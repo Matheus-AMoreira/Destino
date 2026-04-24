@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { LocateFixed, Banknote } from 'lucide-react';
+import { Banknote, LocateFixed } from 'lucide-react';
+import { useRoute } from 'ziggy-js';
 import type { Pacote } from '@/types/Pacote';
 import Image from '../Image';
 
@@ -11,6 +12,7 @@ const formatarValor = (valor: number) => {
 };
 
 export default function PacoteCard({ pacote }: { pacote: Pacote }) {
+    const route = useRoute();
     const destino =
         pacote.ofertas?.[0]?.hotel?.cidade?.nome || 'Destino Desconhecido';
     const fotoUrl = pacote.fotos_do_pacote?.foto_capa_url || 'placeholder';
@@ -50,7 +52,7 @@ export default function PacoteCard({ pacote }: { pacote: Pacote }) {
                         </p>
                     </div>
                     <Link
-                        href={`/pacote/${pacote.nome}`}
+                        href={route('pacote.detalhes', { nome: pacote.nome })}
                         className="mt-2 block w-full rounded-lg bg-blue-50 py-2 text-center text-sm font-bold text-blue-600 hover:bg-blue-100"
                     >
                         Detalhes

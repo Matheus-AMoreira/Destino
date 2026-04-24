@@ -10,6 +10,10 @@ export type User = {
     name_slug: string;
     created_at: string;
     updated_at: string;
+    role: string;
+    cpf?: string;
+    is_valid: boolean;
+    authorities: string[];
     [key: string]: unknown;
 };
 

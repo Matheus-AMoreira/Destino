@@ -1,16 +1,16 @@
-import { Head, router, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Chart, registerables } from 'chart.js';
 import {
+    BarChart3,
+    Building2,
     Calendar,
     ChevronLeft,
-    TrendingUp,
-    BarChart3,
-    Users,
-    MapPin,
     Globe,
-    Building2,
+    MapPin,
+    TrendingUp,
+    Users,
 } from 'lucide-react';
-import { useEffect, useRef, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
 
 Chart.register(...registerables);
