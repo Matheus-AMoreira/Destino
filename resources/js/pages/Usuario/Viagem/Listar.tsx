@@ -4,15 +4,13 @@ import { Auth } from '@/types';
 import { useMemo } from 'react';
 import {
     ArrowRightFromLine,
-    CalendarDays,
     Globe,
     History,
-    MapPin,
     PackageSearch,
-    Ticket,
     TicketsPlane,
     User,
 } from 'lucide-react';
+import ViagemCard from '@/components/usuario/ViagemCard';
 
 interface Compra {
     id: string;
@@ -28,7 +26,8 @@ interface Compra {
             nome: string;
             descricao: string;
             fotos_do_pacote: {
-                fotos: { url: string }[];
+                foto_capa_url: string;
+                fotos: { caminho_url: string }[];
             };
         };
         hotel: {
@@ -89,7 +88,6 @@ export default function Listar({ compras, view, auth }: Props) {
         });
 
         return Object.values(groups).sort((a, b) => {
-            // Sort groups by the newest ticket date
             const dateA = new Date(a.tickets[0].data_compra).getTime();
             const dateB = new Date(b.tickets[0].data_compra).getTime();
             return dateB - dateA;
@@ -123,7 +121,7 @@ export default function Listar({ compras, view, auth }: Props) {
                     <nav className="mt-4 space-y-2 p-4">
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user: auth.user.id,
+                                user_slug: auth.user.name_slug,
                                 view: 'andamento',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
@@ -138,7 +136,7 @@ export default function Listar({ compras, view, auth }: Props) {
 
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user: auth.user.id,
+                                user_slug: auth.user.name_slug,
                                 view: 'concluidas',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
@@ -154,7 +152,7 @@ export default function Listar({ compras, view, auth }: Props) {
                 </aside>
 
                 <main className="flex-1 p-6 lg:p-12">
-                    <div className="mx-auto max-w-6xl">
+                    <div className="mx-auto max-w-7xl">
                         <div className="mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                             <div>
                                 <h1 className="font-outfit flex items-center gap-4 text-4xl font-black text-gray-900">
@@ -208,148 +206,17 @@ export default function Listar({ compras, view, auth }: Props) {
                                 )}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                            <div className="flex flex-col gap-8">
                                 {groupedCompras.map((grupo) => (
-                                    <div
+                                    <ViagemCard
                                         key={grupo.pacote.id}
-                                        className={`group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white transition-all duration-300 hover:border-blue-100 hover:shadow-2xl hover:shadow-blue-50/50 ${
-                                            isHistorico
-                                                ? 'opacity-90 saturate-50'
-                                                : ''
-                                        }`}
-                                    >
-                                        <div className="relative h-60 overflow-hidden">
-                                            <img
-                                                src={
-                                                    grupo.pacote.fotos_do_pacote
-                                                        ?.fotos[0]?.url ||
-                                                    '/images/placeholder.jpg'
-                                                }
-                                                alt={grupo.pacote.nome}
-                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
-                                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-60 transition-opacity group-hover:opacity-80" />
-
-                                            <div className="absolute top-4 left-4 flex gap-2">
-                                                {grupo.tickets.length > 1 && (
-                                                    <span className="flex items-center gap-2 rounded-xl bg-blue-600/90 px-3 py-1.5 text-xs font-black text-white shadow-lg backdrop-blur-md">
-                                                        <Ticket />
-                                                        {
-                                                            grupo.tickets.length
-                                                        }{' '}
-                                                        PASSAGENS
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            <div className="absolute bottom-4 left-6">
-                                                <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-bold text-white/90 backdrop-blur-md">
-                                                    <MapPin className="text-red-400" />
-                                                    <span>
-                                                        {
-                                                            grupo.tickets[0]
-                                                                .oferta.hotel
-                                                                .cidade.nome
-                                                        }
-                                                        ,{' '}
-                                                        {
-                                                            grupo.tickets[0]
-                                                                .oferta.hotel
-                                                                .cidade.estado
-                                                                .sigla
-                                                        }
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-1 flex-col p-8">
-                                            <h3 className="font-outfit mb-3 truncate text-2xl font-black text-gray-900 transition-colors group-hover:text-blue-600">
-                                                {grupo.pacote.nome}
-                                            </h3>
-
-                                            <p className="mb-6 line-clamp-2 text-sm leading-relaxed font-medium text-gray-500">
-                                                {grupo.pacote.descricao}
-                                            </p>
-
-                                            <div className="mt-auto space-y-4 border-t border-gray-100 pt-6">
-                                                {grupo.tickets.map(
-                                                    (compra, idx) => (
-                                                        <div
-                                                            key={compra.id}
-                                                            className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}
-                                                        >
-                                                            <div className="mb-4 flex items-center justify-between">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span
-                                                                        className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}
-                                                                    >
-                                                                        {isHistorico
-                                                                            ? 'CONCLUÍDA'
-                                                                            : compra.status}
-                                                                    </span>
-                                                                    <span className="text-[10px] font-bold text-gray-400 uppercase">
-                                                                        Ticket #
-                                                                        {
-                                                                            compra.id.split(
-                                                                                '-',
-                                                                            )[0]
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <span className="block text-xs font-black text-gray-900">
-                                                                        {formatarValor(
-                                                                            compra.valor_final,
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="mb-4 flex items-center justify-between rounded-2xl border border-transparent bg-gray-50 p-4 transition-colors group-hover:border-blue-100/50 group-hover:bg-blue-50/50">
-                                                                <div className="flex items-center gap-3">
-                                                                    <CalendarDays
-                                                                        className="text-blue-500"
-                                                                        size={
-                                                                            18
-                                                                        }
-                                                                    />
-                                                                    <span className="text-sm font-bold text-gray-700">
-                                                                        {formatarData(
-                                                                            compra
-                                                                                .oferta
-                                                                                .inicio,
-                                                                        )}{' '}
-                                                                        -{' '}
-                                                                        {formatarData(
-                                                                            compra
-                                                                                .oferta
-                                                                                .fim,
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-                                                                <Link
-                                                                    href={route(
-                                                                        'usuario.viagem.detalhes',
-                                                                        {
-                                                                            user: auth
-                                                                                .user
-                                                                                .id,
-                                                                            compra: compra.id,
-                                                                        },
-                                                                    )}
-                                                                    className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
-                                                                >
-                                                                    Detalhes
-                                                                    <ArrowRightFromLine />
-                                                                </Link>
-                                                            </div>
-                                                        </div>
-                                                    ),
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+                                        grupo={grupo}
+                                        isHistorico={isHistorico}
+                                        formatarValor={formatarValor}
+                                        formatarData={formatarData}
+                                        getStatusColor={getStatusColor}
+                                        auth={auth}
+                                    />
                                 ))}
                             </div>
                         )}

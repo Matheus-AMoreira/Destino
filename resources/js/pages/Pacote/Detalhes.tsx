@@ -10,6 +10,7 @@ import {
     TicketsPlane,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import Image from '@/components/Image';
 
 interface DetalhesProps {
     nome: string;
@@ -25,8 +26,8 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
     const numeroPessoas = 1;
 
     useEffect(() => {
-        if (pacote?.fotos_do_pacote?.foto_capa) {
-            setImagemSelecionada(pacote.fotos_do_pacote.foto_capa);
+        if (pacote?.fotos_do_pacote?.foto_capa_url) {
+            setImagemSelecionada(pacote.fotos_do_pacote.foto_capa_url);
         }
         if (
             pacote?.ofertas &&
@@ -76,10 +77,10 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
     }
 
     const todasFotos = [
-        { id: -1, url: pacote.fotos_do_pacote?.foto_capa, nome: 'Principal' },
+        { id: -1, url: pacote.fotos_do_pacote?.foto_capa_url, nome: 'Principal' },
         ...(pacote.fotos_do_pacote?.fotos?.map((f) => ({
             ...f,
-            url: f.caminho,
+            url: f.caminho_url,
         })) || []),
     ].filter((f) => f.url);
 
@@ -127,12 +128,10 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 className="group aspect-w-16 aspect-h-12 relative cursor-zoom-in overflow-hidden rounded-xl bg-gray-100"
                                 onClick={() => setModalAberto(true)}
                             >
-                                <img
-                                    src={
-                                        imagemSelecionada || '/placeholder.jpg'
-                                    }
+                                <Image
+                                    name={imagemSelecionada || 'placeholder'}
                                     alt={pacote.nome}
-                                    className="h-96 w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
+                                    style="h-96 w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
                                 <div className="bg-opacity-0 group-hover:bg-opacity-10 absolute inset-0 flex items-center justify-center transition-all">
                                     <span className="bg-opacity-50 rounded-full bg-black px-3 py-1 text-sm font-medium text-white opacity-0 group-hover:opacity-100">
@@ -153,10 +152,11 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                                 : 'border-transparent opacity-70 hover:opacity-100'
                                         }`}
                                     >
-                                        <img
-                                            src={foto.url}
+                                        <Image
+                                            name={foto.url}
                                             alt={foto.nome}
-                                            className="h-full w-full object-cover"
+                                            style="h-full w-full object-cover"
+                                            noFallback={true}
                                         />
                                     </button>
                                 ))}

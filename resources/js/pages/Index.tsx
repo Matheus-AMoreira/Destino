@@ -116,7 +116,7 @@ export default function Index({
                                     title={pacote.nome}
                                     description={pacote.descricao}
                                     imageUrl={
-                                        pacote.fotos_do_pacote?.foto_capa ||
+                                        pacote.fotos_do_pacote?.foto_capa_url ||
                                         'placeholder'
                                     }
                                     detalharHref={`/pacote/${pacote.nome}`}
@@ -134,11 +134,10 @@ export default function Index({
                             <button
                                 onClick={handlePaginaAnterior}
                                 disabled={paginaAtual === 0}
-                                className={`rounded-full p-3 shadow-md transition ${
-                                    paginaAtual === 0
+                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === 0
                                         ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <ArrowLeft />
                             </button>
@@ -150,11 +149,10 @@ export default function Index({
                             <button
                                 onClick={handleProximaPagina}
                                 disabled={paginaAtual === totalPaginas - 1}
-                                className={`rounded-full p-3 shadow-md transition ${
-                                    paginaAtual === totalPaginas - 1
+                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === totalPaginas - 1
                                         ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
-                                }`}
+                                    }`}
                             >
                                 <ChevronRight />
                             </button>

@@ -8,10 +8,12 @@ export interface Pacote {
         id: number;
         nome: string;
         foto_capa: string;
+        foto_capa_url: string;
         fotos?: Array<{
             id: number;
             nome: string;
             caminho: string;
+            caminho_url: string;
             is_url: boolean;
         }>;
     };

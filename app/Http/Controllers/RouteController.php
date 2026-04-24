@@ -155,8 +155,9 @@ class RouteController extends Controller
         ]);
     }
 
-    public function usuarioViagemListar(Request $request, User $user): Response
+    public function usuarioViagemListar(Request $request, string $user_slug): Response
     {
+        $user = User::whereRaw("REPLACE(CONCAT(nome, ' ', sobre_nome), ' ', '_') = ?", [$user_slug])->firstOrFail();
         $view = $request->query('view', 'andamento');
         $auth = auth()->user();
 
@@ -193,8 +194,9 @@ class RouteController extends Controller
         ]);
     }
 
-    public function usuarioViagemListarId(User $user, Compra $compra): Response
+    public function usuarioViagemListarId(string $user_slug, Compra $compra): Response
     {
+        $user = User::whereRaw("REPLACE(CONCAT(nome, ' ', sobre_nome), ' ', '_') = ?", [$user_slug])->firstOrFail();
         $auth = auth()->user();
 
         // Authorization logic

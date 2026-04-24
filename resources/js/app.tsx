@@ -1,34 +1,29 @@
+import type { ResolvedComponent } from '@inertiajs/react';
 import { createInertiaApp } from '@inertiajs/react';
-import type { ReactComponent } from 'node_modules/@inertiajs/react/types/types';
-import { createRoot } from 'react-dom/client';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'App';
-
-const pages = import.meta.glob('./pages/**/*.tsx');
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    strictMode: true,
-
-    resolve: async (name): Promise<ReactComponent> => {
-        const mod = (await pages[`./pages/${name}.tsx`]?.()) as {
-            default: ReactComponent;
-        };
-
-        if (!mod) {
-            throw new Error(`Página não encontrada: ${name}`);
-        }
-
-        return mod.default;
-    },
-
+    resolve: (name) =>
+        resolvePageComponent(
+            `./pages/${name}.tsx`,
+            import.meta.glob<ResolvedComponent>('./pages/**/*.tsx'),
+        ),
     setup({ el, App, props }) {
         if (!el) {
-            throw new Error('Root element not found');
+            return;
         }
 
-        createRoot(el).render(<App {...props} />);
+        if (el.innerHTML) {
+            hydrateRoot(el, <App {...props} />);
+        } else {
+            createRoot(el).render(<App {...props} />);
+        }
     },
-
-    progress: { color: '#4B5563' },
+    progress: {
+        color: '#4B5563',
+    },
 });

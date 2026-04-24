@@ -10,7 +10,8 @@ use App\Http\Controllers\Administracao\UsuarioController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\PasswordRecoveryController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
@@ -29,7 +30,11 @@ Route::middleware('guest')->group(function () {
 
     Route::get('entrar', [AuthenticatedSessionController::class, 'create'])->name('entrar');
     Route::post('entrar', [AuthenticatedSessionController::class, 'store'])->name('login');
-    Route::post('recuperar-senha', [PasswordRecoveryController::class, 'recover'])->name('password.recover');
+
+    Route::get('esqueci-senha', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('esqueci-senha', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('redefinir-senha/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('redefinir-senha', [NewPasswordController::class, 'store'])->name('password.update');
 });
 
 Route::middleware([Authenticate::class])->group(function () {
@@ -102,13 +107,11 @@ Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->
 
 Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');
 
-Route::prefix('usuario/{user}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('{user_slug}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [RouteController::class, 'usuarioViagemListar'])->name('listar');
     Route::get('/detalhes/{compra}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
 });
 
-Route::prefix('usuario/perfil')->name('usuario.perfil.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [PerfilController::class, 'edit'])->name('edit');
-    Route::put('/', [PerfilController::class, 'update'])->name('update');
-    Route::put('/senha', [PerfilController::class, 'updatePassword'])->name('password');
-});
+Route::get('{user_slug}/perfil', [PerfilController::class, 'edit'])->name('usuario.perfil.edit');
+Route::put('{user_slug}/perfil', [PerfilController::class, 'update'])->name('usuario.perfil.update')->middleware(['auth', 'verified']);
+Route::put('{user_slug}/perfil/senha', [PerfilController::class, 'updatePassword'])->name('usuario.perfil.password')->middleware(['auth', 'verified']);

@@ -1,11 +1,10 @@
+import { Link, useForm } from '@inertiajs/react';
 import GuestLayout from '@/layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import React from 'react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
 
-    const submit = (e: React.FormEvent) => {
+    const submit = (e: React.SubmitEvent) => {
         e.preventDefault();
         post(route('verification.send'));
     };
@@ -27,6 +26,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     <form onSubmit={submit}>
                         <div className="mt-4 flex items-center justify-between">
                             <button
+                                type='submit'
                                 className={`rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700 ${
                                     processing ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}

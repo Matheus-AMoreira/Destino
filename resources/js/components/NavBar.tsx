@@ -1,20 +1,20 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    History,
-    MapPin,
-    User,
-    ShieldUser,
     ChevronDown,
-    LogOut,
-    PackageSearch,
-    MailCheck,
     CircleArrowRight,
+    History,
+    LogOut,
+    MailCheck,
+    MapPin,
+    PackageSearch,
+    ShieldUser,
+    User,
 } from 'lucide-react';
-
+import { route } from 'ziggy-js';
 import Image from '@/components/Image';
 
 export default function Navbar() {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage().props;
 
     return (
         <header className="bg-[#ff944d] px-8 pt-3 pb-1 shadow-md">
@@ -38,7 +38,7 @@ export default function Navbar() {
                         <span>Buscar Pacotes</span>
                     </Link>
                     <Link
-                        href="/contato"
+                        href={route('contato')}
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
                         <MailCheck className="text-xl" />
@@ -46,7 +46,10 @@ export default function Navbar() {
                     </Link>
                     {auth?.user ? (
                         <div className="group relative flex items-center">
-                            <button className="flex items-center space-x-2 py-2 font-bold text-white transition-colors hover:text-[#2071b3] focus:outline-none">
+                            <button
+                                className="flex items-center space-x-2 py-2 font-bold text-white transition-colors hover:text-[#2071b3] focus:outline-none"
+                                type="button"
+                            >
                                 {auth?.user?.role === 'ADMINISTRADOR' ? (
                                     <ShieldUser />
                                 ) : (
@@ -78,7 +81,7 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        user: auth.user.id,
+                                        user_slug: auth.user.name_slug,
                                         view: 'andamento',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
@@ -89,7 +92,7 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        user: auth.user.id,
+                                        user_slug: auth.user.name_slug,
                                         view: 'concluidas',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
@@ -99,7 +102,9 @@ export default function Navbar() {
                                 </Link>
 
                                 <Link
-                                    href={route('usuario.perfil.edit')}
+                                    href={route('usuario.perfil.edit', {
+                                        user_slug: auth.user.name_slug,
+                                    })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <User size={18} />
@@ -121,7 +126,7 @@ export default function Navbar() {
                         </div>
                     ) : (
                         <Link
-                            href="/entrar"
+                            href={route('login')}
                             className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                         >
                             <CircleArrowRight />

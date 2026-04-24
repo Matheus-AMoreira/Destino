@@ -1,18 +1,19 @@
-import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import GuestLayout from '@/layouts/GuestLayout';
-import { Auth } from '@/types';
 import {
+    ArrowLeftFromLine,
     BaggageClaim,
     BookSearch,
     CalendarSync,
     Hotel,
     Mail,
+    Map,
     Phone,
     Plane,
     Receipt,
-    Map,
 } from 'lucide-react';
+import react from 'react';
+import GuestLayout from '@/layouts/GuestLayout';
+import type { Auth } from '@/types';
 
 interface Compra {
     id: string;
@@ -42,7 +43,8 @@ interface Compra {
             nome: string;
             descricao: string;
             fotos_do_pacote: {
-                fotos: { url: string; nome: string }[];
+                foto_capa_url: string;
+                fotos: { caminho_url: string; nome: string }[];
             };
             tags: { nome: string }[];
         };
@@ -55,9 +57,23 @@ interface Props {
 }
 
 export default function Detalhes({ compra, auth }: Props) {
-    const [imagemSelecionada, setImagemSelecionada] = useState(
-        compra.oferta.pacote.fotos_do_pacote?.fotos[0]?.url ||
-            '/images/placeholder.jpg',
+    const todasFotos = [
+        ...(compra.oferta.pacote.fotos_do_pacote?.foto_capa_url
+            ? [
+                  {
+                      caminho_url:
+                          compra.oferta.pacote.fotos_do_pacote.foto_capa_url,
+                      nome: 'Capa',
+                  },
+              ]
+            : []),
+        ...(compra.oferta.pacote.fotos_do_pacote?.fotos || []),
+    ].filter(
+        (v, i, a) => a.findIndex((t) => t.caminho_url === v.caminho_url) === i,
+    );
+
+    const [imagemSelecionada, setImagemSelecionada] = react.useState(
+        todasFotos[0]?.caminho_url || '/assets/images/placeholder.jpg',
     );
 
     const formatarValor = (valor: number) => {
@@ -94,13 +110,11 @@ export default function Detalhes({ compra, auth }: Props) {
                         <div>
                             <Link
                                 href={route('usuario.viagem.listar', {
-                                    user: auth.user.id,
+                                    user_slug: auth.user.name_slug,
                                 })}
                                 className="group mb-4 inline-flex items-center text-sm font-black tracking-widest text-blue-600 uppercase transition-colors hover:text-blue-700"
                             >
-                                <span className="mr-2 transition-transform group-hover:-translate-x-1">
-                                    ←
-                                </span>{' '}
+                                <ArrowLeftFromLine className="mr-4" />
                                 Voltar para Minhas Viagens
                             </Link>
                             <h1 className="font-outfit mb-3 text-4xl leading-tight font-black text-gray-900 lg:text-5xl">
@@ -155,30 +169,30 @@ export default function Detalhes({ compra, auth }: Props) {
                             <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-60" />
                         </div>
 
-                        {compra.oferta.pacote.fotos_do_pacote?.fotos.length >
-                            1 && (
+                        {todasFotos.length > 1 && (
                             <div className="mt-6 grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
-                                {compra.oferta.pacote.fotos_do_pacote.fotos.map(
-                                    (foto, index) => (
-                                        <button
-                                            key={index}
-                                            onClick={() =>
-                                                setImagemSelecionada(foto.url)
-                                            }
-                                            className={`aspect-square overflow-hidden rounded-2xl border-4 transition-all duration-300 ${
-                                                imagemSelecionada === foto.url
-                                                    ? 'scale-105 border-blue-600 shadow-lg'
-                                                    : 'border-white hover:border-blue-200'
-                                            }`}
-                                        >
-                                            <img
-                                                src={foto.url}
-                                                alt={foto.nome}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </button>
-                                    ),
-                                )}
+                                {todasFotos.map((foto, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() =>
+                                            setImagemSelecionada(
+                                                foto.caminho_url,
+                                            )
+                                        }
+                                        className={`aspect-square overflow-hidden rounded-2xl border-4 transition-all duration-300 ${
+                                            imagemSelecionada ===
+                                            foto.caminho_url
+                                                ? 'scale-105 border-blue-600 shadow-lg'
+                                                : 'border-white hover:border-blue-200'
+                                        }`}
+                                    >
+                                        <img
+                                            src={foto.caminho_url}
+                                            alt={foto.nome}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>

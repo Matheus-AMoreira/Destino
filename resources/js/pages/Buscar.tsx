@@ -222,11 +222,10 @@ export default function Buscar({
                                                         onClick={() =>
                                                             handleMudarPagina(p)
                                                         }
-                                                        className={`h-10 w-10 rounded-lg font-medium transition ${
-                                                            paginacao.page === p
+                                                        className={`h-10 w-10 rounded-lg font-medium transition ${paginacao.page === p
                                                                 ? 'bg-[#2071b3] text-white'
                                                                 : 'bg-white text-gray-600 hover:bg-gray-100'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {p + 1}
                                                     </button>

@@ -10,11 +10,22 @@ class PacoteFoto extends Model
     protected $fillable = ['nome', 'foto_capa', 'storage_type', 'is_url'];
 
     /**
-     * @return HasMany<Foto,PacoteFoto>
+     * @return HasMany<PacoteFotoItem,PacoteFoto>
      */
     public function fotos(): HasMany
     {
-        return $this->hasMany(Foto::class);
+        return $this->hasMany(PacoteFotoItem::class);
+    }
+
+    protected $appends = ['foto_capa_url'];
+
+    public function getFotoCapaUrlAttribute(): string
+    {
+        if ($this->is_url) {
+            return $this->foto_capa;
+        }
+
+        return $this->foto_capa ? \Illuminate\Support\Facades\Storage::url($this->foto_capa) : '';
     }
 
     /**

@@ -2,7 +2,6 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { z } from 'zod';
 import AuthLogo from '@/components/auth/AuthLogo';
-import CampoInput from '@/components/auth/CampoInput';
 import RequisitosSenha from '@/components/auth/RequisitosSenha';
 import type { ModalData } from '@/components/Modal';
 import CustomModal from '@/components/Modal';
@@ -33,7 +32,7 @@ const schemaCadastro = z
             .string()
             .min(10, 'Telefone inválido')
             .max(11, 'Telefone inválido'),
-        email: z.string().email('E-mail inválido'),
+        email: z.email('E-mail inválido'),
         password: z
             .string()
             .min(8, 'Mínimo 8 caracteres')
@@ -130,80 +129,198 @@ export default function Cadastro() {
 
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-left">
-                            <CampoInput
-                                label="Nome"
-                                type="text"
-                                value={data.nome}
-                                onChange={(e) =>
-                                    handleChange('nome', e.target.value)
-                                }
-                                isError={!!zodErrors.nome || !!errors.nome}
-                            />
-                            <CampoInput
-                                label="Sobrenome"
-                                type="text"
-                                value={data.sobre_nome}
-                                onChange={(e) =>
-                                    handleChange('sobre_nome', e.target.value)
-                                }
-                                isError={
-                                    !!zodErrors.sobre_nome ||
-                                    !!errors.sobre_nome
-                                }
-                            />
-                            <CampoInput
-                                label="CPF"
-                                type="text"
-                                value={formatarCPF(data.cpf)}
-                                onChange={(e) =>
-                                    handleChange('cpf', e.target.value)
-                                }
-                                isError={!!zodErrors.cpf || !!errors.cpf}
-                                maxLength={14}
-                            />
-                            <CampoInput
-                                label="Telefone"
-                                type="tel"
-                                value={formatarTelefone(data.telefone)}
-                                onChange={(e) =>
-                                    handleChange('telefone', e.target.value)
-                                }
-                                isError={
-                                    !!zodErrors.telefone || !!errors.telefone
-                                }
-                                maxLength={15}
-                            />
-                            <div className="col-span-2">
-                                <CampoInput
-                                    label="E-mail"
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="nome"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    Nome
+                                </label>
+                                <input
+                                    id="nome"
+                                    type="text"
+                                    autoComplete="given-name"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.nome || errors.nome
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
+                                    value={data.nome}
+                                    onChange={(e) =>
+                                        handleChange('nome', e.target.value)
+                                    }
+                                    required
+                                />
+                                {(zodErrors.nome || errors.nome) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.nome || errors.nome}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="sobre_nome"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    Sobrenome
+                                </label>
+                                <input
+                                    id="sobre_nome"
+                                    type="text"
+                                    autoComplete="family-name"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.sobre_nome || errors.sobre_nome
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
+                                    value={data.sobre_nome}
+                                    onChange={(e) =>
+                                        handleChange('sobre_nome', e.target.value)
+                                    }
+                                    required
+                                />
+                                {(zodErrors.sobre_nome || errors.sobre_nome) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.sobre_nome || errors.sobre_nome}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="cpf"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    CPF
+                                </label>
+                                <input
+                                    id="cpf"
+                                    type="text"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.cpf || errors.cpf
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
+                                    value={formatarCPF(data.cpf)}
+                                    onChange={(e) =>
+                                        handleChange('cpf', e.target.value)
+                                    }
+                                    maxLength={14}
+                                    required
+                                />
+                                {(zodErrors.cpf || errors.cpf) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.cpf || errors.cpf}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="mb-4">
+                                <label
+                                    htmlFor="telefone"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    Telefone
+                                </label>
+                                <input
+                                    id="telefone"
+                                    type="tel"
+                                    autoComplete="tel"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.telefone || errors.telefone
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
+                                    value={formatarTelefone(data.telefone)}
+                                    onChange={(e) =>
+                                        handleChange('telefone', e.target.value)
+                                    }
+                                    maxLength={15}
+                                    required
+                                />
+                                {(zodErrors.telefone || errors.telefone) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.telefone || errors.telefone}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="col-span-2 mb-4">
+                                <label
+                                    htmlFor="email"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    E-mail
+                                </label>
+                                <input
+                                    id="email"
                                     type="email"
+                                    autoComplete="email"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.email || errors.email
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
                                     value={data.email}
                                     onChange={(e) =>
                                         setData('email', e.target.value)
                                     }
-                                    isError={
-                                        !!zodErrors.email || !!errors.email
-                                    }
+                                    required
                                 />
+                                {(zodErrors.email || errors.email) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.email || errors.email}
+                                    </p>
+                                )}
                             </div>
-                            <div className="col-span-2">
-                                <CampoInput
-                                    label="Senha"
+
+                            <div className="col-span-2 mb-4">
+                                <label
+                                    htmlFor="password"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    Senha
+                                </label>
+                                <input
+                                    id="password"
                                     type="password"
+                                    autoComplete="new-password"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.password || errors.password
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
                                     value={data.password}
                                     onChange={(e) =>
                                         setData('password', e.target.value)
                                     }
-                                    isError={
-                                        !!zodErrors.password ||
-                                        !!errors.password
-                                    }
+                                    required
                                 />
+                                {(zodErrors.password || errors.password) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.password || errors.password}
+                                    </p>
+                                )}
                             </div>
-                            <div className="col-span-2">
-                                <CampoInput
-                                    label="Confirmar Senha"
+
+                            <div className="col-span-2 mb-4">
+                                <label
+                                    htmlFor="password_confirmation"
+                                    className="mb-1 block text-sm font-bold text-[#555]"
+                                >
+                                    Confirmar Senha
+                                </label>
+                                <input
+                                    id="password_confirmation"
                                     type="password"
+                                    autoComplete="new-password"
+                                    className={`w-full rounded-md border px-3 py-2 text-sm transition duration-300 focus:outline-none ${
+                                        zodErrors.password_confirmation ||
+                                        errors.password_confirmation
+                                            ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)] bg-red-50'
+                                            : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
+                                    }`}
                                     value={data.password_confirmation}
                                     onChange={(e) =>
                                         setData(
@@ -211,11 +328,15 @@ export default function Cadastro() {
                                             e.target.value,
                                         )
                                     }
-                                    isError={
-                                        !!zodErrors.password_confirmation ||
-                                        !!errors.password_confirmation
-                                    }
+                                    required
                                 />
+                                {(zodErrors.password_confirmation ||
+                                    errors.password_confirmation) && (
+                                    <p className="mt-1 text-[10px] text-red-500">
+                                        {zodErrors.password_confirmation ||
+                                            errors.password_confirmation}
+                                    </p>
+                                )}
                             </div>
                         </div>
 

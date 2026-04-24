@@ -16,8 +16,12 @@ class PerfilController extends Controller
     /**
      * Show the profile edit form.
      */
-    public function edit(): Response
+    public function edit(string $user_slug): Response
     {
+        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
+            abort(404);
+        }
+
         return Inertia::render('Usuario/Perfil/Editar', [
             'user' => auth()->user(),
         ]);
@@ -26,8 +30,12 @@ class PerfilController extends Controller
     /**
      * Update user profile information.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request, string $user_slug): RedirectResponse
     {
+        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
+            abort(404);
+        }
+
         $user = auth()->user();
 
         $request->validate([
@@ -46,8 +54,12 @@ class PerfilController extends Controller
     /**
      * Update user password.
      */
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(Request $request, string $user_slug): RedirectResponse
     {
+        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
+            abort(404);
+        }
+
         $request->validate([
             'current_password' => 'required|current_password',
             'password' => ['required', 'confirmed', Password::defaults()],
@@ -71,7 +83,7 @@ class PerfilController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
         ]);
 
         return back()->with('success', 'Senha alterada com sucesso.');

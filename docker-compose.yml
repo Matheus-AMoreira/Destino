@@ -1,0 +1,20 @@
+services:
+  laravel:
+    build:
+      context: .
+      target: runtime_php
+    container_name: destino_laravel
+    env_file: .env.docker
+    ports:
+      - '8000:8000'
+
+  node:
+    build:
+      context: .
+      target: runtime_node
+    container_name: destino_node
+    working_dir: /app
+    ports:
+      - '13714:13714'
+    depends_on:
+      - laravel

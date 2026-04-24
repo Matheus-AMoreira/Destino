@@ -52,7 +52,7 @@ class RegisteredUserController extends Controller
             'cpf' => $request->cpf,
             'telefone' => $request->telefone,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'role' => UserRole::USUARIO,
             'is_valid' => true,
         ]);

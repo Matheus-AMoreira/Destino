@@ -98,7 +98,7 @@ export default function Confirmacao({ compra }: ConfirmacaoProps) {
 
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user: usuario?.id,
+                                user_slug: usuario?.name_slug,
                             })}
                             className="block w-full rounded-lg bg-blue-600 px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-blue-700"
                         >

@@ -61,6 +61,15 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * The attributes that should be appended to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'name_slug',
+    ];
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>
@@ -92,5 +101,13 @@ class User extends Authenticatable implements MustVerifyEmail
             'role' => UserRole::class,
             'authorities' => 'array',
         ];
+    }
+
+    /**
+     * Get the user's name slug (nome+sobrenome).
+     */
+    public function getNameSlugAttribute(): string
+    {
+        return str_replace(' ', '_', "{$this->nome} {$this->sobre_nome}");
     }
 }

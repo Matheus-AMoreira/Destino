@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { LocateFixed, Banknote } from 'lucide-react';
 import type { Pacote } from '@/types/Pacote';
+import Image from '../Image';
 
 const formatarValor = (valor: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -12,15 +13,15 @@ const formatarValor = (valor: number) => {
 export default function PacoteCard({ pacote }: { pacote: Pacote }) {
     const destino =
         pacote.ofertas?.[0]?.hotel?.cidade?.nome || 'Destino Desconhecido';
-    const fotoUrl = pacote.fotos_do_pacote?.foto_capa || '/placeholder.jpg';
+    const fotoUrl = pacote.fotos_do_pacote?.foto_capa_url || 'placeholder';
 
     return (
         <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-xl">
             <div className="relative h-48 overflow-hidden">
-                <img
-                    src={fotoUrl}
+                <Image
+                    name={fotoUrl}
                     alt={pacote.nome}
-                    className="h-full w-full object-cover transition-transform hover:scale-105"
+                    style="h-full w-full object-cover transition-transform hover:scale-105"
                 />
                 {pacote.ofertas?.[0]?.status === 'CONCLUIDO' && (
                     <div className="absolute top-2 right-2 rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-80">

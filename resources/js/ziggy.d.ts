@@ -6,7 +6,15 @@ declare module 'ziggy-js' {
     "cadastro": [],
     "entrar": [],
     "login": [],
-    "password.recover": [],
+    "password.request": [],
+    "password.email": [],
+    "password.reset": [
+        {
+            "name": "token",
+            "required": true
+        }
+    ],
+    "password.update": [],
     "verification.notice": [],
     "verification.verify": [
         {

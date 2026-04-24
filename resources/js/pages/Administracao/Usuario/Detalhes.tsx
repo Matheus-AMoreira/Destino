@@ -1,29 +1,25 @@
-import AdminLayout from '@/layouts/AdminLayout';
-import { User, Auth } from '@/types/auth';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { 
-    Calendar,
-    MapPin,
-    CreditCard,
-    X,
-    CheckCircle2,
-    Lock,
-    Unlock,
-    ShieldCheck,
-    User as UserIcon,
+    AlertCircle,
     ArrowLeft,
-    Clock,
-    Search,
-    Filter,
+    Calendar,
+    CheckCircle,
     ChevronDown,
     ChevronUp,
-    AlertCircle,
-    CheckCircle,
-    XCircle,
-    Eye
+    Clock,
+    Eye, 
+    Filter,
+    MapPin,
+    Search,
+    ShieldCheck,
+    User as UserIcon,
+    XCircle
 } from 'lucide-react';
-import React, { useState, useMemo } from 'react';
-import CustomModal, { ModalData } from '@/components/Modal';
+import { useMemo, useState } from 'react';
+import type { ModalData } from '@/components/Modal';
+import CustomModal from '@/components/Modal';
+import AdminLayout from '@/layouts/AdminLayout';
+import type { Auth, User } from '@/types/auth';
 
 interface Compra {
     id: string;
@@ -334,7 +330,7 @@ export default function Detalhes({ usuario, compras, roles, authorities }: Props
                                                                     </div>
                                                                 </div>
                                                                 <Link 
-                                                                    href={route('usuario.viagem.detalhes', { user: usuario.id, compra: compra.id })}
+                                                                    href={route('usuario.viagem.detalhes', { user_slug: usuario.name_slug, compra: compra.id })}
                                                                     className="w-full md:w-auto px-6 py-3 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-gray-800 transition-all flex items-center justify-center gap-3 group/btn"
                                                                 >
                                                                     Voucher
