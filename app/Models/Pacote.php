@@ -71,4 +71,14 @@ class Pacote extends Model
     {
         return $this->hasMany(Avaliacao::class);
     }
+
+    public function cheapestActiveOffer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Oferta::class)->where('is_available', true)->ofMany('preco', 'min');
+    }
+
+    public function latestOffer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Oferta::class)->latestOfMany();
+    }
 }

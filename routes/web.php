@@ -17,7 +17,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\Usuario\PerfilController;
-use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Support\Facades\Route;
@@ -56,63 +55,99 @@ Route::middleware([Authenticate::class])->group(function () {
 Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
 Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
 
-Route::middleware([Authenticate::class, EnsureEmailIsVerified::class, AdminMiddleware::class]) -> prefix(('administracao')) -> name('administracao.') ->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas');
-    Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
-    Route::get('/hotel/registrar', [HotelController::class, 'create'])->name('hotel.registrar');
-    Route::post('/hotel/registrar', [HotelController::class, 'store'])->name('hotel.store');
-    Route::get('/hotel/editar/{hotel}', [HotelController::class, 'edit'])->name('hotel.edit');
-    Route::put('/hotel/editar/{hotel}', [HotelController::class, 'update'])->name('hotel.update');
-    Route::delete('/hotel/{hotel}', [HotelController::class, 'destroy'])->name('hotel.destroy');
-    Route::get('/pacote/listar', [PacoteController::class, 'index'])->name('pacote.listar');
-    Route::get('/pacote/registrar', [PacoteController::class, 'create'])->name('pacote.registrar');
-    Route::post('/pacote/registrar', [PacoteController::class, 'store'])->name('pacote.store');
-    Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
-    Route::put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
-    Route::delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
-    Route::get('/pacote/{pacote}/compras', [PacoteController::class, 'compras'])->name('pacote.compras');
-    Route::get('/pacotedefoto/listar', [PacoteFotoController::class, 'index'])->name('pacotedefoto.listar');
-    Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar');
-    Route::post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');
-    Route::get('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'edit'])->name('pacotedefoto.edit');
-    Route::post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update');
-    Route::delete('/pacotedefoto/{pacotedefoto}', [PacoteFotoController::class, 'destroy'])->name('pacotedefoto.destroy');
+Route::middleware([Authenticate::class, EnsureEmailIsVerified::class])->prefix('administracao')->name('administracao.')->group(function () {
+    // Dashboard (Acesso básico para quem pode ver algo na admin)
+    Route::middleware('authorize.ui:dashboard:read')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas');
+    });
 
-    Route::get('/oferta/listar', [OfertaController::class, 'index'])->name('oferta.listar');
-    Route::get('/oferta/registrar', [OfertaController::class, 'create'])->name('oferta.registrar');
-    Route::post('/oferta/registrar', [OfertaController::class, 'store'])->name('oferta.store');
-    Route::get('/oferta/editar/{oferta}', [OfertaController::class, 'edit'])->name('oferta.edit');
-    Route::put('/oferta/editar/{oferta}', [OfertaController::class, 'update'])->name('oferta.update');
-    Route::delete('/oferta/{oferta}', [OfertaController::class, 'destroy'])->name('oferta.destroy');
-    Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
-    Route::get('/transporte/registrar', [TransporteController::class, 'create'])->name('transporte.registrar');
-    Route::post('/transporte/registrar', [TransporteController::class, 'store'])->name('transporte.store');
-    Route::get('/transporte/editar/{transporte}', [TransporteController::class, 'edit'])->name('transporte.edit');
-    Route::put('/transporte/editar/{transporte}', [TransporteController::class, 'update'])->name('transporte.update');
-    Route::delete('/transporte/{transporte}', [TransporteController::class, 'destroy'])->name('transporte.destroy');
-    Route::get('/usuario/listar', [UsuarioController::class, 'index'])->name('usuario.listar');
-    Route::get('/usuario/{user}', [UsuarioController::class, 'show'])->name('usuario.show');
-    Route::post('/usuario/{user}/aprovar', [UsuarioController::class, 'aprovar'])->name('usuario.aprovar');
-    Route::post('/usuario/{user}/block', [UsuarioController::class, 'toggleBlock'])->name('usuario.toggle-block');
-    Route::put('/usuario/{user}/access', [UsuarioController::class, 'updateAccess'])->name('usuario.update-access');
-    Route::put('/usuario/{user}/perfil', [PerfilController::class, 'adminUpdate'])->name('usuario.perfil-update');
-    Route::get('/usuario/{user}/compras', [UsuarioController::class, 'compras'])->name('usuario.compras');
+    // Hotéis
+    Route::middleware('authorize.ui:hotel:read')->group(function () {
+        Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
+        Route::get('/hotel/editar/{hotel}', [HotelController::class, 'edit'])->name('hotel.edit');
+    });
+    Route::middleware('authorize.api:hotel,create')->post('/hotel/registrar', [HotelController::class, 'store'])->name('hotel.store');
+    Route::middleware('authorize.api:hotel,update')->put('/hotel/editar/{hotel}', [HotelController::class, 'update'])->name('hotel.update');
+    Route::middleware('authorize.api:hotel,delete')->delete('/hotel/{hotel}', [HotelController::class, 'destroy'])->name('hotel.destroy');
+    Route::get('/hotel/registrar', [HotelController::class, 'create'])->name('hotel.registrar')->middleware('authorize.ui:hotel:create');
+
+    // Pacotes
+    Route::middleware('authorize.ui:package:read')->group(function () {
+        Route::get('/pacote/listar', [PacoteController::class, 'index'])->name('pacote.listar');
+        Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
+        Route::get('/pacote/{pacote}/compras', [PacoteController::class, 'compras'])->name('pacote.compras');
+    });
+    Route::middleware('authorize.api:package,create')->post('/pacote/registrar', [PacoteController::class, 'store'])->name('pacote.store');
+    Route::middleware('authorize.api:package,update')->put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
+    Route::middleware('authorize.api:package,delete')->delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
+    Route::get('/pacote/registrar', [PacoteController::class, 'create'])->name('pacote.registrar')->middleware('authorize.ui:package:create');
+
+    // Pacotes de Fotos
+    Route::middleware('authorize.ui:package-photo:read')->group(function () {
+        Route::get('/pacotedefoto/listar', [PacoteFotoController::class, 'index'])->name('pacotedefoto.listar');
+        Route::get('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'edit'])->name('pacotedefoto.edit');
+    });
+    Route::middleware('authorize.api:package-photo,create')->post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');
+    Route::middleware('authorize.api:package-photo,update')->post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update');
+    Route::middleware('authorize.api:package-photo,delete')->delete('/pacotedefoto/{pacotedefoto}', [PacoteFotoController::class, 'destroy'])->name('pacotedefoto.destroy');
+    Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar')->middleware('authorize.ui:package-photo:create');
+
+    // Usuários (Gestão)
+    Route::get('/usuario/registrar', [UsuarioController::class, 'create'])->name('usuario.registrar')->middleware('authorize.ui:user:create');
+    Route::post('/usuario/registrar', [UsuarioController::class, 'store'])->name('usuario.store')->middleware('authorize.api:user,create');
+
+    Route::middleware('authorize.ui:user:read')->group(function () {
+        Route::get('/usuario/listar', [UsuarioController::class, 'index'])->name('usuario.listar');
+        Route::get('/usuario/{user}', [UsuarioController::class, 'show'])->name('usuario.show');
+        Route::get('/usuario/{user}/compras', [UsuarioController::class, 'compras'])->name('usuario.compras');
+    });
+    
+    Route::post('/usuario/{user}/resend-invitation', [UsuarioController::class, 'resendInvitation'])->name('usuario.resend-invitation')->middleware('authorize.api:user,update');
+    
+    Route::middleware('authorize.api:user,update')->group(function () {
+        Route::post('/usuario/{user}/aprovar', [UsuarioController::class, 'aprovar'])->name('usuario.aprovar');
+        Route::post('/usuario/{user}/block', [UsuarioController::class, 'toggleBlock'])->name('usuario.toggle-block');
+        Route::delete('/usuario/{user}', [UsuarioController::class, 'destroy'])->name('usuario.destroy');
+        Route::put('/usuario/{user}/access', [UsuarioController::class, 'updateAccess'])->name('usuario.update-access');
+        Route::put('/usuario/{user}/perfil', [PerfilController::class, 'adminUpdate'])->name('usuario.perfil-update');
+    });
+
+    // Ofertas
+    Route::middleware('authorize.ui:offer:read')->group(function () {
+        Route::get('/oferta/listar', [OfertaController::class, 'index'])->name('oferta.listar');
+        Route::get('/oferta/editar/{oferta}', [OfertaController::class, 'edit'])->name('oferta.edit');
+    });
+    Route::middleware('authorize.api:offer,create')->post('/oferta/registrar', [OfertaController::class, 'store'])->name('offer.store');
+    Route::middleware('authorize.api:offer,update')->put('/oferta/editar/{oferta}', [OfertaController::class, 'update'])->name('offer.update');
+    Route::middleware('authorize.api:offer,delete')->delete('/oferta/{oferta}', [OfertaController::class, 'destroy'])->name('offer.destroy');
+    Route::get('/oferta/registrar', [OfertaController::class, 'create'])->name('oferta.registrar')->middleware('authorize.ui:offer:create');
+
+    // Transportes
+    Route::middleware('authorize.ui:transport:read')->group(function () {
+        Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
+        Route::get('/transporte/editar/{transporte}', [TransporteController::class, 'edit'])->name('transporte.edit');
+    });
+    Route::middleware('authorize.api:transport,create')->post('/transporte/registrar', [TransporteController::class, 'store'])->name('transport.store');
+    Route::middleware('authorize.api:transport,update')->put('/transporte/editar/{transporte}', [TransporteController::class, 'update'])->name('transport.update');
+    Route::middleware('authorize.api:transport,delete')->delete('/transporte/{transporte}', [TransporteController::class, 'destroy'])->name('transport.destroy');
+    Route::get('/transporte/registrar', [TransporteController::class, 'create'])->name('transporte.registrar')->middleware('authorize.ui:transport:create');
 });
 
 Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [CheckoutController::class, 'index'])->name('index');
-    Route::post('/processar', [CheckoutController::class, 'processar'])->name('processar');
-    Route::get('/confirmacao/{compraId}', [CheckoutController::class, 'confirmacao'])->name('confirmacao');
+    Route::get('/', [CheckoutController::class, 'index'])->name('index')->middleware('authorize.ui:purchase:create');
+    Route::post('/processar', [CheckoutController::class, 'processar'])->name('processar')->middleware('authorize.api:purchase,create');
+    Route::get('/confirmacao/{compraId}', [CheckoutController::class, 'confirmacao'])->name('confirmacao')->middleware('authorize.ui:purchase:read');
 });
 
 Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');
 
-Route::prefix('{user_slug}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified'])->group(function () {
+Route::prefix('{user:slug}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified', 'authorize.ui:purchase:read'])->group(function () {
     Route::get('/', [RouteController::class, 'usuarioViagemListar'])->name('listar');
     Route::get('/detalhes/{compra}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
 });
 
-Route::get('{user_slug}/perfil', [PerfilController::class, 'edit'])->name('usuario.perfil.edit');
-Route::put('{user_slug}/perfil', [PerfilController::class, 'update'])->name('usuario.perfil.update')->middleware(['auth', 'verified']);
-Route::put('{user_slug}/perfil/senha', [PerfilController::class, 'updatePassword'])->name('usuario.perfil.password')->middleware(['auth', 'verified']);
+Route::get('{user:slug}/perfil', [PerfilController::class, 'edit'])->name('usuario.perfil.edit')->middleware(['auth', 'verified', 'authorize.ui:profile:update']);
+Route::put('{user:slug}/perfil', [PerfilController::class, 'update'])->name('usuario.perfil.update')->middleware(['auth', 'verified', 'authorize.api:profile,update']);
+Route::put('{user:slug}/perfil/senha', [PerfilController::class, 'updatePassword'])->name('usuario.perfil.password')->middleware(['auth', 'verified', 'authorize.api:profile,update']);
+Route::delete('{user:slug}/perfil', [PerfilController::class, 'destroy'])->name('usuario.perfil.destroy')->middleware(['auth', 'verified', 'authorize.api:profile,delete']);

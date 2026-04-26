@@ -9,7 +9,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -40,11 +39,19 @@ class RegisteredUserController extends Controller
         $request->validate([
             'nome' => 'required|string|max:20',
             'sobre_nome' => 'required|string|max:20',
-            'cpf' => 'required|string|size:11|unique:'.User::class,
+            'cpf' => 'required|string|size:11',
             'telefone' => 'required|string|min:10|max:11',
-            'email' => 'required|string|lowercase|email|max:100|unique:'.User::class,
+            'email' => 'required|string|lowercase|email|max:100',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        // Verificação de unicidade com mensagem genérica para não revelar quais dados já existem
+        $jaExiste = User::where('email', $request->email)->orWhere('cpf', $request->cpf)->exists();
+        if ($jaExiste) {
+            throw ValidationException::withMessages([
+                'email' => 'Os dados informados já estão associados a uma conta. Verifique o e-mail ou CPF e tente novamente.',
+            ]);
+        }
 
         $User = User::create([
             'nome' => $request->nome,
@@ -53,7 +60,7 @@ class RegisteredUserController extends Controller
             'telefone' => $request->telefone,
             'email' => $request->email,
             'password' => $request->password,
-            'role' => UserRole::USUARIO,
+            'role_id' => \App\Models\Role::where('name', UserRole::USUARIO->value)->first()->id,
             'is_valid' => true,
         ]);
 

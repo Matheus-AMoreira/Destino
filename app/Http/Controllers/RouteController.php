@@ -15,7 +15,16 @@ class RouteController extends Controller
 {
     public function index(Request $request): Response
     {
-        $pacotes = Pacote::with(['fotos_do_pacote', 'tags', 'ofertas.hotel.cidade.estado'])
+        $pacotes = Pacote::has('ofertas')
+            ->with([
+                'fotos_do_pacote',
+                'tags',
+                'cheapestActiveOffer.hotel.cidade.estado',
+                'latestOffer.hotel.cidade.estado'
+            ])
+            ->withCount(['ofertas as active_ofertas_count' => function ($query) {
+                $query->where('is_available', true);
+            }])
             ->latest()
             ->paginate(12);
 
@@ -30,9 +39,18 @@ class RouteController extends Controller
     {
         $termo = $request->get('termo', '');
         $precoMax = (int) $request->get('precoMax', 0);
-        $size = (int) $request->get('size', 12);
+        $size = min((int) $request->get('size', 12), 50); // Limite máximo para prevenir DoS
 
-        $query = Pacote::with(['fotos_do_pacote', 'tags', 'ofertas.hotel.cidade.estado']);
+        $query = Pacote::has('ofertas')
+            ->with([
+                'fotos_do_pacote',
+                'tags',
+                'cheapestActiveOffer.hotel.cidade.estado',
+                'latestOffer.hotel.cidade.estado'
+            ])
+            ->withCount(['ofertas as active_ofertas_count' => function ($query) {
+                $query->where('is_available', true);
+            }]);
 
         if ($termo) {
             $query->where(function ($q) use ($termo) {
@@ -43,7 +61,8 @@ class RouteController extends Controller
 
         if ($precoMax > 0) {
             $query->whereHas('ofertas', function ($q) use ($precoMax) {
-                $q->where('preco', '<=', $precoMax);
+                $q->where('preco', '<=', $precoMax)
+                    ->where('is_available', true);
             });
         }
 
@@ -70,75 +89,6 @@ class RouteController extends Controller
         return Inertia::render('Contato');
     }
 
-    public function administracao(): Response|RedirectResponse
-    {
-        return Inertia::render('Administracao/Dashboard');
-    }
-
-    public function administracaoDashboard(): Response
-    {
-        return Inertia::render('Administracao/Dashboard');
-    }
-
-    public function administracaoUsuarioListar(): Response
-    {
-        return Inertia::render('Administracao/Usuarios', [
-            'usuarios' => User::all(),
-        ]);
-    }
-
-    public function administracaoHotelListar(): Response
-    {
-        return Inertia::render('Administracao/Hotel/Listar');
-    }
-
-    public function administracaoHotelRegistrar(): Response
-    {
-        return Inertia::render('Administracao/Hotel/Registrar');
-    }
-
-    public function administracaoPacoteListar(): Response
-    {
-        return Inertia::render('Administracao/Pacote/Listar');
-    }
-
-    public function administracaoPacoteRegistrar(): Response
-    {
-        return Inertia::render('Administracao/Pacote/Registrar');
-    }
-
-    public function administracaoPacotedefotoListar(): Response
-    {
-        return Inertia::render('Administracao/Pacotedefoto/Listar');
-    }
-
-    public function administracaoPacotedefotoRegistrar(): Response
-    {
-        return Inertia::render('Administracao/Pacotedefoto/Registrar');
-    }
-
-    public function administracaoTransporteListar(): Response
-    {
-        return Inertia::render('Administracao/Transporte/Listar');
-    }
-
-    public function administracaoTransporteRegistrar(): Response
-    {
-        return Inertia::render('Administracao/Transporte/Registrar');
-    }
-
-    public function checkout(): Response
-    {
-        return Inertia::render('Checkout/Index');
-    }
-
-    public function checkoutConfirmacao(string $compraId): Response
-    {
-        return Inertia::render('Checkout/Confirmacao', [
-            'compraId' => $compraId,
-        ]);
-    }
-
     public function pacote(string $nome): Response
     {
         $pacote = Pacote::where('nome', $nome)->with([
@@ -148,6 +98,8 @@ class RouteController extends Controller
                 $query->where('is_available', true)
                     ->with(['hotel.cidade.estado', 'transporte']);
             },
+            'latestOffer.hotel.cidade.estado',
+            'latestOffer.transporte',
         ])->firstOrFail();
 
         return Inertia::render('Pacote/Detalhes', [
@@ -155,18 +107,17 @@ class RouteController extends Controller
         ]);
     }
 
-    public function usuarioViagemListar(Request $request, string $user_slug): Response
+    public function usuarioViagemListar(Request $request, User $user): Response
     {
-        $user = User::whereRaw("REPLACE(CONCAT(nome, ' ', sobre_nome), ' ', '_') = ?", [$user_slug])->firstOrFail();
         $view = $request->query('view', 'andamento');
         $auth = auth()->user();
 
         // Authorization logic
         if ($auth->id !== $user->id) {
-            if ($auth->role === UserRole::USUARIO) {
+            if ($auth->role->name === UserRole::USUARIO->value) {
                 abort(403, 'Acesso negado.');
             }
-            if ($auth->role === UserRole::FUNCIONARIO && $user->role !== UserRole::USUARIO) {
+            if ($auth->role->name === UserRole::FUNCIONARIO->value && $user->role->name !== UserRole::USUARIO->value) {
                 abort(403, 'Funcionários só podem visualizar histórico de usuários comuns.');
             }
         }
@@ -194,17 +145,16 @@ class RouteController extends Controller
         ]);
     }
 
-    public function usuarioViagemListarId(string $user_slug, Compra $compra): Response
+    public function usuarioViagemListarId(User $user, Compra $compra): Response
     {
-        $user = User::whereRaw("REPLACE(CONCAT(nome, ' ', sobre_nome), ' ', '_') = ?", [$user_slug])->firstOrFail();
         $auth = auth()->user();
 
         // Authorization logic
         if ($auth->id !== $user->id) {
-            if ($auth->role === UserRole::USUARIO) {
+            if ($auth->role->name === UserRole::USUARIO->value) {
                 abort(403, 'Acesso negado.');
             }
-            if ($auth->role === UserRole::FUNCIONARIO && $user->role !== UserRole::USUARIO) {
+            if ($auth->role->name === UserRole::FUNCIONARIO->value && $user->role->name !== UserRole::USUARIO->value) {
                 abort(403, 'Funcionários só podem visualizar detalhes de viagens de usuários comuns.');
             }
         }

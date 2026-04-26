@@ -1,57 +1,14 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import { z } from 'zod';
+import { useState, useEffect } from 'react';
 import AuthLogo from '@/components/auth/AuthLogo';
 import RequisitosSenha from '@/components/auth/RequisitosSenha';
 import type { ModalData } from '@/components/Modal';
 import CustomModal from '@/components/Modal';
-
-const formatarCPF = (val: string) =>
-    val
-        .replace(/\D/g, '')
-        .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
-        .substring(0, 14);
-const formatarTelefone = (val: string) =>
-    val
-        .replace(/\D/g, '')
-        .replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-        .substring(0, 15);
-
-const schemaCadastro = z
-    .object({
-        nome: z
-            .string()
-            .min(3, 'Mínimo 3 caracteres')
-            .regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-        sobre_nome: z
-            .string()
-            .min(3, 'Mínimo 3 caracteres')
-            .regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-        cpf: z.string().length(11, 'CPF deve ter 11 dígitos'),
-        telefone: z
-            .string()
-            .min(10, 'Telefone inválido')
-            .max(11, 'Telefone inválido'),
-        email: z.email('E-mail inválido'),
-        password: z
-            .string()
-            .min(8, 'Mínimo 8 caracteres')
-            .regex(/[A-Z]/, 'Uma letra maiúscula é obrigatória')
-            .regex(/[a-z]/, 'Uma letra minúscula é obrigatória')
-            .regex(/\d/, 'Um número é obrigatório')
-            .regex(
-                /[@$!%*?&#\-_]/,
-                'Um caractere especial (@$!%*?&#-_) é obrigatório',
-            ),
-        password_confirmation: z.string(),
-    })
-    .refine((data) => data.password === data.password_confirmation, {
-        message: 'As senhas não coincidem',
-        path: ['password_confirmation'],
-    });
+import { formatarCPF, formatarTelefone, limparNaoNumericos } from '@/lib/masks';
+import { schemaCadastro } from '@/lib/schemas';
 
 export default function Cadastro() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset, transform } = useForm({
         nome: '',
         sobre_nome: '',
         cpf: '',
@@ -69,8 +26,16 @@ export default function Cadastro() {
 
     const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
 
+    useEffect(() => {
+        transform((data) => ({
+            ...data,
+            cpf: limparNaoNumericos(data.cpf),
+            telefone: limparNaoNumericos(data.telefone)
+        }));
+    }, [data.cpf, data.telefone]);
+
     const handleChange = (campo: string, valor: string) => {
-        const rawValue = valor.replace(/\D/g, '');
+        const rawValue = limparNaoNumericos(valor);
 
         if (campo === 'cpf') {
             setData('cpf', rawValue.substring(0, 11));
@@ -81,7 +46,7 @@ export default function Cadastro() {
         }
     };
 
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const result = schemaCadastro.safeParse(data);
@@ -152,7 +117,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.nome || errors.nome) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.nome || errors.nome}
                                     </p>
                                 )}
@@ -181,7 +146,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.sobre_nome || errors.sobre_nome) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.sobre_nome || errors.sobre_nome}
                                     </p>
                                 )}
@@ -210,7 +175,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.cpf || errors.cpf) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.cpf || errors.cpf}
                                     </p>
                                 )}
@@ -240,7 +205,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.telefone || errors.telefone) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.telefone || errors.telefone}
                                     </p>
                                 )}
@@ -269,7 +234,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.email || errors.email) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.email || errors.email}
                                     </p>
                                 )}
@@ -298,7 +263,7 @@ export default function Cadastro() {
                                     required
                                 />
                                 {(zodErrors.password || errors.password) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.password || errors.password}
                                     </p>
                                 )}
@@ -332,7 +297,7 @@ export default function Cadastro() {
                                 />
                                 {(zodErrors.password_confirmation ||
                                     errors.password_confirmation) && (
-                                    <p className="mt-1 text-[10px] text-red-500">
+                                    <p className="mt-1 text-[10px] text-red-500 font-bold">
                                         {zodErrors.password_confirmation ||
                                             errors.password_confirmation}
                                     </p>

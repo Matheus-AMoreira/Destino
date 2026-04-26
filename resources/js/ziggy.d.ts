@@ -32,8 +32,6 @@ declare module 'ziggy-js' {
     "administracao.dashboard": [],
     "administracao.dashboard.estatisticas": [],
     "administracao.hotel.listar": [],
-    "administracao.hotel.registrar": [],
-    "administracao.hotel.store": [],
     "administracao.hotel.edit": [
         {
             "name": "hotel",
@@ -41,6 +39,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "administracao.hotel.store": [],
     "administracao.hotel.update": [
         {
             "name": "hotel",
@@ -55,9 +54,8 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "administracao.hotel.registrar": [],
     "administracao.pacote.listar": [],
-    "administracao.pacote.registrar": [],
-    "administracao.pacote.store": [],
     "administracao.pacote.edit": [
         {
             "name": "pacote",
@@ -65,6 +63,14 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "administracao.pacote.compras": [
+        {
+            "name": "pacote",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.pacote.store": [],
     "administracao.pacote.update": [
         {
             "name": "pacote",
@@ -79,16 +85,8 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
-    "administracao.pacote.compras": [
-        {
-            "name": "pacote",
-            "required": true,
-            "binding": "id"
-        }
-    ],
+    "administracao.pacote.registrar": [],
     "administracao.pacotedefoto.listar": [],
-    "administracao.pacotedefoto.registrar": [],
-    "administracao.pacotedefoto.store": [],
     "administracao.pacotedefoto.edit": [
         {
             "name": "pacotedefoto",
@@ -96,6 +94,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "administracao.pacotedefoto.store": [],
     "administracao.pacotedefoto.update": [
         {
             "name": "pacotedefoto",
@@ -110,56 +109,25 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
-    "administracao.oferta.listar": [],
-    "administracao.oferta.registrar": [],
-    "administracao.oferta.store": [],
-    "administracao.oferta.edit": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.oferta.update": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.oferta.destroy": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transporte.listar": [],
-    "administracao.transporte.registrar": [],
-    "administracao.transporte.store": [],
-    "administracao.transporte.edit": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transporte.update": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transporte.destroy": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
+    "administracao.pacotedefoto.registrar": [],
+    "administracao.usuario.registrar": [],
+    "administracao.usuario.store": [],
     "administracao.usuario.listar": [],
     "administracao.usuario.show": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.compras": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.usuario.resend-invitation": [
         {
             "name": "user",
             "required": true,
@@ -180,6 +148,13 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
+    "administracao.usuario.destroy": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "id"
+        }
+    ],
     "administracao.usuario.update-access": [
         {
             "name": "user",
@@ -194,13 +169,54 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
-    "administracao.usuario.compras": [
+    "administracao.oferta.listar": [],
+    "administracao.oferta.edit": [
         {
-            "name": "user",
+            "name": "oferta",
             "required": true,
             "binding": "id"
         }
     ],
+    "administracao.offer.store": [],
+    "administracao.offer.update": [
+        {
+            "name": "oferta",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.offer.destroy": [
+        {
+            "name": "oferta",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.oferta.registrar": [],
+    "administracao.transporte.listar": [],
+    "administracao.transporte.edit": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.transport.store": [],
+    "administracao.transport.update": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.transport.destroy": [
+        {
+            "name": "transporte",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "administracao.transporte.registrar": [],
     "checkout.index": [],
     "checkout.processar": [],
     "checkout.confirmacao": [
@@ -217,14 +233,16 @@ declare module 'ziggy-js' {
     ],
     "usuario.viagem.listar": [
         {
-            "name": "user_slug",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "slug"
         }
     ],
     "usuario.viagem.detalhes": [
         {
-            "name": "user_slug",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "slug"
         },
         {
             "name": "compra",
@@ -234,20 +252,30 @@ declare module 'ziggy-js' {
     ],
     "usuario.perfil.edit": [
         {
-            "name": "user_slug",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "slug"
         }
     ],
     "usuario.perfil.update": [
         {
-            "name": "user_slug",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "slug"
         }
     ],
     "usuario.perfil.password": [
         {
-            "name": "user_slug",
-            "required": true
+            "name": "user",
+            "required": true,
+            "binding": "slug"
+        }
+    ],
+    "usuario.perfil.destroy": [
+        {
+            "name": "user",
+            "required": true,
+            "binding": "slug"
         }
     ],
     "storage.local": [
@@ -264,9 +292,4 @@ declare module 'ziggy-js' {
     ]
 }
 }
-
-import type { Config } from 'ziggy-js';
-
-declare const Ziggy: Config;
-
-export { Ziggy };
+export {};

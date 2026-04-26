@@ -38,9 +38,11 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
         }
     }, [pacote]);
 
+    const temOfertasAtivas = (pacote.ofertas?.length ?? 0) > 0;
     const ofertaAtual =
         pacote?.ofertas?.find((o) => o.id === ofertaSelecionadaId) ||
-        pacote?.ofertas?.[0];
+        pacote?.ofertas?.[0] ||
+        pacote?.latest_offer;
 
     const formatarPreco = (preco: number) => {
         return preco.toLocaleString('pt-BR', {
@@ -50,7 +52,7 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
     };
 
     const handleComprar = () => {
-        if (!ofertaAtual) return;
+        if (!temOfertasAtivas || !ofertaAtual) return;
         router.get(route('checkout.index'), {
             ofertaId: ofertaAtual.id,
         });
@@ -121,6 +123,16 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                 </nav>
 
                 <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+                    {!temOfertasAtivas && (
+                        <div className="bg-orange-50 border-b border-orange-100 p-4 text-center">
+                            <p className="text-orange-800 font-bold flex items-center justify-center gap-2">
+                                ⚠️ Não possuem ofertas abertas no momento.
+                                <span className="font-normal">
+                                    Mostrando informações da última viagem realizada.
+                                </span>
+                            </p>
+                        </div>
+                    )}
                     <div className="grid grid-cols-1 gap-8 p-8 lg:grid-cols-2">
                         {/* Galeria */}
                         <div className="space-y-4">
@@ -216,9 +228,9 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 )}
                             </div>
 
-                            <div className="rounded-xl border border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50 p-6">
+                            <div className={`rounded-xl border p-6 ${temOfertasAtivas ? 'border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <div className="flex items-baseline space-x-2">
-                                    <span className="text-4xl font-bold text-blue-900">
+                                    <span className={`text-4xl font-bold ${temOfertasAtivas ? 'text-blue-900' : 'text-gray-400'}`}>
                                         {formatarPreco(
                                             (ofertaAtual?.preco || 0) *
                                                 numeroPessoas,
@@ -240,76 +252,92 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
                             <div className="space-y-3">
                                 <label className="block text-lg font-semibold text-gray-900">
-                                    Escolha a data da viagem
+                                    {temOfertasAtivas ? 'Escolha a data da viagem' : 'Última viagem realizada'}
                                 </label>
                                 <div className="flex flex-col gap-2">
-                                    {pacote.ofertas?.map((oferta) => (
-                                        <label
-                                            key={oferta.id}
-                                            className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${
-                                                ofertaSelecionadaId ===
-                                                oferta.id
-                                                    ? 'border-blue-500 bg-blue-50/50 shadow-sm'
-                                                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <input
-                                                    type="radio"
-                                                    name="oferta"
-                                                    checked={
-                                                        ofertaSelecionadaId ===
-                                                        oferta.id
-                                                    }
-                                                    onChange={() =>
-                                                        setOfertaSelecionadaId(
-                                                            oferta.id,
-                                                        )
-                                                    }
-                                                    className="h-5 w-5 cursor-pointer text-blue-600 focus:ring-blue-500"
-                                                />
-                                                <div>
-                                                    <div className="font-medium text-gray-900">
-                                                        {formatarData(
-                                                            oferta.inicio,
-                                                        )}{' '}
-                                                        a{' '}
-                                                        {formatarData(
-                                                            oferta.fim,
+                                    {temOfertasAtivas ? (
+                                        pacote.ofertas?.map((oferta) => (
+                                            <label
+                                                key={oferta.id}
+                                                className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all ${
+                                                    ofertaSelecionadaId ===
+                                                    oferta.id
+                                                        ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                                                        : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <input
+                                                        type="radio"
+                                                        name="oferta"
+                                                        checked={
+                                                            ofertaSelecionadaId ===
+                                                            oferta.id
+                                                        }
+                                                        onChange={() =>
+                                                            setOfertaSelecionadaId(
+                                                                oferta.id,
+                                                            )
+                                                        }
+                                                        className="h-5 w-5 cursor-pointer text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                    <div>
+                                                        <div className="font-medium text-gray-900">
+                                                            {formatarData(
+                                                                oferta.inicio,
+                                                            )}{' '}
+                                                            a{' '}
+                                                            {formatarData(
+                                                                oferta.fim,
+                                                            )}
+                                                        </div>
+                                                        <div className="text-sm text-gray-500">
+                                                            Hotel:{' '}
+                                                            {oferta.hotel?.nome} |{' '}
+                                                            {
+                                                                oferta.transporte
+                                                                    ?.meio
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="font-bold text-gray-900">
+                                                        {formatarPreco(
+                                                            oferta.preco,
                                                         )}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
-                                                        Hotel:{' '}
-                                                        {oferta.hotel?.nome} |{' '}
-                                                        {
-                                                            oferta.transporte
-                                                                ?.meio
-                                                        }
+                                                    <div className="text-xs font-medium text-green-600">
+                                                        {oferta.disponibilidade}{' '}
+                                                        vagas
                                                     </div>
                                                 </div>
+                                            </label>
+                                        ))
+                                    ) : (
+                                        <div className="rounded-xl border border-gray-200 p-4 bg-white opacity-60">
+                                            <div className="font-medium text-gray-900">
+                                                {formatarData(ofertaAtual?.inicio || '')} a {formatarData(ofertaAtual?.fim || '')}
                                             </div>
-                                            <div className="text-right">
-                                                <div className="font-bold text-gray-900">
-                                                    {formatarPreco(
-                                                        oferta.preco,
-                                                    )}
-                                                </div>
-                                                <div className="text-xs font-medium text-green-600">
-                                                    {oferta.disponibilidade}{' '}
-                                                    vagas
-                                                </div>
+                                            <div className="text-sm text-gray-500">
+                                                Hotel: {ofertaAtual?.hotel?.nome} | {ofertaAtual?.transporte?.meio}
                                             </div>
-                                        </label>
-                                    ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleComprar}
-                                className="flex w-full transform items-center justify-center space-x-2 rounded-xl bg-blue-600 px-6 py-4 text-lg font-bold text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95"
+                                disabled={!temOfertasAtivas}
+                                className={`flex w-full transform items-center justify-center space-x-2 rounded-xl px-6 py-4 text-lg font-bold text-white shadow-lg transition-all ${
+                                    temOfertasAtivas 
+                                    ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl active:scale-95' 
+                                    : 'bg-gray-400 cursor-not-allowed'
+                                }`}
                             >
                                 <TicketsPlane className="text-2xl" />
-                                <span>Reservar Agora</span>
+                                <span>{temOfertasAtivas ? 'Reservar Agora' : 'Sem Ofertas Disponíveis'}</span>
                             </button>
 
                             <div className="rounded-lg bg-gray-50 p-4 text-gray-700">

@@ -39,7 +39,19 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() 
+                    ? array_merge($request->user()->load(['role'])->toArray(), [
+                        'permissions' => app(\App\Services\AuthService::class)->loadUserPermissionsForFrontend($request->user())
+                    ]) 
+                    : null,
+            ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+                'warning' => $request->session()->get('warning'),
+                // ATENÇÃO: invitation_password é exposto apenas fora de produção.
+                // Em produção, substituir por envio de e-mail real (WelcomeStaffMail).
+                'invitation_password' => app()->isProduction() ? null : $request->session()->get('invitation_password'),
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),

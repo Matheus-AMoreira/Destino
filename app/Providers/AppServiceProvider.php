@@ -19,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\AuthService::class, function ($app) {
+            return new \App\Services\AuthService();
+        });
     }
 
     /**

@@ -21,7 +21,7 @@ export interface Pacote {
         id: number;
         nome: string;
     }>;
-    ofertas: Array<{
+    ofertas?: Array<{
         id: number;
         preco: number;
         inicio: string;
@@ -50,6 +50,9 @@ export interface Pacote {
             preco: number;
         };
     }>;
+    cheapest_active_offer?: any;
+    latest_offer?: any;
+    active_ofertas_count?: number;
     created_at?: string;
     updated_at?: string;
 }

@@ -16,37 +16,46 @@ class PerfilController extends Controller
     /**
      * Show the profile edit form.
      */
-    public function edit(string $user_slug): Response
+    public function edit(User $user): Response
     {
-        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
-            abort(404);
+        // Apenas o próprio usuário pode ver/editar seu perfil
+        if (auth()->id() !== $user->id) {
+            abort(403);
         }
 
         return Inertia::render('Usuario/Perfil/Editar', [
-            'user' => auth()->user(),
+            'user' => $user,
         ]);
     }
 
     /**
      * Update user profile information.
      */
-    public function update(Request $request, string $user_slug): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
-        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
-            abort(404);
+        // Apenas o próprio usuário pode atualizar seu perfil
+        if (auth()->id() !== $user->id) {
+            abort(403);
         }
 
-        $user = auth()->user();
+        $request->merge([
+            'cpf' => preg_replace('/\D/', '', $request->cpf),
+            'telefone' => preg_replace('/\D/', '', $request->telefone ?? ''),
+        ]);
 
         $request->validate([
             'nome' => 'required|string|max:255',
             'sobre_nome' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
-            'cpf' => "required|string|unique:users,cpf,{$user->id}",
+            'cpf' => "required|string|size:11|unique:users,cpf,{$user->id}",
+            'telefone' => 'nullable|string|max:11',
+        ], [
+            'cpf.size' => 'O CPF deve conter exatamente 11 números.',
+            'telefone.max' => 'O telefone não pode ter mais de 11 dígitos.',
         ]);
 
         /** @var User $user */
-        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf']))->save();
+        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf', 'telefone']))->save();
 
         return back()->with('success', 'Perfil atualizado com sucesso.');
     }
@@ -54,10 +63,11 @@ class PerfilController extends Controller
     /**
      * Update user password.
      */
-    public function updatePassword(Request $request, string $user_slug): RedirectResponse
+    public function updatePassword(Request $request, User $user): RedirectResponse
     {
-        if (!auth()->check() || auth()->user()->name_slug !== $user_slug) {
-            abort(404);
+        // Apenas o próprio usuário pode alterar sua senha
+        if (auth()->id() !== $user->id) {
+            abort(403);
         }
 
         $request->validate([
@@ -75,9 +85,6 @@ class PerfilController extends Controller
             'password.uncompromised' => 'A senha informada apareceu em um vazamento de dados. Por favor, escolha outra senha.',
         ]);
 
-        /** @var User $user */
-        $user = auth()->user();
-
         if (Hash::check($request->password, $user->password)) {
             return back()->withErrors(['password' => 'A nova senha não pode ser igual à senha atual.']);
         }
@@ -94,14 +101,23 @@ class PerfilController extends Controller
      */
     public function adminUpdate(Request $request, User $user): RedirectResponse
     {
+        $request->merge([
+            'cpf' => preg_replace('/\D/', '', $request->cpf),
+            'telefone' => preg_replace('/\D/', '', $request->telefone ?? ''),
+        ]);
+
         $request->validate([
             'nome' => 'required|string|max:255',
             'sobre_nome' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
-            'cpf' => "required|string|unique:users,cpf,{$user->id}",
+            'cpf' => "required|string|size:11|unique:users,cpf,{$user->id}",
+            'telefone' => 'nullable|string|max:11',
+        ], [
+            'cpf.size' => 'O CPF deve conter exatamente 11 números.',
+            'telefone.max' => 'O telefone não pode ter mais de 11 dígitos.',
         ]);
 
-        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf']))->save();
+        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf', 'telefone']))->save();
 
         return back()->with('success', "Perfil de {$user->nome} atualizado com sucesso.");
     }

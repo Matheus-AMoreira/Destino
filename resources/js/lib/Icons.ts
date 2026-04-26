@@ -13,6 +13,6 @@ export const ASSETS = {
         LOGO: `${BASE_IMAGE}/logo.png`,
         LOGO_COR: `${BASE_IMAGE}/logo_cor.png`,
         PLACEHOLDER: `${BASE_IMAGE}/placeholder.jpg`,
-        DESTAQUE: `${BASE_IMAGE}/destaque.jpg`,
+        DESTAQUE: `${BASE_IMAGE}/destaque.png`,
     },
 };

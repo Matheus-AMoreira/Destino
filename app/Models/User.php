@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Enums\UserAuthority;
-use App\Enums\UserRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 
 use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -22,103 +22,140 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nome', 'email', 'role'])
+            ->logOnly(['nome', 'email', 'role_id'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
     }
 
     protected static function booted(): void
     {
-        static::creating(function ($user) {
-            if (empty($user->authorities)) {
-                $user->authorities = match ($user->role) {
-                    UserRole::ADMINISTRADOR => [UserAuthority::DELETAR_USUARIO->value],
-                    UserRole::FUNCIONARIO => [UserAuthority::CRIAR_PACOTE->value],
-                    default => [UserAuthority::EDICAO_PERFIL->value],
-                };
+        // 1. Regra de Promoção e Proteção de Admin
+        static::saving(function (User $user) {
+            $isConsole = app()->runningInConsole();
+
+            // Bloquear promoção de Cliente para Staff via Web/API
+            if (!$isConsole && $user->isDirty('role_id')) {
+                $oldRole = Role::find($user->getOriginal('role_id'));
+                $newRole = Role::find($user->role_id);
+
+                // Se era cliente e tenta virar Staff, bloqueia
+                if ($oldRole && !$oldRole->is_staff && $newRole->is_staff) {
+                    abort(403, 'Um cliente não pode ser promovido a funcionário por segurança. Crie uma conta institucional.');
+                }
+            }
+
+            // Regra do Administrador (Master Key)
+            $adminRole = Role::where('name', 'ADMINISTRADOR')->first();
+            if ($adminRole && $user->role_id === $adminRole->id && !$isConsole) {
+                if ($user->getOriginal('role_id') !== $adminRole->id) {
+                    $user->role_id = $user->getOriginal('role_id');
+                }
+            }
+        });
+
+        // 1b. Geração de Slug Único na Criação
+        static::creating(function (User $user) {
+            if (empty($user->slug)) {
+                $user->slug = self::generateUniqueSlug($user->nome, $user->sobre_nome);
+            }
+        });
+
+        // 1c. Atualiza o slug se o nome mudar
+        static::updating(function (User $user) {
+            if ($user->isDirty('nome') || $user->isDirty('sobre_nome')) {
+                $user->slug = self::generateUniqueSlug($user->nome, $user->sobre_nome, $user->id);
+            }
+        });
+
+        // 2. Proteção contra Deleção de Staff
+        static::deleting(function (User $user) {
+            if ($user->role && $user->role->is_staff) {
+                abort(403, 'Funcionários não podem ser deletados para preservar o histórico do sistema. Use a função de Bloqueio.');
             }
         });
     }
 
-    /**
-     * Set the primary key type.
-     *
-     * @var string
-     */
     protected $keyType = 'string';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
     public $incrementing = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'nome',
         'sobre_nome',
+        'slug',
         'cpf',
         'email',
         'telefone',
         'password',
         'is_valid',
-        'role',
-        'authorities',
+        'role_id',
     ];
 
-    /**
-     * The attributes that should be appended to the model's array form.
-     *
-     * @var list<string>
-     */
     protected $appends = [
         'name_slug',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * @return HasMany<Compra,User>
-     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Permission::class, 'user_permissions');
+    }
+
+    public function hasPermission(string $slug): bool
+    {
+        // Implementação Singleton/Request-bound no AuthService será chamada aqui
+        return app(\App\Services\AuthService::class)->isAuthorized($this, $slug);
+    }
+
     public function compras(): HasMany
     {
         return $this->hasMany(Compra::class);
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_valid' => 'boolean',
-            'role' => UserRole::class,
-            'authorities' => 'array',
         ];
     }
 
     /**
-     * Get the user's name slug (nome+sobrenome).
+     * Gera um slug único para o usuário, adicionando sufixo numérico em caso de conflito.
+     */
+    public static function generateUniqueSlug(string $nome, string $sobrenome, ?string $excludeId = null): string
+    {
+        $base = \Illuminate\Support\Str::slug("{$nome} {$sobrenome}");
+        $slug = $base;
+        $counter = 2;
+
+        while (
+            static::where('slug', $slug)
+                ->when($excludeId, fn ($q) => $q->where('id', '!=', $excludeId))
+                ->exists()
+        ) {
+            $slug = "{$base}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Slug cosmético baseado no nome (para exibição no frontend).
+     * Não é garantidamente único — use o campo `slug` armazenado para roteamento.
      */
     public function getNameSlugAttribute(): string
     {
-        return str_replace(' ', '_', "{$this->nome} {$this->sobre_nome}");
+        return \Illuminate\Support\Str::slug("{$this->nome} {$this->sobre_nome}");
     }
 }

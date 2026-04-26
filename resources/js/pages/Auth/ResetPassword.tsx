@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import AuthLogo from '@/components/auth/AuthLogo';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
+import { schemaResetSenha } from '@/lib/schemas';
 
 export default function ResetPassword({
     token,
@@ -24,14 +25,28 @@ export default function ResetPassword({
         url: null,
     });
 
+    const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
+
     useEffect(() => {
         return () => {
             reset('password', 'password_confirmation');
         };
     }, []);
 
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const result = schemaResetSenha.safeParse(data);
+        if (!result.success) {
+            const errs: Record<string, string> = {};
+            result.error.issues.forEach(issue => {
+                if (issue.path[0]) errs[issue.path[0].toString()] = issue.message;
+            });
+            setZodErrors(errs);
+            return;
+        }
+
+        setZodErrors({});
         post(route('password.update'), {
             onSuccess: () => {
                 setModal({
@@ -51,7 +66,7 @@ export default function ResetPassword({
     };
 
     return (
-        <div className="flex h-screen w-screen items-center justify-center bg-linear-to-br from-[#e4f3ff] via-[#ffffff] to-[#e4f3ff] bg-cover bg-fixed bg-center">
+        <div className="flex min-h-screen w-screen items-center justify-center bg-linear-to-br from-[#e4f3ff] via-[#ffffff] to-[#e4f3ff] bg-cover bg-fixed bg-center">
             <Head title="Redefinir Senha" />
             <div className="flex w-full max-w-5xl flex-col items-center justify-center gap-8 p-4 md:flex-row">
                 <div className="z-10 w-full max-w-md rounded-xl bg-white/95 p-10 text-center shadow-[0_10px_25px_rgba(0,0,0,0.4)] backdrop-blur-sm">
@@ -69,7 +84,7 @@ export default function ResetPassword({
                             </label>
                             <input
                                 className={`w-full rounded-lg border px-4 py-3 text-base transition duration-300 focus:outline-none ${
-                                    errors.email
+                                    zodErrors.email || errors.email
                                         ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)]'
                                         : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
                                 }`}
@@ -81,8 +96,8 @@ export default function ResetPassword({
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                             />
-                            {errors.email && (
-                                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                            {(zodErrors.email || errors.email) && (
+                                <p className="mt-1 text-xs text-red-500 font-bold">{zodErrors.email || errors.email}</p>
                             )}
                         </div>
 
@@ -95,7 +110,7 @@ export default function ResetPassword({
                             </label>
                             <input
                                 className={`w-full rounded-lg border px-4 py-3 text-base transition duration-300 focus:outline-none ${
-                                    errors.password
+                                    zodErrors.password || errors.password
                                         ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)]'
                                         : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
                                 }`}
@@ -107,8 +122,8 @@ export default function ResetPassword({
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
                             />
-                            {errors.password && (
-                                <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+                            {(zodErrors.password || errors.password) && (
+                                <p className="mt-1 text-xs text-red-500 font-bold">{zodErrors.password || errors.password}</p>
                             )}
                         </div>
 
@@ -121,7 +136,7 @@ export default function ResetPassword({
                             </label>
                             <input
                                 className={`w-full rounded-lg border px-4 py-3 text-base transition duration-300 focus:outline-none ${
-                                    errors.password_confirmation
+                                    zodErrors.password_confirmation || errors.password_confirmation
                                         ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)]'
                                         : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
                                 }`}
@@ -133,9 +148,9 @@ export default function ResetPassword({
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required
                             />
-                            {errors.password_confirmation && (
-                                <p className="mt-1 text-xs text-red-500">
-                                    {errors.password_confirmation}
+                            {(zodErrors.password_confirmation || errors.password_confirmation) && (
+                                <p className="mt-1 text-xs text-red-500 font-bold">
+                                    {zodErrors.password_confirmation || errors.password_confirmation}
                                 </p>
                             )}
                         </div>

@@ -7,32 +7,14 @@ import {
     Lock, 
     Save, 
     ShieldCheck, 
-    AlertCircle 
+    AlertCircle,
+    Phone as PhoneIcon
 } from 'lucide-react';
-import React, { FormEventHandler, useState } from 'react';
-import { z } from 'zod';
+import React, { FormEventHandler, useState, useEffect } from 'react';
 import RequisitosSenha from '@/components/auth/RequisitosSenha';
 import CustomModal, { ModalData } from '@/components/Modal';
-
-const schemaPerfil = z.object({
-    nome: z.string().min(3, 'Mínimo 3 caracteres').regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-    sobre_nome: z.string().min(3, 'Mínimo 3 caracteres').regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-    email: z.string().email('E-mail inválido'),
-});
-
-const schemaSenha = z.object({
-    current_password: z.string().min(1, 'Senha atual é obrigatória'),
-    password: z.string()
-        .min(8, 'Mínimo 8 caracteres')
-        .regex(/[A-Z]/, 'Uma letra maiúscula é obrigatória')
-        .regex(/[a-z]/, 'Uma letra minúscula é obrigatória')
-        .regex(/\d/, 'Um número é obrigatório')
-        .regex(/[@$!%*?&#\-_]/, 'Um caractere especial (@$!%*?&#-_) é obrigatório'),
-    password_confirmation: z.string(),
-}).refine(data => data.password === data.password_confirmation, {
-    message: 'As senhas não coincidem',
-    path: ['password_confirmation']
-});
+import { formatarCPF, formatarTelefone, limparNaoNumericos } from '@/lib/masks';
+import { schemaPerfil, schemaSenha } from '@/lib/schemas';
 
 interface Props {
     user: any;
@@ -52,7 +34,8 @@ export default function Editar({ user }: Props) {
         nome: user.nome,
         sobre_nome: user.sobre_nome,
         email: user.email,
-        cpf: user.cpf,
+        cpf: user.cpf || '',
+        telefone: user.telefone || '',
     });
 
     const passwordForm = useForm({
@@ -60,6 +43,25 @@ export default function Editar({ user }: Props) {
         password: '',
         password_confirmation: '',
     });
+
+    useEffect(() => {
+        profileForm.transform((data) => ({
+            ...data,
+            cpf: limparNaoNumericos(data.cpf),
+            telefone: limparNaoNumericos(data.telefone)
+        }));
+    }, [profileForm.data.cpf, profileForm.data.telefone]);
+
+    const handleProfileChange = (campo: string, valor: string) => {
+        const rawValue = limparNaoNumericos(valor);
+        if (campo === 'cpf') {
+            profileForm.setData('cpf', rawValue.substring(0, 11));
+        } else if (campo === 'telefone') {
+            profileForm.setData('telefone', rawValue.substring(0, 11));
+        } else {
+            profileForm.setData(campo as any, valor);
+        }
+    };
 
     const submitProfile: FormEventHandler = (e) => {
         e.preventDefault();
@@ -187,7 +189,7 @@ export default function Editar({ user }: Props) {
                                             <input
                                                 type="text"
                                                 value={profileForm.data.nome}
-                                                onChange={e => profileForm.setData('nome', e.target.value)}
+                                                onChange={e => handleProfileChange('nome', e.target.value)}
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="Seu nome"
                                             />
@@ -204,7 +206,7 @@ export default function Editar({ user }: Props) {
                                             <input
                                                 type="text"
                                                 value={profileForm.data.sobre_nome}
-                                                onChange={e => profileForm.setData('sobre_nome', e.target.value)}
+                                                onChange={e => handleProfileChange('sobre_nome', e.target.value)}
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="Seu sobrenome"
                                             />
@@ -230,21 +232,38 @@ export default function Editar({ user }: Props) {
                                     {(zodErrors.email || profileForm.errors.email) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.email || profileForm.errors.email}</p>}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">CPF (Somente números)</label>
-                                    <div className="relative group opacity-75">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <CreditCard size={18} />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">CPF</label>
+                                        <div className="relative group opacity-75">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                                <CreditCard size={18} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formatarCPF(profileForm.data.cpf)}
+                                                className="w-full pl-12 pr-6 py-4 bg-gray-100 border-2 border-transparent rounded-2xl font-bold text-gray-500 cursor-not-allowed"
+                                                readOnly
+                                            />
                                         </div>
-                                        <input
-                                            type="text"
-                                            value={profileForm.data.cpf}
-                                            onChange={e => profileForm.setData('cpf', e.target.value)}
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-100 border-2 border-transparent rounded-2xl font-bold text-gray-500 cursor-not-allowed"
-                                            readOnly
-                                        />
                                     </div>
-                                    <p className="text-[10px] text-gray-400 font-bold ml-4">* Para alterar o CPF, entre em contato com o suporte.</p>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Telefone</label>
+                                        <div className="relative group">
+                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
+                                                <PhoneIcon size={18} />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={formatarTelefone(profileForm.data.telefone)}
+                                                onChange={e => handleProfileChange('telefone', e.target.value)}
+                                                className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
+                                                placeholder="(00) 00000-0000"
+                                            />
+                                        </div>
+                                        {(zodErrors.telefone || profileForm.errors.telefone) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.telefone || profileForm.errors.telefone}</p>}
+                                    </div>
                                 </div>
 
                                 <button

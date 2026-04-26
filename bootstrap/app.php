@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
+
+        $middleware->alias([
+            'authorize.api' => \App\Http\Middleware\AuthorizeAPI::class,
+            'authorize.ui' => \App\Http\Middleware\AuthorizeUI::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

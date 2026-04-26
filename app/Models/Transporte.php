@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Enums\Meio;
 use Illuminate\Database\Eloquent\Model;
 
-use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class Transporte extends Model

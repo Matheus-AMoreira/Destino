@@ -1,3 +1,10 @@
+export type Role = {
+    id: number;
+    name: string;
+    description: string | null;
+    is_staff: boolean;
+};
+
 export type User = {
     id: number;
     name: string;
@@ -7,14 +14,23 @@ export type User = {
     two_factor_enabled?: boolean;
     nome: string;
     sobre_nome: string;
-    name_slug: string;
+    slug: string;       // slug único armazenado no banco (usado no roteamento)
+    name_slug: string;  // slug cosmético computado (nome + sobrenome, para exibição)
     created_at: string;
     updated_at: string;
-    role: string;
+    role?: Role;
+    role_id?: number;
+    permissions?: PermissionType[];
     cpf?: string;
     is_valid: boolean;
-    authorities: string[];
     [key: string]: unknown;
+};
+
+export type PermissionType = {
+    id: number;
+    slug: string;
+    description: string | null;
+    is_staff: boolean;
 };
 
 export type Auth = {

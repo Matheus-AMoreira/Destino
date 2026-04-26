@@ -18,7 +18,7 @@ class AdminMiddleware
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role, [UserRole::ADMINISTRADOR, UserRole::FUNCIONARIO]) || ! $user->is_valid) {
+        if (! $user || ! in_array($user->role->name, [UserRole::ADMINISTRADOR->value, UserRole::FUNCIONARIO->value]) || ! $user->is_valid) {
             abort(403, 'Acesso negado.');
         }
 

@@ -27,7 +27,9 @@ class PacoteController extends Controller
     public function create(): Response
     {
         return Inertia::render('Administracao/Pacote/Create', [
-            'funcionarios' => User::whereIn('role', [UserRole::ADMINISTRADOR, UserRole::FUNCIONARIO])->get(),
+            'funcionarios' => User::whereHas('role', function ($query) {
+                $query->whereIn('name', [UserRole::ADMINISTRADOR->value, UserRole::FUNCIONARIO->value]);
+            })->get(),
             'pacoteFotos' => PacoteFoto::all(),
             'tags' => Tag::all(),
         ]);
@@ -56,7 +58,9 @@ class PacoteController extends Controller
 
         return Inertia::render('Administracao/Pacote/Edit', [
             'pacote' => $pacote,
-            'funcionarios' => User::whereIn('role', [UserRole::ADMINISTRADOR, UserRole::FUNCIONARIO])->get(),
+            'funcionarios' => User::whereHas('role', function ($query) {
+                $query->whereIn('name', [UserRole::ADMINISTRADOR->value, UserRole::FUNCIONARIO->value]);
+            })->get(),
             'pacoteFotos' => PacoteFoto::all(),
             'tags' => Tag::all(),
         ]);
