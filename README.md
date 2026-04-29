@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="public/favicon.svg" width="200" alt="Destino Logo">
+    <img src="public/assets/icons/favicon.svg" width="200" alt="Destino Logo">
 </p>
 
 <h1 align="center">Destino</h1>
@@ -29,7 +29,6 @@ Primeiro, instale as dependências do PHP (Composer) e do Node.js (pnpm):
 ```bash
 composer install
 pnpm install
-pnpm run build
 ```
 
 ### 2. Configuração do Ambiente (`.env`)
@@ -46,7 +45,7 @@ php artisan key:generate
 ```
 
 *   **Ambiente Local:** Utilize o arquivo `.env`.
-*   **Containers:** O Docker Compose utiliza o arquivo `.env.docker` automaticamente.
+*   **Containers:** O Docker Compose utiliza o arquivo `.env.docker`.
 
 ### 3. Migrações e Dados Geográficos
 
@@ -54,7 +53,7 @@ Prepare o banco de dados e importe as tabelas do IBGE:
 
 ```bash
 php artisan migrate
-pnpm run dev
+php artisan app:import-ibge
 ```
 
 ---
@@ -63,7 +62,7 @@ pnpm run dev
 
 Você pode rodar a aplicação de duas formas:
 
-### ⚡ Modo Local (PHP Artisan)
+### ⚡ Local (PHP e PNPM)
 Ideal para desenvolvimento rápido com SSR habilitado. Abra dois terminais:
 
 ```bash
@@ -71,11 +70,11 @@ Ideal para desenvolvimento rápido com SSR habilitado. Abra dois terminais:
 php artisan serve
 
 # Terminal 2: SSR Render
-php artisan inertia:start-ssr
+pnpm run dev
 ```
 
-### 🐳 Modo Container (Docker/Podman)
-Recomendado para validar o build final e orquestração com Nginx.
+### 🐳 Container (Docker/Podman)
+Recomendado para validar a build final.
 
 ```bash
 # Com Docker
@@ -93,10 +92,10 @@ podman compose up -d
 O **Destino** utiliza as tecnologias mais recentes para garantir performance e manutenibilidade:
 
 - **Core**: PHP 8.5+, Laravel 13
-- **Frontend**: React 19, Inertia.js v3 (SSR)
+- **Frontend**: React 19, Inertia.js v3
 - **Estilização**: Tailwind CSS v4
-- **Interface**: Lucide React Icons
-- **Roteamento**: Ziggy & Laravel Wayfinder
+- **Interface**: Lucide Icons
+- **Roteamento**: Ziggy, Laravel Wayfinder
 - **Banco de Dados**: PostgreSQL 18
 - **Testes**: Pest PHP 4
 - **Build Tool**: Vite 8 & Composer 2
