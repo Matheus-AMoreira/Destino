@@ -12,6 +12,7 @@ import {
     Receipt,
 } from 'lucide-react';
 import react from 'react';
+import { useRoute } from 'ziggy-js';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
 
@@ -57,6 +58,7 @@ interface Props {
 }
 
 export default function Detalhes({ compra, auth }: Props) {
+    const route = useRoute();
     const todasFotos = [
         ...(compra.oferta.pacote.fotos_do_pacote?.foto_capa_url
             ? [
@@ -110,7 +112,7 @@ export default function Detalhes({ compra, auth }: Props) {
                         <div>
                             <Link
                                 href={route('usuario.viagem.listar', {
-                                    user_slug: auth.user.name_slug,
+                                    user: auth.user.slug,
                                 })}
                                 className="group mb-4 inline-flex items-center text-sm font-black tracking-widest text-blue-600 uppercase transition-colors hover:text-blue-700"
                             >

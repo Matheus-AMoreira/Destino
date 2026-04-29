@@ -80,7 +80,7 @@ export default function Editar({ user }: Props) {
         }
 
         setZodErrors({});
-        profileForm.put(route('usuario.perfil.update', { user_slug: user.name_slug }), {
+        profileForm.put(route('usuario.perfil.update', { user: user.slug }), {
             preserveScroll: true,
             onSuccess: () => {
                 setModal({
@@ -113,7 +113,7 @@ export default function Editar({ user }: Props) {
         }
 
         setZodErrors({});
-        passwordForm.put(route('usuario.perfil.password', { user_slug: user.name_slug }), {
+        passwordForm.put(route('usuario.perfil.password', { user: user.slug }), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();

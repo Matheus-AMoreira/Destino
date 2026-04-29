@@ -1,7 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import GuestLayout from '@/layouts/GuestLayout';
-import { Auth } from '@/types';
-import { useMemo } from 'react';
 import {
     ArrowRightFromLine,
     Globe,
@@ -10,7 +7,11 @@ import {
     TicketsPlane,
     User,
 } from 'lucide-react';
+import { useMemo } from 'react';
+import { useRoute } from 'ziggy-js';
 import ViagemCard from '@/components/usuario/ViagemCard';
+import GuestLayout from '@/layouts/GuestLayout';
+import type { Auth } from '@/types';
 
 interface Compra {
     id: string;
@@ -46,6 +47,7 @@ interface Props {
 }
 
 export default function Listar({ compras, view, auth }: Props) {
+    const route = useRoute();
     const isHistorico = view === 'concluidas';
 
     const formatarValor = (valor: number) => {
@@ -121,7 +123,7 @@ export default function Listar({ compras, view, auth }: Props) {
                     <nav className="mt-4 space-y-2 p-4">
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user_slug: auth.user.name_slug,
+                                user: auth.user.slug,
                                 view: 'andamento',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
@@ -136,7 +138,7 @@ export default function Listar({ compras, view, auth }: Props) {
 
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user_slug: auth.user.name_slug,
+                                user: auth.user.slug,
                                 view: 'concluidas',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
