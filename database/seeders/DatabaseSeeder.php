@@ -13,11 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call(AuthorizationSeeder::class);
+
+        $role = \App\Models\Role::where('name', \App\Enums\UserRole::USUARIO->value)->first();
 
         User::factory()->create([
-            'name' => 'Test User',
+            'nome' => 'Test',
+            'sobre_nome' => 'User',
             'email' => 'test@example.com',
+            'role_id' => $role?->id,
         ]);
     }
 }

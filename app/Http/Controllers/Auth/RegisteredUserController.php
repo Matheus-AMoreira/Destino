@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -42,7 +43,7 @@ class RegisteredUserController extends Controller
             'cpf' => 'required|string|size:11',
             'telefone' => 'required|string|min:10|max:11',
             'email' => 'required|string|lowercase|email|max:100',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         // Verificação de unicidade com mensagem genérica para não revelar quais dados já existem
@@ -53,7 +54,7 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $User = User::create([
+        $user = User::create([
             'nome' => $request->nome,
             'sobre_nome' => $request->sobre_nome,
             'cpf' => $request->cpf,
@@ -64,9 +65,9 @@ class RegisteredUserController extends Controller
             'is_valid' => true,
         ]);
 
-        event(new Registered($User));
+        event(new Registered($user));
 
-        Auth::login($User);
+        Auth::login($user);
 
         return redirect(route('verification.notice', absolute: false));
     }

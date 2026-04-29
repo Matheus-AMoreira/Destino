@@ -22,6 +22,7 @@ export type User = {
     role_id?: number;
     permissions?: PermissionType[];
     cpf?: string;
+    cpf_mascarado?: string;
     is_valid: boolean;
     [key: string]: unknown;
 };

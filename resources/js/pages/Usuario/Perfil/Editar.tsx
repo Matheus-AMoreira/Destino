@@ -8,12 +8,14 @@ import {
     Save, 
     ShieldCheck, 
     AlertCircle,
-    Phone as PhoneIcon
+    Phone as PhoneIcon,
+    Eye,
+    EyeOff
 } from 'lucide-react';
 import React, { FormEventHandler, useState, useEffect } from 'react';
 import RequisitosSenha from '@/components/auth/RequisitosSenha';
 import CustomModal, { ModalData } from '@/components/Modal';
-import { formatarCPF, formatarTelefone, limparNaoNumericos } from '@/lib/masks';
+import { formatarCPF, formatarTelefone, limparNaoNumericos, mascararCPF } from '@/lib/masks';
 import { schemaPerfil, schemaSenha } from '@/lib/schemas';
 
 interface Props {
@@ -24,6 +26,7 @@ export default function Editar({ user }: Props) {
     const { success, error }: any = usePage().props;
     const [activeTab, setActiveTab] = useState<'info' | 'password'>('info');
     const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
+    const [showFullCpf, setShowFullCpf] = useState(false);
     const [modal, setModal] = useState<ModalData>({
         show: false,
         mensagem: '',
@@ -235,16 +238,24 @@ export default function Editar({ user }: Props) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">CPF</label>
-                                        <div className="relative group opacity-75">
+                                        <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                                 <CreditCard size={18} />
                                             </div>
                                             <input
                                                 type="text"
-                                                value={formatarCPF(profileForm.data.cpf)}
-                                                className="w-full pl-12 pr-6 py-4 bg-gray-100 border-2 border-transparent rounded-2xl font-bold text-gray-500 cursor-not-allowed"
+                                                value={showFullCpf ? formatarCPF(profileForm.data.cpf) : mascararCPF(profileForm.data.cpf)}
+                                                className="w-full pl-12 pr-14 py-4 bg-gray-50 border-2 border-transparent rounded-2xl font-bold text-gray-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all"
                                                 readOnly
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowFullCpf(!showFullCpf)}
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                                                title={showFullCpf ? "Esconder" : "Mostrar"}
+                                            >
+                                                {showFullCpf ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
                                         </div>
                                     </div>
 

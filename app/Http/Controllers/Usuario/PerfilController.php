@@ -23,6 +23,8 @@ class PerfilController extends Controller
             abort(403);
         }
 
+        $user->makeVisible(['cpf']);
+
         return Inertia::render('Usuario/Perfil/Editar', [
             'user' => $user,
         ]);
@@ -39,23 +41,36 @@ class PerfilController extends Controller
         }
 
         $request->merge([
-            'cpf' => preg_replace('/\D/', '', $request->cpf),
             'telefone' => preg_replace('/\D/', '', $request->telefone ?? ''),
         ]);
 
-        $request->validate([
+        $regras = [
             'nome' => 'required|string|max:255',
             'sobre_nome' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
-            'cpf' => "required|string|size:11|unique:users,cpf,{$user->id}",
             'telefone' => 'nullable|string|max:11',
-        ], [
+        ];
+
+        // Se o CPF contém asteriscos, é a máscara. Não tentamos validar nem atualizar.
+        $atualizarCpf = !str_contains($request->cpf, '*');
+
+        if ($atualizarCpf) {
+            $request->merge(['cpf' => preg_replace('/\D/', '', $request->cpf)]);
+            $regras['cpf'] = "required|string|size:11|unique:users,cpf,{$user->id}";
+        }
+
+        $request->validate($regras, [
             'cpf.size' => 'O CPF deve conter exatamente 11 números.',
             'telefone.max' => 'O telefone não pode ter mais de 11 dígitos.',
         ]);
 
         /** @var User $user */
-        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf', 'telefone']))->save();
+        $campos = ['nome', 'sobre_nome', 'email', 'telefone'];
+        if ($atualizarCpf) {
+            $campos[] = 'cpf';
+        }
+
+        $user->fill($request->only($campos))->save();
 
         return back()->with('success', 'Perfil atualizado com sucesso.');
     }
@@ -102,22 +117,34 @@ class PerfilController extends Controller
     public function adminUpdate(Request $request, User $user): RedirectResponse
     {
         $request->merge([
-            'cpf' => preg_replace('/\D/', '', $request->cpf),
             'telefone' => preg_replace('/\D/', '', $request->telefone ?? ''),
         ]);
 
-        $request->validate([
+        $regras = [
             'nome' => 'required|string|max:255',
             'sobre_nome' => 'required|string|max:255',
             'email' => "required|email|unique:users,email,{$user->id}",
-            'cpf' => "required|string|size:11|unique:users,cpf,{$user->id}",
             'telefone' => 'nullable|string|max:11',
-        ], [
+        ];
+
+        $atualizarCpf = !str_contains($request->cpf, '*');
+
+        if ($atualizarCpf) {
+            $request->merge(['cpf' => preg_replace('/\D/', '', $request->cpf)]);
+            $regras['cpf'] = "required|string|size:11|unique:users,cpf,{$user->id}";
+        }
+
+        $request->validate($regras, [
             'cpf.size' => 'O CPF deve conter exatamente 11 números.',
             'telefone.max' => 'O telefone não pode ter mais de 11 dígitos.',
         ]);
 
-        $user->fill($request->only(['nome', 'sobre_nome', 'email', 'cpf', 'telefone']))->save();
+        $campos = ['nome', 'sobre_nome', 'email', 'telefone'];
+        if ($atualizarCpf) {
+            $campos[] = 'cpf';
+        }
+
+        $user->fill($request->only($campos))->save();
 
         return back()->with('success', "Perfil de {$user->nome} atualizado com sucesso.");
     }

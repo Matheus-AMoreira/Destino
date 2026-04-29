@@ -3,8 +3,10 @@ import { useState } from 'react';
 import AuthLogo from '@/components/auth/AuthLogo';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
+import { useRoute } from 'ziggy-js';
 
 export default function Entrar() {
+    const route = useRoute();
     const { data, setData, post, processing } = useForm({
         email: '',
         password: '',
@@ -95,11 +97,10 @@ export default function Entrar() {
                         </div>
 
                         <button
-                            className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${
-                                processing
+                            className={`w-full rounded-lg bg-[#2071b3] py-3 text-lg font-bold text-white transition duration-300 hover:bg-[#1a5b8e] active:scale-[0.98] ${processing
                                     ? 'cursor-not-allowed opacity-70'
                                     : 'cursor-pointer'
-                            }`}
+                                }`}
                             type="submit"
                             disabled={processing}
                         >

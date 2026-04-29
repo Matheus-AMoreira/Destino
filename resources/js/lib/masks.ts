@@ -11,3 +11,10 @@ export const formatarTelefone = (val: string) =>
         .substring(0, 15);
 
 export const limparNaoNumericos = (val: string) => val.replace(/\D/g, '');
+
+export const mascararCPF = (cpf: string) => {
+    if (!cpf) return '';
+    const clean = limparNaoNumericos(cpf);
+    if (clean.length < 11) return cpf;
+    return `${clean.substring(0, 3)}.***.***-${clean.substring(9, 11)}`;
+};

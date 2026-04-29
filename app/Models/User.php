@@ -17,7 +17,11 @@ use Spatie\Activitylog\Models\Concerns\LogsActivity;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasUuids, Notifiable, LogsActivity;
+    use HasUuids, HasFactory, Notifiable, LogsActivity;
+
+    protected $primaryKey = 'id';
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -75,9 +79,6 @@ class User extends Authenticatable implements MustVerifyEmail
         });
     }
 
-    protected $keyType = 'string';
-    public $incrementing = false;
-
     protected $fillable = [
         'nome',
         'sobre_nome',
@@ -92,11 +93,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = [
         'name_slug',
+        'cpf_mascarado',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'cpf',
     ];
 
     public function role(): BelongsTo
@@ -126,6 +129,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_valid' => 'boolean',
+            'cpf' => 'encrypted',
         ];
     }
 
@@ -157,5 +161,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getNameSlugAttribute(): string
     {
         return \Illuminate\Support\Str::slug("{$this->nome} {$this->sobre_nome}");
+    }
+
+    /**
+     * Retorna o CPF formatado com máscara (ex: 123.***.***-01)
+     */
+    public function getCpfMascaradoAttribute(): string
+    {
+        $cpf = $this->cpf;
+        if (!$cpf || strlen($cpf) < 11) {
+            return $cpf ?? '';
+        }
+
+        // Formato: 345.***.***-43
+        return substr($cpf, 0, 3) . '.***.***-' . substr($cpf, -2);
     }
 }

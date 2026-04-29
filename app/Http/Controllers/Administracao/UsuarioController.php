@@ -12,6 +12,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -51,7 +53,7 @@ class UsuarioController extends Controller
         ]);
 
         $role = Role::find($request->role_id);
-        
+
         if (!$role) {
             return back()->withErrors(['role_id' => 'O cargo selecionado é inválido ou não existe.'])->withInput();
         }
@@ -62,7 +64,7 @@ class UsuarioController extends Controller
         }
 
         // Gera uma senha aleatória de 12 caracteres
-        $plainPassword = \Illuminate\Support\Str::random(12);
+        $plainPassword = Str::random(12);
 
         $user = User::create([
             'nome' => $request->nome,
@@ -71,13 +73,13 @@ class UsuarioController extends Controller
             'cpf' => $request->cpf,
             'telefone' => $request->telefone ?? 'Não informado',
             'role_id' => $role->id,
-            'password' => \Illuminate\Support\Facades\Hash::make($plainPassword),
+            'password' => Hash::make($plainPassword),
             'is_valid' => false, // Começa bloqueado até o primeiro acesso/validação
         ]);
 
         // Aqui dispararíamos o e-mail:
         // Mail::to($user->email)->send(new WelcomeStaffMail($user, $plainPassword));
-        
+
         // Como estamos simulando, vamos salvar a senha no log ou flash para testes
         session()->flash('invitation_password', $plainPassword);
 
@@ -93,8 +95,8 @@ class UsuarioController extends Controller
             abort(403);
         }
 
-        $newPassword = \Illuminate\Support\Str::random(12);
-        $user->password = \Illuminate\Support\Facades\Hash::make($newPassword);
+        $newPassword = Str::random(12);
+        $user->password = Hash::make($newPassword);
         $user->save();
 
         // Simulação de reenvio
@@ -147,6 +149,7 @@ class UsuarioController extends Controller
     public function show(User $user): Response
     {
         if ($user->id === auth()->id()) {
+            $user->makeVisible(['cpf']);
             return Inertia::render('Usuario/Perfil/Editar', [
                 'user' => $user,
             ]);
@@ -192,7 +195,7 @@ class UsuarioController extends Controller
             abort(403, 'Você não pode se bloquear ou desbloquear.');
         }
 
-        $user->is_valid = ! (bool) $user->is_valid;
+        $user->is_valid = !(bool) $user->is_valid;
         $user->save();
 
         $status = $user->is_valid ? 'desbloqueado' : 'bloqueado';
@@ -242,7 +245,7 @@ class UsuarioController extends Controller
                 ->where('is_staff', false)
                 ->pluck('id')
                 ->toArray();
-            
+
             if (count($request->permissions ?? []) > count($permissionsToSync)) {
                 // Opcional: avisar que algumas foram removidas por segurança
                 session()->flash('warning', 'Algumas permissões de Staff foram removidas pois o cargo selecionado não é administrativo.');
