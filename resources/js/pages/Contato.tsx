@@ -6,7 +6,7 @@ import Image from '@/components/Image';
 export default function Contato() {
     return (
         <GuestLayout title="Fale Conosco">
-            <div className="flex h-[75%] flex-col bg-white pt-35 md:h-full">
+            <div className="flex h-[55%] flex-col bg-white pt-15 md:h-full">
                 <section className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-10 px-6 py-20 md:flex-row">
                     <div className="flex flex-col space-y-6 md:w-1/2">
                         <h1 className="text-4xl font-bold text-[#2071b3]">

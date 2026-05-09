@@ -119,7 +119,7 @@ export default function Buscar({
 
                         <button
                             type="submit"
-                            className="w-full rounded-lg bg-blue-600 py-2 font-semibold text-white transition hover:bg-blue-700"
+                            className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
                         >
                             Aplicar Filtros
                         </button>
@@ -144,7 +144,7 @@ export default function Buscar({
                             />
                             <button
                                 type="submit"
-                                className="rounded-xl bg-[#2071b3] px-8 py-3 font-bold text-white shadow-md transition hover:bg-blue-800"
+                                className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
                             >
                                 Buscar
                             </button>

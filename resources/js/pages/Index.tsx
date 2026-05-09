@@ -39,12 +39,20 @@ export default function Index({
     return (
         <GuestLayout title="PAULA VIAGENS E TURISMO">
             <main className="grow p-4 md:p-8">
-                <section className="flex flex-wrap items-center gap-8 pt-4">
-                    <div className="mb-4 flex w-full flex-col xl:w-[48%]">
-                        <h1 className="mb-4 px-4 pt-3 text-center text-4xl font-extrabold md:text-left lg:text-5xl">
+                <section className="relative min-h-[500px] w-full overflow-hidden bg-gray-900 py-20 px-4 flex items-center justify-center rounded-xl">
+                    <div className="absolute inset-0 z-0 opacity-60">
+                        <Image
+                            name={'destaque'}
+                            alt={'Imagem de destaque'}
+                            style="h-full w-full object-cover"
+                        />
+                    </div>
+
+                    <div className="relative z-10 flex w-full max-w-4xl flex-col items-center text-center text-white">
+                        <h1 className="mb-6 text-4xl font-extrabold md:text-5xl lg:text-6xl drop-shadow-md">
                             O Mundo Todo em Suas Mãos
                         </h1>
-                        <div className="p-4 text-lg md:px-8">
+                        <div className="mb-8 max-w-2xl text-lg md:text-xl drop-shadow-sm">
                             <p>
                                 Planeje a jornada dos seus sonhos sem
                                 complicações. Descubra roteiros exclusivos,
@@ -52,21 +60,14 @@ export default function Index({
                                 viagem inesquecíveis.
                             </p>
                         </div>
-                        <div className="mt-6 flex justify-center px-4 md:justify-start md:px-8">
+                        <div className="flex justify-center">
                             <button
                                 onClick={() => router.get('/buscar')}
-                                className="rounded-lg bg-[#2071b3] px-8 py-3 text-white shadow-lg transition duration-300 hover:bg-blue-800"
+                                className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
                             >
                                 Comece a Planejar
                             </button>
                         </div>
-                    </div>
-                    <div className="mt-8 flex w-full justify-center xl:mt-0 xl:w-[48%]">
-                        <Image
-                            name={'destaque'}
-                            alt={'Imagem de destaque'}
-                            style="max-w-xgg w-full rounded-3xl shadow-xl"
-                        />
                     </div>
                 </section>
 
@@ -101,7 +102,7 @@ export default function Index({
 
                             <button
                                 type="submit"
-                                className="rounded-xl bg-[#2071b3] px-6 py-3 font-semibold text-white shadow-lg transition duration-300 hover:bg-blue-800"
+                                className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
                             >
                                 Buscar
                             </button>
