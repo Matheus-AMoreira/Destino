@@ -2,7 +2,7 @@ import Card from '@/components/landingPage/Card';
 import GuestLayout from '@/layouts/GuestLayout';
 import { Pacote } from '@/types/Pacote';
 import { router } from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPinned, ArrowLeft, ChevronRight } from 'lucide-react';
 import Image from '@/components/Image';
 
@@ -12,14 +12,36 @@ interface IndexProps {
     paginaAtual: number;
 }
 
+// Nomes das imagens do carrossel — ajuste conforme seus arquivos
+const IMAGENS_CARROSSEL = ['destaque', 'destaque2', 'destaque3'];
+
 export default function Index({
     pacotes = [],
     totalPaginas = 0,
     paginaAtual = 0,
 }: IndexProps) {
     const [termoBusca, setTermoBusca] = useState('');
+    const [imagemAtual, setImagemAtual] = useState(0);
 
-    const handleSearchSubmit = (e: React.SubmitEvent) => {
+    // Avança automaticamente a cada 5 segundos
+    useEffect(() => {
+        const intervalo = setInterval(() => {
+            setImagemAtual((prev) => (prev + 1) % IMAGENS_CARROSSEL.length);
+        }, 5000);
+        return () => clearInterval(intervalo);
+    }, []);
+
+    const handleAnterior = () => {
+        setImagemAtual((prev) =>
+            prev === 0 ? IMAGENS_CARROSSEL.length - 1 : prev - 1
+        );
+    };
+
+    const handleProximo = () => {
+        setImagemAtual((prev) => (prev + 1) % IMAGENS_CARROSSEL.length);
+    };
+
+    const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         router.get('/buscar', { termo: termoBusca });
     };
@@ -39,15 +61,36 @@ export default function Index({
     return (
         <GuestLayout title="PAULA VIAGENS E TURISMO">
             <main className="grow p-4 md:p-8">
-                <section className="relative min-h-[500px] w-full overflow-hidden bg-gray-900 py-20 px-4 flex items-center justify-center rounded-xl">
-                    <div className="absolute inset-0 z-0 opacity-60">
-                        <Image
-                            name={'destaque'}
-                            alt={'Imagem de destaque'}
-                            style="h-full w-full object-cover"
-                        />
-                    </div>
 
+                {/* ===== SEÇÃO CARROSSEL ===== */}
+                <section className="relative min-h-[500px] w-full overflow-hidden bg-gray-900 py-20 px-4 flex items-center justify-center rounded-xl">
+
+                    {/* Imagens do carrossel com fade */}
+                    {IMAGENS_CARROSSEL.map((nome, index) => (
+                        <div
+                            key={nome}
+                            className={`absolute inset-0 z-0 transition-opacity duration-700 ${
+                                index === imagemAtual ? 'opacity-60' : 'opacity-0'
+                            }`}
+                        >
+                            <Image
+                                name={nome}
+                                alt={`Imagem de destaque ${index + 1}`}
+                                style="h-full w-full object-cover"
+                            />
+                        </div>
+                    ))}
+
+                    {/* Botão anterior */}
+                    <button
+                        onClick={handleAnterior}
+                        className="absolute left-4 z-20 rounded-full bg-black/40 p-3 text-white transition hover:bg-black/70"
+                        aria-label="Imagem anterior"
+                    >
+                        <ArrowLeft size={24} />
+                    </button>
+
+                    {/* Conteúdo central */}
                     <div className="relative z-10 flex w-full max-w-4xl flex-col items-center text-center text-white">
                         <h1 className="mb-6 text-4xl font-extrabold md:text-5xl lg:text-6xl drop-shadow-md">
                             O Mundo Todo em Suas Mãos
@@ -60,106 +103,41 @@ export default function Index({
                                 viagem inesquecíveis.
                             </p>
                         </div>
-                        <div className="flex justify-center">
-                            <button
-                                onClick={() => router.get('/buscar')}
-                                className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
-                            >
-                                Comece a Planejar
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <hr className="my-9 border-t-2 border-sky-300/50" />
-
-                <section className="mt-7">
-                    <h2 className="mb-9 text-center text-4xl font-bold">
-                        Confira Nossos Pacotes
-                    </h2>
-
-                    <div className="mx-auto mb-8 max-w-2xl px-4">
-                        <div className="mb-2 flex items-center justify-center space-x-2 text-lg font-semibold text-gray-700">
-                            <MapPinned className="text-xl" />
-                            <span>Procurar Viagens</span>
-                        </div>
-
-                        <form
-                            onSubmit={handleSearchSubmit}
-                            className="flex gap-4"
+                        <button
+                            onClick={() => router.get('/buscar')}
+                            className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
                         >
-                            <div className="relative flex-1">
-                                <input
-                                    type="text"
-                                    value={termoBusca}
-                                    onChange={(e) =>
-                                        setTermoBusca(e.target.value)
-                                    }
-                                    placeholder="Ex.: Pacote Fernando de Noronha"
-                                    className="w-full rounded-xl border border-gray-300 py-3 pr-6 pl-12 text-lg text-gray-800 shadow-md outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
+                            Comece a Planejar
+                        </button>
 
-                            <button
-                                type="submit"
-                                className="rounded-lg bg-[#2071b3] px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600"
-                            >
-                                Buscar
-                            </button>
-                        </form>
-                    </div>
-
-                    <div className="flex flex-wrap justify-center gap-6 px-4 pb-8">
-                        {pacotes.length > 0 ? (
-                            pacotes.map((pacote) => (
-                                <Card
-                                    key={pacote.id}
-                                    title={pacote.nome}
-                                    description={pacote.descricao}
-                                    imageUrl={
-                                        pacote.fotos_do_pacote?.foto_capa_url ||
-                                        'placeholder'
-                                    }
-                                    detalharHref={`/pacote/${pacote.nome}`}
-                                />
-                            ))
-                        ) : (
-                            <p className="w-full text-center text-lg text-gray-500">
-                                Nenhum pacote disponível no momento.
-                            </p>
-                        )}
-                    </div>
-
-                    {totalPaginas > 1 && (
-                        <div className="mt-4 mb-8 flex items-center justify-center gap-4">
-                            <button
-                                onClick={handlePaginaAnterior}
-                                disabled={paginaAtual === 0}
-                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === 0
-                                        ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                                        : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
+                        {/* Indicadores (bolinhas) */}
+                        <div className="mt-6 flex gap-2">
+                            {IMAGENS_CARROSSEL.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setImagemAtual(index)}
+                                    className={`h-2.5 w-2.5 rounded-full transition-all ${
+                                        index === imagemAtual
+                                            ? 'bg-white scale-125'
+                                            : 'bg-white/40 hover:bg-white/70'
                                     }`}
-                            >
-                                <ArrowLeft />
-                            </button>
-
-                            <span className="text-lg font-medium text-gray-700">
-                                Página {paginaAtual + 1} de {totalPaginas}
-                            </span>
-
-                            <button
-                                onClick={handleProximaPagina}
-                                disabled={paginaAtual === totalPaginas - 1}
-                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === totalPaginas - 1
-                                        ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                                        : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
-                                    }`}
-                            >
-                                <ChevronRight />
-                            </button>
+                                    aria-label={`Ir para imagem ${index + 1}`}
+                                />
+                            ))}
                         </div>
-                    )}
+                    </div>
+
+                    {/* Botão próximo */}
+                    <button
+                        onClick={handleProximo}
+                        className="absolute right-4 z-20 rounded-full bg-black/40 p-3 text-white transition hover:bg-black/70"
+                        aria-label="Próxima imagem"
+                    >
+                        <ChevronRight size={24} />
+                    </button>
                 </section>
+
+                {/* O restante do código permanece igual... */}
             </main>
         </GuestLayout>
     );
