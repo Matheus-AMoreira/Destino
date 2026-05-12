@@ -1,7 +1,7 @@
 services:
   laravel:
     build:
-      context: .
+      context: ./Dockerfile-php
       target: runtime_php
     container_name: destino_laravel
     env_file: .env.docker
@@ -12,7 +12,7 @@ services:
 
   node:
     build:
-      context: .
+      context: ./Dockerfile-node
       target: runtime_node
     container_name: destino_node
     depends_on:

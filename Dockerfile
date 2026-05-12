@@ -1,43 +1,43 @@
-# --- Estágio de Base ---
-FROM php:8.5-fpm-alpine AS base
-RUN apk add --no-cache \
-    postgresql-dev \
-    libpng-dev \
-    libzip-dev \
+FROM php:8.5-fpm-alpine
+
+WORKDIR /app
+
+RUN apk add --no-cache git unzip icu-dev
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions \
     zip \
-    unzip \
-    icu-dev \
-    oniguruma-dev
-RUN docker-php-ext-install pdo pdo_pgsql bcmath zip intl mbstring
+    pdo_pgsql \
+    pgsql \
+    bcmath \
+    gd \
+    opcache \
+    intl
 
-# --- Estágio Builder ---
-FROM base AS builder
-WORKDIR /app
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY --from=node:24-alpine /usr/local/bin /usr/local/bin
+# Pegar o node e o corepak direto da image
+COPY --from=node:24-alpine /usr/local/bin/node /usr/local/bin/node
 COPY --from=node:24-alpine /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN corepack enable pnpm && corepack prepare pnpm@latest --activate
-COPY . .
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-RUN pnpm install --frozen-lockfile
-RUN pnpm run build
+RUN ln -s /usr/local/lib/node_modules/corepack/dist/corepack.js /usr/local/bin/corepack
 
-# --- Estágio Runtime PHP ---
-FROM base AS runtime_php
-WORKDIR /app
-COPY --from=builder /app/vendor ./vendor
-COPY --from=builder /app/public/build ./public/build
+# pegar o composer da imagem official
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# copia o projeto
 COPY . .
-RUN chown -R www-data:www-data storage bootstrap/cache
+
+# Instalação da dependencias do php
+RUN composer install --no-dev --optimize-autoloader
+
+# Habilitando o pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Instalação da dependencias do node
+RUN pnpm install --frozen-lockfile && pnpm run build
+
+# Ajuste de permissão
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
+
 EXPOSE 8000
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
-# --- Estágio Runtime Node (SSR) ---
-FROM node:24-alpine AS runtime_node
-WORKDIR /app
-COPY --from=builder /app/bootstrap/ssr ./bootstrap/ssr
-COPY --from=builder /app/public/build ./public/build
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-EXPOSE 13714
-CMD ["node", "bootstrap/ssr/app.js"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

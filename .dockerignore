@@ -10,7 +10,6 @@ storage/*.key
 .prettierrc
 .prettierignore
 eslint.config.js
-tsconfig.json
 phpunit.xml
 pint.json
 README.md
