@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { 
+import {
     ArrowLeft,
     ShieldCheck,
     UserPlus,
@@ -79,17 +79,17 @@ export default function Registrar({ roles }: Props) {
         setZodErrors({});
         post(route('administracao.usuario.store'), {
             onSuccess: () => {
-                setModal({ 
-                    show: true, 
-                    mensagem: 'Funcionário cadastrado com sucesso! O convite foi enviado ao e-mail informado.', 
-                    url: route('administracao.usuario.listar') 
+                setModal({
+                    show: true,
+                    mensagem: 'Funcionário cadastrado com sucesso! O convite foi enviado ao e-mail informado.',
+                    url: route('administracao.usuario.index')
                 });
             },
             onError: (err) => {
-                setModal({ 
-                    show: true, 
-                    mensagem: 'Erro ao cadastrar funcionário. ' + Object.values(err).join(', '), 
-                    url: null 
+                setModal({
+                    show: true,
+                    mensagem: 'Erro ao cadastrar funcionário. ' + Object.values(err).join(', '),
+                    url: null
                 });
             }
         });
@@ -101,8 +101,8 @@ export default function Registrar({ roles }: Props) {
 
             <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <Link 
-                        href={route('administracao.usuario.listar')}
+                    <Link
+                        href={route('administracao.usuario.index')}
                         className="p-2 text-gray-400 hover:text-gray-900 transition-colors"
                     >
                         <ArrowLeft size={24} />
@@ -123,7 +123,7 @@ export default function Registrar({ roles }: Props) {
                                 Informações Pessoais
                             </h3>
                         </div>
-                        
+
                         <div className="p-6 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1">
@@ -210,11 +210,10 @@ export default function Registrar({ roles }: Props) {
                                 {roles.map((role) => (
                                     <label
                                         key={role.id}
-                                        className={`flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                                            Number(data.role_id) === role.id 
-                                                ? 'border-blue-600 bg-blue-50' 
+                                        className={`flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer ${Number(data.role_id) === role.id
+                                                ? 'border-blue-600 bg-blue-50'
                                                 : 'border-gray-100 hover:border-blue-200'
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between mb-2">
                                             <span className={`font-bold text-sm ${Number(data.role_id) === role.id ? 'text-blue-700' : 'text-gray-700'}`}>
@@ -241,7 +240,7 @@ export default function Registrar({ roles }: Props) {
 
                     <div className="flex items-center justify-end gap-4">
                         <Link
-                            href={route('administracao.usuario.listar')}
+                            href={route('administracao.usuario.index')}
                             className="px-6 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                         >
                             Cancelar

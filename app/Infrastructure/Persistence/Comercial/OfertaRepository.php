@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Infrastructure\Persistence\Comercial;
+
+use App\Domain\Comercial\Entities\Oferta;
+use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
+use App\Enums\OfertaStatus;
+use Illuminate\Support\Facades\DB;
+
+class OfertaRepository implements OfertaRepositoryInterface
+{
+    public function buscarPorId(int $id): ?Oferta
+    {
+        $row = DB::table('ofertas')->where('id', $id)->first();
+        return $row ? $this->hydrate($row) : null;
+    }
+
+    public function listarAdmin(): array
+    {
+        return DB::table('ofertas')
+            ->leftJoin('pacotes', 'ofertas.pacote_id', '=', 'pacotes.id')
+            ->leftJoin('hotels', 'ofertas.hotel_id', '=', 'hotels.id')
+            ->leftJoin('transportes', 'ofertas.transporte_id', '=', 'transportes.id')
+            ->select(
+                'ofertas.*',
+                'pacotes.nome as pacote_nome',
+                'hotels.nome as hotel_nome',
+                'transportes.empresa as transporte_empresa',
+                'transportes.meio as transporte_meio',
+            )
+            ->latest('ofertas.created_at')
+            ->get()
+            ->all();
+    }
+
+    public function criar(array $dados): int
+    {
+        $isAvailable = ($dados['disponibilidade'] ?? 0) > 0;
+
+        return DB::table('ofertas')->insertGetId([
+            'preco' => $dados['preco'],
+            'inicio' => $dados['inicio'],
+            'fim' => $dados['fim'],
+            'disponibilidade' => $dados['disponibilidade'],
+            'status' => $dados['status'] ?? OfertaStatus::EMANDAMENTO->value,
+            'is_available' => $isAvailable,
+            'pacote_id' => $dados['pacote_id'],
+            'hotel_id' => $dados['hotel_id'],
+            'transporte_id' => $dados['transporte_id'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    public function atualizar(int $id, array $dados): bool
+    {
+        if (isset($dados['disponibilidade'])) {
+            $dados['is_available'] = $dados['disponibilidade'] > 0;
+        }
+        $dados['updated_at'] = now();
+
+        return DB::table('ofertas')->where('id', $id)->update($dados) > 0;
+    }
+
+    public function deletar(int $id): bool
+    {
+        return DB::table('ofertas')->where('id', $id)->delete() > 0;
+    }
+
+    public function contar(): int
+    {
+        return DB::table('ofertas')->count();
+    }
+
+    private function hydrate(object $row): Oferta
+    {
+        return new Oferta(
+            id: $row->id,
+            preco: (float) $row->preco,
+            inicio: $row->inicio,
+            fim: $row->fim,
+            disponibilidade: $row->disponibilidade,
+            status: OfertaStatus::from($row->status),
+            isAvailable: (bool) $row->is_available,
+            pacoteId: $row->pacote_id,
+            hotelId: $row->hotel_id,
+            transporteId: $row->transporte_id,
+            createdAt: $row->created_at,
+            updatedAt: $row->updated_at,
+        );
+    }
+}

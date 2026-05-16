@@ -109,8 +109,7 @@ export default function ViagemCard({
                                 </div>
                                 <Link
                                     href={route('usuario.viagem.detalhes', {
-                                        user: auth.user.slug,
-                                        compra: compra.id,
+                                        id: compra.id,
                                     })}
                                     className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
                                 >

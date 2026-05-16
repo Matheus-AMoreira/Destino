@@ -18,7 +18,7 @@ interface Props {
 export default function Index({ pacoteFotos = [], success }: Props) {
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir este álbum?')) {
-            router.delete(`/administracao/pacotedefoto/${id}`);
+            router.delete(route('administracao.pacote-foto.destroy', { id }));
         }
     };
 
@@ -35,7 +35,7 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                 </div>
 
                 <Link
-                    href={route('administracao.pacotedefoto.registrar')}
+                    href={route('administracao.pacote-foto.create')}
                     className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-purple-700"
                 >
                     <Plus size={20} />
@@ -85,7 +85,7 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                                 </h3>
                                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                                     <Link
-                                        href={`/administracao/pacotedefoto/editar/${album.id}`}
+                                        href={route('administracao.pacote-foto.edit', { id: album.id })}
                                         className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
                                     >
                                         <Pencil size={14} />

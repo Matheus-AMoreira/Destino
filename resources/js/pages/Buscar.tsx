@@ -47,7 +47,7 @@ export default function Buscar({
             {
                 termo: inputTermo,
                 precoMax: inputPreco,
-                page: 0,
+                page: 1,
                 size: filters.size,
             },
             { preserveState: true },
@@ -223,8 +223,8 @@ export default function Buscar({
                                                             handleMudarPagina(p)
                                                         }
                                                         className={`h-10 w-10 rounded-lg font-medium transition ${paginacao.page === p
-                                                                ? 'bg-[#2071b3] text-white'
-                                                                : 'bg-white text-gray-600 hover:bg-gray-100'
+                                                            ? 'bg-[#2071b3] text-white'
+                                                            : 'bg-white text-gray-600 hover:bg-gray-100'
                                                             }`}
                                                     >
                                                         {p + 1}

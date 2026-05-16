@@ -73,7 +73,7 @@ export default function Index({ oferta }: CheckoutProps) {
 
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        post(route('checkout.processar'), {
+        post(route('checkout.process', { ofertaId: oferta.id }), {
             onError: (err) => {
                 setModal({
                     show: true,

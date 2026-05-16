@@ -112,7 +112,7 @@ export default function Detalhes({ compra, auth }: Props) {
                         <div>
                             <Link
                                 href={route('usuario.viagem.listar', {
-                                    user: auth.user.slug,
+                                    usuario: auth.user.nome,
                                 })}
                                 className="group mb-4 inline-flex items-center text-sm font-black tracking-widest text-blue-600 uppercase transition-colors hover:text-blue-700"
                             >

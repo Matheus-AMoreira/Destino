@@ -23,7 +23,8 @@ interface Props {
 }
 
 export default function Editar({ user }: Props) {
-    const { success, error }: any = usePage().props;
+    if (!user) return null;
+
     const [activeTab, setActiveTab] = useState<'info' | 'password'>('info');
     const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
     const [showFullCpf, setShowFullCpf] = useState(false);
@@ -80,7 +81,7 @@ export default function Editar({ user }: Props) {
         }
 
         setZodErrors({});
-        profileForm.put(route('usuario.perfil.update', { user: user.slug }), {
+        profileForm.put(route('user.profile.update'), {
             preserveScroll: true,
             onSuccess: () => {
                 setModal({
@@ -113,7 +114,7 @@ export default function Editar({ user }: Props) {
         }
 
         setZodErrors({});
-        passwordForm.put(route('usuario.perfil.password', { user: user.slug }), {
+        passwordForm.put(route('user.profile.password'), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();

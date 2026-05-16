@@ -33,7 +33,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 export default function Index({ ofertas = [], success }: Props) {
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir esta oferta?')) {
-            router.delete(`/administracao/oferta/${id}`);
+            router.delete(route('administracao.oferta.destroy', { id }));
         }
     };
 
@@ -48,7 +48,7 @@ export default function Index({ ofertas = [], success }: Props) {
                 </div>
                 
                 <Link
-                    href="/administracao/oferta/registrar"
+                    href={route('administracao.oferta.create')}
                     className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-emerald-700"
                 >
                     <Plus size={20} />
@@ -111,7 +111,7 @@ export default function Index({ ofertas = [], success }: Props) {
                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                                         <div className="flex justify-end gap-2">
                                             <Link
-                                                href={`/administracao/oferta/editar/${oferta.id}`}
+                                                href={route('administracao.oferta.edit', { id: oferta.id })}
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                             >
                                                 <Pencil size={18} />

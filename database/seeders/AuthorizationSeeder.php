@@ -2,15 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class AuthorizationSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Criar Permissões
+        // 1. Criar Permissões (usando Query Builder)
         $permissions = [
             // Dashboard
             ['slug' => 'dashboard:read', 'description' => 'Acessar painel administrativo', 'is_staff' => true],
@@ -59,30 +58,61 @@ class AuthorizationSeeder extends Seeder
         ];
 
         foreach ($permissions as $p) {
-            Permission::updateOrCreate(['slug' => $p['slug']], $p);
+            $exists = DB::table('permissions')->where('slug', $p['slug'])->first();
+            if (!$exists) {
+                DB::table('permissions')->insert([
+                    'slug' => $p['slug'],
+                    'description' => $p['description'],
+                    'is_staff' => $p['is_staff'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table('permissions')->where('id', $exists->id)->update([
+                    'description' => $p['description'],
+                    'is_staff' => $p['is_staff'],
+                    'updated_at' => now(),
+                ]);
+            }
         }
 
         // 2. Criar Cargos
-        $adminRole = Role::updateOrCreate(['name' => 'ADMINISTRADOR'], [
-            'description' => 'Acesso total ao sistema e banco de dados',
-            'is_staff' => true
-        ]);
+        $roles = [
+            ['name' => 'ADMINISTRADOR', 'description' => 'Acesso total ao sistema e banco de dados', 'is_staff' => true],
+            ['name' => 'FUNCIONARIO', 'description' => 'Auxiliar administrativo com acesso a hotéis e pacotes', 'is_staff' => true],
+            ['name' => 'USUARIO', 'description' => 'Cliente final da plataforma', 'is_staff' => false],
+        ];
 
-        $funcionarioRole = Role::updateOrCreate(['name' => 'FUNCIONARIO'], [
-            'description' => 'Auxiliar administrativo com acesso a hotéis e pacotes',
-            'is_staff' => true
-        ]);
-
-        $usuarioRole = Role::updateOrCreate(['name' => 'USUARIO'], [
-            'description' => 'Cliente final da plataforma',
-            'is_staff' => false
-        ]);
+        foreach ($roles as $r) {
+            $exists = DB::table('roles')->where('name', $r['name'])->first();
+            if (!$exists) {
+                DB::table('roles')->insert([
+                    'name' => $r['name'],
+                    'description' => $r['description'],
+                    'is_staff' => $r['is_staff'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                DB::table('roles')->where('id', $exists->id)->update([
+                    'description' => $r['description'],
+                    'is_staff' => $r['is_staff'],
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
         // 3. Vincular Permissões aos Cargos Staff
-        $adminPermissions = Permission::all();
-        $adminRole->permissions()->sync($adminPermissions);
+        $adminRole = DB::table('roles')->where('name', 'ADMINISTRADOR')->first();
+        $funcionarioRole = DB::table('roles')->where('name', 'FUNCIONARIO')->first();
+        $usuarioRole = DB::table('roles')->where('name', 'USUARIO')->first();
 
-        $funcionarioPermissions = Permission::whereIn('slug', [
+        // Admin: todas as permissões
+        $allPermissionIds = DB::table('permissions')->pluck('id')->all();
+        $this->syncRolePermissions($adminRole->id, $allPermissionIds);
+
+        // Funcionário: permissões específicas
+        $funcSlugs = [
             'dashboard:read',
             'user:read',
             'hotel:read', 'hotel:create', 'hotel:update',
@@ -90,11 +120,27 @@ class AuthorizationSeeder extends Seeder
             'package-photo:read', 'package-photo:create', 'package-photo:update',
             'offer:read', 'offer:create', 'offer:update',
             'transport:read', 'transport:create', 'transport:update'
-        ])->get();
-        $funcionarioRole->permissions()->sync($funcionarioPermissions);
+        ];
+        $funcPermissionIds = DB::table('permissions')->whereIn('slug', $funcSlugs)->pluck('id')->all();
+        $this->syncRolePermissions($funcionarioRole->id, $funcPermissionIds);
         
-        // Usuário comum pode ter apenas permissões não-staff
-        $usuarioPermissions = Permission::where('is_staff', false)->get();
-        $usuarioRole->permissions()->sync($usuarioPermissions);
+        // Usuário: permissões não-staff
+        $userPermissionIds = DB::table('permissions')->where('is_staff', false)->pluck('id')->all();
+        $this->syncRolePermissions($usuarioRole->id, $userPermissionIds);
+    }
+
+    private function syncRolePermissions(int $roleId, array $permissionIds): void
+    {
+        DB::table('role_permissions')->where('role_id', $roleId)->delete();
+        $records = array_map(fn($pid) => [
+            'role_id' => $roleId,
+            'permission_id' => $pid,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $permissionIds);
+        
+        if (!empty($records)) {
+            DB::table('role_permissions')->insert($records);
+        }
     }
 }

@@ -14,8 +14,6 @@ export type User = {
     two_factor_enabled?: boolean;
     nome: string;
     sobre_nome: string;
-    slug: string;       // slug único armazenado no banco (usado no roteamento)
-    name_slug: string;  // slug cosmético computado (nome + sobrenome, para exibição)
     created_at: string;
     updated_at: string;
     role?: Role;

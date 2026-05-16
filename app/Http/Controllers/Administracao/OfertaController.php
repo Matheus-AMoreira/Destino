@@ -2,72 +2,73 @@
 
 namespace App\Http\Controllers\Administracao;
 
+use App\Application\Comercial\OfertaService;
+use App\Application\Catalogo\PacoteService;
+use App\Application\Hospedagem\HotelService;
+use App\Application\Hospedagem\TransporteService;
 use App\Enums\OfertaStatus;
-use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StoreOfertaRequest;
 use App\Http\Requests\Administracao\UpdateOfertaRequest;
-use App\Models\Hotel;
-use App\Models\Oferta;
-use App\Models\Pacote;
-use App\Models\Transporte;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class OfertaController extends Controller
 {
+    public function __construct(
+        private readonly OfertaService $ofertaService,
+        private readonly PacoteService $pacoteService,
+        private readonly HotelService $hotelService,
+        private readonly TransporteService $transporteService,
+    ) {}
+
     public function index(): Response
     {
         return Inertia::render('Administracao/Oferta/Index', [
-            'ofertas' => Oferta::with(['pacote', 'hotel', 'transporte'])->get(),
+            'ofertas' => $this->ofertaService->listarAdmin(),
         ]);
     }
 
     public function create(): Response
     {
         return Inertia::render('Administracao/Oferta/Create', [
-            'pacotes' => Pacote::all(),
-            'hoteis' => Hotel::all(),
-            'transportes' => Transporte::all(),
-            'statuses' => OfertaStatus::cases(),
+            'pacotes' => $this->pacoteService->listarAdmin(),
+            'hoteis' => $this->hotelService->listarComLocalizacao(),
+            'transportes' => $this->transporteService->listarTodos(),
+            'statuses' => array_map(fn($s) => ['name' => $s->name, 'value' => $s->value], OfertaStatus::cases()),
         ]);
     }
 
     public function store(StoreOfertaRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-        $data['status'] = OfertaStatus::EMANDAMENTO;
-
-        Oferta::create($data);
-
-        return redirect()->route('administracao.oferta.listar')
-            ->with('success', 'Oferta criada com sucesso!');
+        $this->ofertaService->criar($request->validated());
+        return redirect()->route('administracao.oferta.index')->with('success', 'Oferta criada com sucesso.');
     }
 
-    public function edit(Oferta $oferta): Response
+    public function edit(int $id): Response
     {
+        $oferta = $this->ofertaService->buscarPorId($id);
+        if (!$oferta) abort(404);
+
         return Inertia::render('Administracao/Oferta/Edit', [
             'oferta' => $oferta,
-            'pacotes' => Pacote::all(),
-            'hoteis' => Hotel::all(),
-            'transportes' => Transporte::all(),
-            'statuses' => OfertaStatus::cases(),
+            'pacotes' => $this->pacoteService->listarAdmin(),
+            'hoteis' => $this->hotelService->listarComLocalizacao(),
+            'transportes' => $this->transporteService->listarTodos(),
+            'statuses' => array_map(fn($s) => ['name' => $s->name, 'value' => $s->value], OfertaStatus::cases()),
         ]);
     }
 
-    public function update(UpdateOfertaRequest $request, Oferta $oferta): RedirectResponse
+    public function update(UpdateOfertaRequest $request, int $id): RedirectResponse
     {
-        $oferta->update($request->validated());
-
-        return redirect()->route('administracao.oferta.listar')
-            ->with('success', 'Oferta atualizada com sucesso!');
+        $this->ofertaService->atualizar($id, $request->validated());
+        return redirect()->route('administracao.oferta.index')->with('success', 'Oferta atualizada com sucesso.');
     }
 
-    public function destroy(Oferta $oferta): RedirectResponse
+    public function destroy(int $id): RedirectResponse
     {
-        $oferta->delete();
-
-        return redirect()->route('administracao.oferta.listar')
-            ->with('success', 'Oferta excluída com sucesso!');
+        $this->ofertaService->deletar($id);
+        return redirect()->route('administracao.oferta.index')->with('success', 'Oferta deletada com sucesso.');
     }
 }
