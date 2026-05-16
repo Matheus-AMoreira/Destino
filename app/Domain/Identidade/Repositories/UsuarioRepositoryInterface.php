@@ -30,6 +30,8 @@ interface UsuarioRepositoryInterface
     /** @return string[] slugs */
     public function buscarPermissoesDaRole(int $roleId): array;
     public function sincronizarPermissoesDoUsuario(string $userId, array $permissionIds): void;
+    /** @return int[] */
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array;
 
     // === Contadores ===
     public function contarUsuarios(): int;

@@ -147,8 +147,14 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             DB::table('user_permissions')->insert($records);
         }
     }
-
-    // === Contadores ===
+    
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array
+    {
+        return DB::table('user_permissions')
+            ->where('user_id', $userId)
+            ->pluck('permission_id')
+            ->all();
+    }
 
     public function contarUsuarios(): int
     {

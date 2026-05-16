@@ -19,7 +19,7 @@ class PerfilService
         $user = $this->repo->buscarPorId($userId);
         if (!$user) return null;
 
-        $cpfRaw = clone $user; // CPF is not in entity anymore directly
+        $cpfRaw = clone $user;
         $cpf = $this->repo->buscarCpfDescriptografado($userId) ?? '';
         
         $cpfMascarado = '';

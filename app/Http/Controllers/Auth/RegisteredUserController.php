@@ -7,12 +7,15 @@ use App\Domain\Shared\ValueObjects\Email;
 use App\Domain\Shared\ValueObjects\Telefone;
 use App\Domain\Identidade\Enums\UserRole;
 use Illuminate\Routing\Controller;
+use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -20,6 +23,10 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        private readonly UsuarioRepositoryInterface $usuarioRepo,
+    ) {}
+
     /**
      * Display the registration view.
      */
@@ -59,9 +66,7 @@ class RegisteredUserController extends Controller
         }
 
         // Verificação de unicidade com mensagem genérica para não revelar quais dados já existem
-        $jaExiste = User::where('email', $emailVO->value)
-            ->orWhere('cpf', $cpfVO->value)
-            ->exists();
+        $jaExiste = $this->usuarioRepo->existePorEmailOuCpf($emailVO->value, $cpfVO->value);
 
         if ($jaExiste) {
             throw ValidationException::withMessages([
@@ -69,22 +74,29 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $roleId = DB::table('roles')->where('name', UserRole::USUARIO->value)->value('id');
+        $role = $this->usuarioRepo->buscarRolePorNome(UserRole::USUARIO->value);
+        $roleId = $role?->id;
 
-        $user = User::create([
+        $id = (string) Str::uuid();
+
+        $this->usuarioRepo->criar([
+            'id'         => $id,
             'nome'       => $request->nome,
             'sobre_nome' => $request->sobre_nome,
-            'cpf'        => $cpfVO->value,
+            'cpf'        => Crypt::encryptString($cpfVO->value),
             'telefone'   => $telefoneVO->value,
             'email'      => $emailVO->value,
-            'password'   => $request->password,
+            'password'   => Hash::make($request->password),
             'role_id'    => $roleId,
             'is_valid'   => true,
         ]);
 
-        event(new Registered($user));
+        $user = User::find($id);
 
-        Auth::login($user);
+        if ($user) {
+            event(new Registered($user));
+            Auth::login($user);
+        }
 
         return redirect(route('verification.notice', absolute: false));
     }

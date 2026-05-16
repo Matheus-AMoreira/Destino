@@ -84,7 +84,7 @@ class PacoteController extends Controller
         return redirect()->route('administracao.pacote.index')->with('success', 'Pacote deletado com sucesso.');
     }
 
-    public function compras(int $pacoteId): \Illuminate\Http\JsonResponse
+    public function compras(int $pacoteId): JsonResponse
     {
         $compras = $this->pacoteService->listarComprasDoPacote($pacoteId);
         return response()->json($compras);

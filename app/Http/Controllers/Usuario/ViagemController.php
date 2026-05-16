@@ -26,7 +26,7 @@ class ViagemController extends Controller
         ]);
     }
 
-    public function show(Request $request, string $id): Response|\Illuminate\Http\RedirectResponse
+    public function show(Request $request, string $id): Response|RedirectResponse
     {
         $compra = $this->compraService->buscarDetalhesDaViagem($id, $request->user()->id);
 

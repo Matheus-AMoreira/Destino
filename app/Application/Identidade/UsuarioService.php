@@ -107,4 +107,8 @@ class UsuarioService
         return $this->repo->listarFuncionarios();
     }
 
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array
+    {
+        return $this->repo->buscarIdsPermissoesDiretasDoUsuario($userId);
+    }
 }
