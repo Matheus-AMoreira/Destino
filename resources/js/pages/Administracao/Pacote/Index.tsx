@@ -56,7 +56,7 @@ export default function Index({ pacotes = [], success }: Props) {
 
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir este pacote?')) {
-            router.delete(`/administracao/pacote/${id}`);
+            router.delete(route('administracao.pacote.destroy', { id }));
         }
     };
 
@@ -93,7 +93,7 @@ export default function Index({ pacotes = [], success }: Props) {
                 </div>
                 
                 <Link
-                    href="/administracao/pacote/registrar"
+                    href={route('administracao.pacote.create')}
                     className="flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-orange-700"
                 >
                     <Plus size={20} />
@@ -147,7 +147,7 @@ export default function Index({ pacotes = [], success }: Props) {
                                                 <ShoppingBag size={18} />
                                             </button>
                                             <Link
-                                                href={`/administracao/pacote/editar/${pacote.id}`}
+                                                href={route('administracao.pacote.edit', { id: pacote.id })}
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-orange-50 hover:text-orange-600"
                                                 title="Editar"
                                             >

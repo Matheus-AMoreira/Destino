@@ -16,19 +16,20 @@ export default function Sidebar() {
     const { url } = usePage();
     const [isAdminOpen, setIsAdminOpen] = useState(true);
 
-    const isActive = (path: string) => {
-        if (path === '/administracao/dashboard') {
-            return url === path;
+    const isActive = (routeName: string) => {
+        try {
+            const currentRoute = route().current();
+            return currentRoute === routeName || currentRoute?.startsWith(`${routeName}.`);
+        } catch (e) {
+            return false;
         }
-
-        return url === path || url.startsWith(`${path}/`);
     };
 
-    const linkClass = (path: string, isSubItem = false) => `
+    const linkClass = (routeName: string, isSubItem = false) => `
         flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition-colors mb-1
         ${isSubItem ? 'text-sm pl-8' : ''}
         ${
-            isActive(path)
+            isActive(routeName)
                 ? 'bg-blue-50 text-blue-600 border border-blue-200'
                 : 'text-gray-700 hover:bg-gray-100'
         }
@@ -49,8 +50,8 @@ export default function Sidebar() {
             <nav className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-1">
                     <Link
-                        href="/administracao/dashboard"
-                        className={linkClass('/administracao/dashboard')}
+                        href={route('administracao.dashboard')}
+                        className={linkClass('administracao.dashboard')}
                     >
                         <LayoutDashboard size={20} />
                         <span>Dashboard</span>
@@ -73,9 +74,9 @@ export default function Sidebar() {
                         {isAdminOpen && (
                             <div className="mt-1 space-y-1">
                                 <Link
-                                    href="/administracao/pacote/listar"
+                                    href={route('administracao.pacote.index')}
                                     className={linkClass(
-                                        '/administracao/pacote',
+                                        'administracao.pacote.index',
                                         true,
                                     )}
                                 >
@@ -83,9 +84,9 @@ export default function Sidebar() {
                                     <span>Pacotes de Viagem</span>
                                 </Link>
                                 <Link
-                                    href="/administracao/pacotedefoto/listar"
+                                    href={route('administracao.pacote-foto.index')}
                                     className={linkClass(
-                                        '/administracao/pacotedefoto',
+                                        'administracao.pacote-foto.index',
                                         true,
                                     )}
                                 >
@@ -94,9 +95,9 @@ export default function Sidebar() {
                                 </Link>
 
                                 <Link
-                                    href="/administracao/hotel/listar"
+                                    href={route('administracao.hotel.index')}
                                     className={linkClass(
-                                        '/administracao/hotel',
+                                        'administracao.hotel.index',
                                         true,
                                     )}
                                 >
@@ -105,9 +106,9 @@ export default function Sidebar() {
                                 </Link>
 
                                 <Link
-                                    href="/administracao/transporte/listar"
+                                    href={route('administracao.transporte.index')}
                                     className={linkClass(
-                                        '/administracao/transporte',
+                                        'administracao.transporte.index',
                                         true,
                                     )}
                                 >
@@ -115,9 +116,9 @@ export default function Sidebar() {
                                     <span>Transporte</span>
                                 </Link>
                                 <Link
-                                    href="/administracao/oferta/listar"
+                                    href={route('administracao.oferta.index')}
                                     className={linkClass(
-                                        '/administracao/oferta',
+                                        'administracao.oferta.index',
                                         true,
                                     )}
                                 >
@@ -125,9 +126,9 @@ export default function Sidebar() {
                                     <span>Ofertas</span>
                                 </Link>
                                 <Link
-                                    href="/administracao/usuario/listar"
+                                    href={route('administracao.usuario.index')}
                                     className={linkClass(
-                                        '/administracao/usuario',
+                                        'administracao.usuario.index',
                                         true,
                                     )}
                                 >

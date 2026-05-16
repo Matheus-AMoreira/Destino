@@ -27,7 +27,7 @@ interface Props {
 export default function Index({ hotels = [], success }: Props) {
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir este hotel?')) {
-            router.delete(`/administracao/hotel/${id}`);
+            router.delete(route('administracao.hotel.destroy', { id }));
         }
     };
 
@@ -42,7 +42,7 @@ export default function Index({ hotels = [], success }: Props) {
                 </div>
                 
                 <Link
-                    href="/administracao/hotel/registrar"
+                    href={route('administracao.hotel.create')}
                     className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
                 >
                     <Plus size={20} />
@@ -90,7 +90,7 @@ export default function Index({ hotels = [], success }: Props) {
                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                                         <div className="flex justify-end gap-2">
                                             <Link
-                                                href={`/administracao/hotel/editar/${hotel.id}`}
+                                                href={route('administracao.hotel.edit', { id: hotel.id })}
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                             >
                                                 <Pencil size={18} />

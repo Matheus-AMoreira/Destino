@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class UserCreationTest extends TestCase
@@ -14,10 +14,10 @@ class UserCreationTest extends TestCase
     public function test_staff_can_create_new_employee_with_auto_password()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id
         ]);
 
-        $roleFuncionario = Role::where('name', 'FUNCIONARIO')->first();
+        $roleFuncionario = DB::table('roles')->where('name', 'FUNCIONARIO')->first();
 
         $response = $this->actingAs($admin)
             ->post(route('administracao.usuario.store'), [
@@ -42,10 +42,10 @@ class UserCreationTest extends TestCase
     public function test_cannot_create_admin_via_api()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id
         ]);
 
-        $roleAdmin = Role::where('name', 'ADMINISTRADOR')->first();
+        $roleAdmin = DB::table('roles')->where('name', 'ADMINISTRADOR')->first();
 
         $response = $this->actingAs($admin)
             ->post(route('administracao.usuario.store'), [

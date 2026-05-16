@@ -41,7 +41,7 @@ export default function Edit({ oferta, pacotes, hoteis, transportes, statuses }:
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/administracao/oferta/editar/${oferta.id}`);
+        put(route('administracao.oferta.update', { id: oferta.id }));
     };
 
     const inputClasses = "mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none";
@@ -53,7 +53,7 @@ export default function Edit({ oferta, pacotes, hoteis, transportes, statuses }:
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link
-                            href="/administracao/oferta/listar"
+                            href={route('administracao.oferta.index')}
                             className="rounded-lg bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
                         >
                             <X size={20} />
@@ -177,7 +177,7 @@ export default function Edit({ oferta, pacotes, hoteis, transportes, statuses }:
 
                     <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
                         <Link
-                            href="/administracao/oferta/listar"
+                            href={route('administracao.oferta.index')}
                             className="rounded-lg px-6 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                         >
                             Cancelar

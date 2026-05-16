@@ -2,66 +2,66 @@
 
 namespace App\Http\Controllers\Administracao;
 
-use App\Http\Controllers\Controller;
+use App\Application\Hospedagem\HotelService;
+use App\Application\Geografia\LocalizacaoService;
+use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StoreHotelRequest;
 use App\Http\Requests\Administracao\UpdateHotelRequest;
-use App\Models\Cidade;
-use App\Models\Estado;
-use App\Models\Hotel;
-use App\Models\Regiao;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class HotelController extends Controller
 {
+    public function __construct(
+        private readonly HotelService $hotelService,
+        private readonly LocalizacaoService $locService,
+    ) {}
+
     public function index(): Response
     {
         return Inertia::render('Administracao/Hotel/Index', [
-            'hotels' => Hotel::with('cidade.estado.regiao')->get(),
+            'hotels' => $this->hotelService->listarComLocalizacao(),
         ]);
     }
 
     public function create(): Response
     {
         return Inertia::render('Administracao/Hotel/Create', [
-            'regioes' => Regiao::all(),
-            'estados' => Estado::all(),
-            'cidades' => Cidade::all(),
+            'regioes' => $this->locService->listarRegioes(),
+            'estados' => $this->locService->listarEstados(),
+            'cidades' => $this->locService->listarCidades(),
         ]);
     }
 
     public function store(StoreHotelRequest $request): RedirectResponse
     {
-        Hotel::create($request->validated());
-
-        return redirect()->route('administracao.hotel.listar')
-            ->with('success', 'Hotel criado com sucesso!');
+        $this->hotelService->criar($request->validated());
+        return redirect()->route('administracao.hotel.index')->with('success', 'Hotel criado com sucesso.');
     }
 
-    public function edit(Hotel $hotel): Response
+    public function edit(int $id): Response
     {
+        $hotel = $this->hotelService->buscarPorId($id);
+        if (!$hotel) abort(404);
+
         return Inertia::render('Administracao/Hotel/Edit', [
-            'hotel' => $hotel->load('cidade.estado.regiao'),
-            'regioes' => Regiao::all(),
-            'estados' => Estado::all(),
-            'cidades' => Cidade::all(),
+            'hotel' => $hotel,
+            'regioes' => $this->locService->listarRegioes(),
+            'estados' => $this->locService->listarEstados(),
+            'cidades' => $this->locService->listarCidades(),
         ]);
     }
 
-    public function update(UpdateHotelRequest $request, Hotel $hotel): RedirectResponse
+    public function update(UpdateHotelRequest $request, int $id): RedirectResponse
     {
-        $hotel->update($request->validated());
-
-        return redirect()->route('administracao.hotel.listar')
-            ->with('success', 'Hotel atualizado com sucesso!');
+        $this->hotelService->atualizar($id, $request->validated());
+        return redirect()->route('administracao.hotel.index')->with('success', 'Hotel atualizado com sucesso.');
     }
 
-    public function destroy(Hotel $hotel): RedirectResponse
+    public function destroy(int $id): RedirectResponse
     {
-        $hotel->delete();
-
-        return redirect()->route('administracao.hotel.listar')
-            ->with('success', 'Hotel excluído com sucesso!');
+        $this->hotelService->deletar($id);
+        return redirect()->route('administracao.hotel.index')->with('success', 'Hotel deletado com sucesso.');
     }
 }

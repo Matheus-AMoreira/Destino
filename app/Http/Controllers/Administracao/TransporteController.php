@@ -2,60 +2,62 @@
 
 namespace App\Http\Controllers\Administracao;
 
-use App\Enums\Meio;
-use App\Http\Controllers\Controller;
+use App\Application\Hospedagem\TransporteService;
+use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StoreTransporteRequest;
 use App\Http\Requests\Administracao\UpdateTransporteRequest;
-use App\Models\Transporte;
+use App\Domain\Hospedagem\Enums\Meio;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class TransporteController extends Controller
 {
+    public function __construct(
+        private readonly TransporteService $transporteService,
+    ) {}
+
     public function index(): Response
     {
         return Inertia::render('Administracao/Transporte/Index', [
-            'transportes' => Transporte::all(),
+            'transportes' => $this->transporteService->listarTodos(),
+            'meios' => array_column(Meio::cases(), 'value'),
         ]);
     }
 
     public function create(): Response
     {
         return Inertia::render('Administracao/Transporte/Create', [
-            'meios' => Meio::cases(),
+            'meios' => array_column(Meio::cases(), 'value'),
         ]);
     }
 
     public function store(StoreTransporteRequest $request): RedirectResponse
     {
-        Transporte::create($request->validated());
-
-        return redirect()->route('administracao.transporte.listar')
-            ->with('success', 'Transporte criado com sucesso!');
+        $this->transporteService->criar($request->validated());
+        return redirect()->route('administracao.transporte.index')->with('success', 'Transporte criado com sucesso.');
     }
 
-    public function edit(Transporte $transporte): Response
+    public function edit(int $id): Response
     {
+        $transporte = $this->transporteService->buscarPorId($id);
+        if (!$transporte) abort(404);
+
         return Inertia::render('Administracao/Transporte/Edit', [
             'transporte' => $transporte,
-            'meios' => Meio::cases(),
+            'meios' => array_column(Meio::cases(), 'value'),
         ]);
     }
 
-    public function update(UpdateTransporteRequest $request, Transporte $transporte): RedirectResponse
+    public function update(UpdateTransporteRequest $request, int $id): RedirectResponse
     {
-        $transporte->update($request->validated());
-
-        return redirect()->route('administracao.transporte.listar')
-            ->with('success', 'Transporte atualizado com sucesso!');
+        $this->transporteService->atualizar($id, $request->validated());
+        return redirect()->route('administracao.transporte.index')->with('success', 'Transporte atualizado com sucesso.');
     }
 
-    public function destroy(Transporte $transporte): RedirectResponse
+    public function destroy(int $id): RedirectResponse
     {
-        $transporte->delete();
-
-        return redirect()->route('administracao.transporte.listar')
-            ->with('success', 'Transporte excluído com sucesso!');
+        $this->transporteService->deletar($id);
+        return redirect()->route('administracao.transporte.index')->with('success', 'Transporte deletado com sucesso.');
     }
 }

@@ -44,10 +44,25 @@ interface Estado {
     regiao_id: string;
 }
 
-interface Props {
-    dados: DadoCompra[];
+interface Graficos {
+    compras: {
+        meses: string[];
+        ACEITO: number[];
+        PENDENTE: number[];
+        RECUSADO: number[];
+    };
     destinosPopulares: DestinoPopular[];
-    crescimentoUsuarios: UserCrescimento[];
+    crescimentoUsuarios: {
+        anos: number[];
+        totais: number[];
+    };
+    anosDisponiveis: number[];
+}
+
+interface Props {
+    graficos: Graficos;
+    destinosPopulares: DestinoPopular[];
+    crescimentoUsuarios: UserCrescimento[]; // Note: DashboardController is currently sending the object version here too, but we can fix the controller
     ano: number;
     anosDisponiveis: number[];
     regioes: Regiao[];
@@ -61,7 +76,7 @@ interface Props {
 type TabType = 'vendas' | 'destinos' | 'usuarios';
 
 export default function Estatisticas({
-    dados,
+    graficos,
     destinosPopulares,
     crescimentoUsuarios,
     ano,
@@ -79,60 +94,33 @@ export default function Estatisticas({
     const destinosChartInstance = useRef<Chart | null>(null);
     const usersChartInstance = useRef<Chart | null>(null);
 
-    const labels = [
-        'Jan',
-        'Fev',
-        'Mar',
-        'Abr',
-        'Mai',
-        'Jun',
-        'Jul',
-        'Ago',
-        'Set',
-        'Out',
-        'Nov',
-        'Dez',
-    ];
+    const labels = graficos.compras.meses;
 
     const chartData = useMemo(() => {
-        const datasets = {
-            ACEITO: new Array(12).fill(0),
-            PENDENTE: new Array(12).fill(0),
-            RECUSADO: new Array(12).fill(0),
-        };
-
-        dados.forEach((d) => {
-            const status = d.status as keyof typeof datasets;
-
-            if (datasets[status]) {
-                datasets[status][d.mes - 1] = d.total;
-            }
-        });
-
         return {
             labels,
             datasets: [
                 {
                     label: 'Concluídas',
-                    data: datasets.ACEITO,
+                    data: graficos.compras.ACEITO,
                     backgroundColor: '#10b981', // Emerald 500
                     borderRadius: 4,
                 },
                 {
                     label: 'Em Andamento',
-                    data: datasets.PENDENTE,
+                    data: graficos.compras.PENDENTE,
                     backgroundColor: '#f59e0b', // Amber 500
                     borderRadius: 4,
                 },
                 {
                     label: 'Canceladas',
-                    data: datasets.RECUSADO,
+                    data: graficos.compras.RECUSADO,
                     backgroundColor: '#ef4444', // Red 500
                     borderRadius: 4,
                 },
             ],
         };
-    }, [dados]);
+    }, [graficos.compras]);
 
     const destinosChartData = useMemo(() => {
         return {
@@ -150,19 +138,28 @@ export default function Estatisticas({
     }, [destinosPopulares]);
 
     const usersChartData = useMemo(() => {
+        // Growth data might come in different formats depending on controller fix
+        const growthLabels = Array.isArray(crescimentoUsuarios) 
+            ? crescimentoUsuarios.map(u => u.ano.toString())
+            : (graficos.crescimentoUsuarios?.anos || []).map(a => a.toString());
+            
+        const growthValues = Array.isArray(crescimentoUsuarios)
+            ? crescimentoUsuarios.map(u => u.total)
+            : (graficos.crescimentoUsuarios?.totais || []);
+
         return {
-            labels: crescimentoUsuarios.map((u) => u.ano.toString()),
+            labels: growthLabels,
             datasets: [
                 {
                     label: 'Usuários Cadastrados',
-                    data: crescimentoUsuarios.map((u) => u.total),
+                    data: growthValues,
                     backgroundColor: '#8b5cf6', // Violet 500
                     borderRadius: 8,
                     barThickness: 48,
                 },
             ],
         };
-    }, [crescimentoUsuarios]);
+    }, [crescimentoUsuarios, graficos.crescimentoUsuarios]);
 
     useEffect(() => {
         const chartOptions = {
@@ -240,13 +237,15 @@ export default function Estatisticas({
     }, [activeTab, chartData, destinosChartData, usersChartData]);
 
     const totalVendas = useMemo(
-        () => dados.reduce((acc, curr) => acc + curr.total, 0),
-        [dados],
+        () => graficos.compras.ACEITO.reduce((a, b) => a + b, 0) + 
+              graficos.compras.PENDENTE.reduce((a, b) => a + b, 0) + 
+              graficos.compras.RECUSADO.reduce((a, b) => a + b, 0),
+        [graficos.compras],
     );
 
     const handleFilterChange = (key: string, value: any) => {
         router.get(
-            route('administracao.dashboard.estatisticas'),
+            route().current() || '',
             {
                 ...filtros,
                 ano,
@@ -259,7 +258,7 @@ export default function Estatisticas({
     const estadosFiltrados = useMemo(() => {
         if (!filtros.regiao_id) return estados;
 
-        return estados.filter((e) => e.regiao_id === filtros.regiao_id);
+        return estados.filter((e) => String(e.regiao_id) === String(filtros.regiao_id));
     }, [estados, filtros.regiao_id]);
 
     return (
@@ -353,7 +352,7 @@ export default function Estatisticas({
                             </div>
                         </div>
 
-                        <div className="h-112.5 w-full">
+                        <div className="h-112 w-full">
                             {totalVendas > 0 ? (
                                 <canvas ref={chartRef}></canvas>
                             ) : (
@@ -386,7 +385,7 @@ export default function Estatisticas({
                                         handleFilterChange('regiao_id', v)
                                     }
                                     options={regioes.map((r) => ({
-                                        value: r.id,
+                                        value: String(r.id),
                                         label: r.nome,
                                     }))}
                                     placeholder="Todas as Regiões"
@@ -398,7 +397,7 @@ export default function Estatisticas({
                                         handleFilterChange('estado_id', v)
                                     }
                                     options={estadosFiltrados.map((e) => ({
-                                        value: e.id,
+                                        value: String(e.id),
                                         label: e.nome,
                                     }))}
                                     placeholder="Todos os Estados"
@@ -406,7 +405,7 @@ export default function Estatisticas({
                             </div>
                         </div>
 
-                        <div className="h-112.5 w-full">
+                        <div className="h-112 w-full">
                             {destinosPopulares.length > 0 ? (
                                 <canvas ref={destinosChartRef}></canvas>
                             ) : (
@@ -431,8 +430,8 @@ export default function Estatisticas({
                             </p>
                         </div>
 
-                        <div className="h-112.5 w-full">
-                            {crescimentoUsuarios.length > 0 ? (
+                        <div className="h-112 w-full">
+                            {(Array.isArray(crescimentoUsuarios) ? crescimentoUsuarios.length > 0 : (graficos.crescimentoUsuarios?.totais?.length > 0)) ? (
                                 <canvas ref={usersChartRef}></canvas>
                             ) : (
                                 <EmptyState
@@ -519,7 +518,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
 
 function EmptyState({ icon: Icon, message }: { icon: any; message: string }) {
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center rounded-4xl border-2 border-dashed border-gray-100 bg-gray-50/30 text-gray-400">
+        <div className="flex h-full w-full flex-col items-center justify-center rounded-[40px] border-2 border-dashed border-gray-100 bg-gray-50/30 text-gray-400">
             <Icon size={48} className="mb-4 opacity-20" />
             <p className="text-[10px] font-bold tracking-widest uppercase">
                 {message}

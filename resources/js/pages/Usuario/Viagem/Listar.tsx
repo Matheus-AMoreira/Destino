@@ -123,7 +123,7 @@ export default function Listar({ compras, view, auth }: Props) {
                     <nav className="mt-4 space-y-2 p-4">
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user: auth.user.slug,
+                                usuario: auth.user.nome,
                                 view: 'andamento',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
@@ -138,7 +138,7 @@ export default function Listar({ compras, view, auth }: Props) {
 
                         <Link
                             href={route('usuario.viagem.listar', {
-                                user: auth.user.slug,
+                                usuario: auth.user.nome,
                                 view: 'concluidas',
                             })}
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${

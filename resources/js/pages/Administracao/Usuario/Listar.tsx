@@ -54,14 +54,14 @@ export default function Listar({ usuarios, filters, auth }: Props) {
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(route('administracao.usuario.listar'), { 
+        router.get(route('administracao.usuario.index'), { 
             termo, 
             tab: filters.tab 
         }, { preserveState: true });
     };
 
     const handleTabChange = (newTab: string) => {
-        router.get(route('administracao.usuario.listar'), { 
+        router.get(route('administracao.usuario.index'), { 
             termo, 
             tab: newTab 
         }, { preserveState: true });
@@ -73,8 +73,10 @@ export default function Listar({ usuarios, filters, auth }: Props) {
         });
     };
 
-    const handleToggleBlock = (id: string) => {
-        router.post(route('administracao.usuario.toggle-block', { user: id }), {}, {
+    const handleToggleBlock = (id: string, currentStatus: boolean) => {
+        router.patch(route('administracao.usuario.update-status', { id }), {
+            is_valid: !currentStatus
+        }, {
             onSuccess: () => setModal({ show: true, mensagem: 'Status do usuário atualizado.', url: null })
         });
     };
@@ -86,7 +88,7 @@ export default function Listar({ usuarios, filters, auth }: Props) {
     };
 
     const handleDelete = (id: string) => {
-        router.delete(route('administracao.usuario.destroy', { user: id }), {
+        router.delete(route('administracao.usuario.destroy', { id }), {
             onSuccess: () => setModal({ show: true, mensagem: 'Usuário removido.', url: null })
         });
     };
@@ -104,7 +106,7 @@ export default function Listar({ usuarios, filters, auth }: Props) {
                 </div>
 
                 <Link
-                    href={route('administracao.usuario.registrar')}
+                    href={route('administracao.usuario.create')}
                     className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95"
                 >
                     <Plus size={18} />
@@ -207,7 +209,10 @@ export default function Listar({ usuarios, filters, auth }: Props) {
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Link
-                                                    href={route('administracao.usuario.show', { user: usuario.id })}
+                                                    href={route('administracao.usuario.edit', { 
+                                                        id: btoa(usuario.id),
+                                                        nome: `${usuario.nome}-${usuario.sobre_nome || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+                                                    })}
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                                     title="Ver Detalhes"
                                                 >
@@ -236,7 +241,7 @@ export default function Listar({ usuarios, filters, auth }: Props) {
                                                 )}
                                                 
                                                 <button
-                                                    onClick={() => handleToggleBlock(usuario.id)}
+                                                    onClick={() => handleToggleBlock(usuario.id, usuario.is_valid)}
                                                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors border border-gray-100"
                                                     title={usuario.is_valid ? 'Suspender' : 'Liberar'}
                                                 >

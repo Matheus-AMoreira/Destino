@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Domain\Identidade\Enums;
+
+enum UserAuthority: string
+{
+    case DELETAR_USUARIO = 'DELETAR_USUARIO';
+    case CRIAR_PACOTE = 'CRIAR_PACOTE';
+    case EDICAO_PERFIL = 'EDICAO_PERFIL';
+}

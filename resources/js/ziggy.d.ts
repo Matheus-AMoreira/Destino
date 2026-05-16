@@ -2,6 +2,14 @@
 declare module 'ziggy-js' {
   interface RouteList {
     "home": [],
+    "contato": [],
+    "buscar": [],
+    "pacote.detalhes": [
+        {
+            "name": "nome",
+            "required": true
+        }
+    ],
     "cadastro": [],
     "entrar": [],
     "login": [],
@@ -27,255 +35,175 @@ declare module 'ziggy-js' {
     ],
     "verification.send": [],
     "logout": [],
-    "buscar": [],
-    "contato": [],
-    "administracao.dashboard": [],
-    "administracao.dashboard.estatisticas": [],
-    "administracao.hotel.listar": [],
-    "administracao.hotel.edit": [
+    "checkout": [
         {
-            "name": "hotel",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.hotel.store": [],
-    "administracao.hotel.update": [
-        {
-            "name": "hotel",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.hotel.destroy": [
-        {
-            "name": "hotel",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.hotel.registrar": [],
-    "administracao.pacote.listar": [],
-    "administracao.pacote.edit": [
-        {
-            "name": "pacote",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacote.compras": [
-        {
-            "name": "pacote",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacote.store": [],
-    "administracao.pacote.update": [
-        {
-            "name": "pacote",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacote.destroy": [
-        {
-            "name": "pacote",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacote.registrar": [],
-    "administracao.pacotedefoto.listar": [],
-    "administracao.pacotedefoto.edit": [
-        {
-            "name": "pacotedefoto",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacotedefoto.store": [],
-    "administracao.pacotedefoto.update": [
-        {
-            "name": "pacotedefoto",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacotedefoto.destroy": [
-        {
-            "name": "pacotedefoto",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.pacotedefoto.registrar": [],
-    "administracao.usuario.registrar": [],
-    "administracao.usuario.store": [],
-    "administracao.usuario.listar": [],
-    "administracao.usuario.show": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.compras": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.resend-invitation": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.aprovar": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.toggle-block": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.destroy": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.update-access": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.usuario.perfil-update": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.oferta.listar": [],
-    "administracao.oferta.edit": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.offer.store": [],
-    "administracao.offer.update": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.offer.destroy": [
-        {
-            "name": "oferta",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.oferta.registrar": [],
-    "administracao.transporte.listar": [],
-    "administracao.transporte.edit": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transport.store": [],
-    "administracao.transport.update": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transport.destroy": [
-        {
-            "name": "transporte",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "administracao.transporte.registrar": [],
-    "checkout.index": [],
-    "checkout.processar": [],
-    "checkout.confirmacao": [
-        {
-            "name": "compraId",
+            "name": "ofertaId",
             "required": true
         }
     ],
-    "pacote.detalhes": [
+    "checkout.process": [
         {
-            "name": "nome",
+            "name": "ofertaId",
+            "required": true
+        }
+    ],
+    "user.profile.edit": [],
+    "user.profile.update": [],
+    "user.profile.password": [],
+    "usuario.viagem.detalhes": [
+        {
+            "name": "id",
             "required": true
         }
     ],
     "usuario.viagem.listar": [
         {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
+            "name": "usuario",
+            "required": false
         }
     ],
-    "usuario.viagem.detalhes": [
+    "administracao.dashboard": [],
+    "administracao.dashboard.estatisticas": [],
+    "administracao.hotel.index": [],
+    "administracao.hotel.create": [],
+    "administracao.hotel.store": [],
+    "administracao.hotel.edit": [
         {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.hotel.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.hotel.destroy": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.transporte.index": [],
+    "administracao.transporte.create": [],
+    "administracao.transporte.store": [],
+    "administracao.transporte.edit": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.transporte.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.transporte.destroy": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote-foto.index": [],
+    "administracao.pacote-foto.create": [],
+    "administracao.pacote-foto.store": [],
+    "administracao.pacote-foto.edit": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote-foto.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote-foto.destroy": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote.index": [],
+    "administracao.pacote.create": [],
+    "administracao.pacote.store": [],
+    "administracao.pacote.edit": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote.destroy": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.pacote.compras": [
+        {
+            "name": "pacote",
+            "required": true
+        }
+    ],
+    "administracao.oferta.index": [],
+    "administracao.oferta.create": [],
+    "administracao.oferta.store": [],
+    "administracao.oferta.edit": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.oferta.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.oferta.destroy": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "administracao.usuario.index": [],
+    "administracao.usuario.create": [],
+    "administracao.usuario.store": [],
+    "administracao.usuario.edit": [
+        {
+            "name": "nome",
+            "required": true
         },
         {
-            "name": "compra",
-            "required": true,
-            "binding": "id"
+            "name": "id",
+            "required": true
         }
     ],
-    "usuario.perfil.edit": [
+    "administracao.usuario.update": [
         {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
+            "name": "id",
+            "required": true
         }
     ],
-    "usuario.perfil.update": [
+    "administracao.usuario.update-status": [
         {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
+            "name": "id",
+            "required": true
         }
     ],
-    "usuario.perfil.password": [
+    "administracao.usuario.destroy": [
         {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
-        }
-    ],
-    "usuario.perfil.destroy": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "slug"
+            "name": "id",
+            "required": true
         }
     ],
     "storage.local": [
