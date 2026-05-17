@@ -65,7 +65,7 @@ interface AcessoForm {
     permissions: number[];
 }
 
-export default function Detalhes({ usuario, compras, roles, permissions }: Props) {
+export default function Detalhes({ usuario, compras = [], roles, permissions }: Props) {
     const route = useRoute();
     const [activeTab, setActiveTab] = useState<'perfil' | 'acesso' | 'historico'>('historico');
     const [statusFilter, setStatusFilter] = useState<string>('TODOS');
@@ -120,14 +120,14 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
         }
 
         setZodErrors({});
-        perfilForm.put(route('administracao.usuario.perfil-update', { user: usuario.id }), {
+        perfilForm.put(route('administracao.usuario.update', { id: usuario.id }), {
             onSuccess: () => setModal({ show: true, mensagem: 'Perfil atualizado com sucesso!', url: null }),
         });
     };
 
     const handleUpdateAccess = (e: React.FormEvent) => {
         e.preventDefault();
-        acessoForm.put(route('administracao.usuario.update-access', { user: usuario.id }), {
+        acessoForm.put(route('administracao.usuario.update', { id: usuario.id }), {
             onSuccess: () => setModal({ show: true, mensagem: 'Acessos sincronizados com sucesso!', url: null }),
         });
     };
@@ -172,7 +172,7 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                             <Link
-                                href={route('administracao.usuario.listar')}
+                                href={route('administracao.usuario.index')}
                                 className="p-3 bg-white text-gray-400 hover:text-blue-600 rounded-2xl shadow-sm border border-gray-100 transition-all hover:shadow-md"
                             >
                                 <ArrowLeft size={20} />
@@ -182,7 +182,7 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                 <p className="text-gray-500 font-medium text-sm">Gerencie informações e permissões de {usuario.nome}.</p>
                             </div>
                         </div>
- 
+
                         <div className="flex items-center gap-3">
                             <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${usuario.role?.is_staff ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-100' : 'bg-gray-100 text-gray-700 border-gray-200'
                                 }`}>
@@ -207,12 +207,12 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                     <h2 className="text-xl font-black text-gray-900">{usuario.nome} {usuario.sobre_nome}</h2>
                                     <p className="text-sm text-gray-400 font-bold mt-1 tracking-tight">{usuario.email}</p>
                                 </div>
- 
+
                                 <div className="space-y-3">
                                     <button
                                         onClick={() => setActiveTab('historico')}
-                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'historico' 
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'historico'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                             : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
                                             }`}
                                     >
@@ -221,8 +221,8 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('perfil')}
-                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'perfil' 
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'perfil'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                             : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
                                             }`}
                                     >
@@ -231,8 +231,8 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('acesso')}
-                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'acesso' 
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'acesso'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                             : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
                                             }`}
                                     >
@@ -260,8 +260,8 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                                         key={status}
                                                         onClick={() => setStatusFilter(status)}
                                                         className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === status
-                                                                ? 'bg-white text-gray-900 shadow-md'
-                                                                : 'text-gray-500 hover:text-gray-900'
+                                                            ? 'bg-white text-gray-900 shadow-md'
+                                                            : 'text-gray-500 hover:text-gray-900'
                                                             }`}
                                                     >
                                                         {status}
@@ -287,7 +287,7 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                                             <div className="flex items-center gap-6">
                                                                 <span className="font-black text-xl text-gray-900 tracking-tighter">{formatCurrency(compra.valor_final)}</span>
                                                                 <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${compra.status === 'ACEITO' ? 'bg-green-600 text-white shadow-lg shadow-green-100' :
-                                                                        compra.status === 'RECUSADO' ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-amber-500 text-white shadow-lg shadow-amber-100'
+                                                                    compra.status === 'RECUSADO' ? 'bg-red-600 text-white shadow-lg shadow-red-100' : 'bg-amber-500 text-white shadow-lg shadow-amber-100'
                                                                     }`}>
                                                                     {getStatusIcon(compra.status)}
                                                                     {compra.status}
@@ -403,8 +403,8 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                                 {roles.filter(r => r.is_staff === usuario.role?.is_staff).map(role => (
                                                     <label
                                                         key={role.id}
-                                                        className={`p-6 border-2 rounded-3xl cursor-pointer transition-all ${Number(acessoForm.data.role_id) === role.id 
-                                                            ? 'border-blue-600 bg-blue-50 shadow-lg shadow-blue-100' 
+                                                        className={`p-6 border-2 rounded-3xl cursor-pointer transition-all ${Number(acessoForm.data.role_id) === role.id
+                                                            ? 'border-blue-600 bg-blue-50 shadow-lg shadow-blue-100'
                                                             : 'border-gray-50 hover:border-blue-100 hover:bg-gray-50/50'
                                                             }`}
                                                     >
@@ -440,8 +440,8 @@ export default function Detalhes({ usuario, compras, roles, permissions }: Props
                                                                 acessoForm.setData('permissions', updated);
                                                             }}
                                                             className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border-2 transition-all ${acessoForm.data.permissions.includes(permission.id)
-                                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-100'
-                                                                    : 'bg-white text-gray-400 border-gray-100 hover:border-blue-200 hover:text-blue-600'
+                                                                ? 'bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-100'
+                                                                : 'bg-white text-gray-400 border-gray-100 hover:border-blue-200 hover:text-blue-600'
                                                                 }`}
                                                         >
                                                             {permission.slug}

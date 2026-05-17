@@ -314,7 +314,6 @@ CREATE TABLE public.users (
     telefone            varchar(11)     NOT NULL,
     password            varchar(255)    NOT NULL,
     is_valid            boolean         NOT NULL  DEFAULT false,
-    slug                varchar(255)    NOT NULL  UNIQUE,
     email_verified_at   timestamp(0),
     remember_token      varchar(100),
     role_id             bigint,

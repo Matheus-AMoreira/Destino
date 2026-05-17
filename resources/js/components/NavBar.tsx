@@ -82,7 +82,7 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        user: auth.user.slug,
+                                        usuario: auth.user.nome,
                                         view: 'andamento',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
@@ -93,7 +93,7 @@ export default function Navbar() {
 
                                 <Link
                                     href={route('usuario.viagem.listar', {
-                                        user: auth.user.slug,
+                                        usuario: auth.user.nome,
                                         view: 'concluidas',
                                     })}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
@@ -103,9 +103,7 @@ export default function Navbar() {
                                 </Link>
 
                                 <Link
-                                    href={route('usuario.perfil.edit', {
-                                        user: auth.user.slug,
-                                    })}
+                                    href={route('user.profile.edit')}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <User size={18} />
@@ -127,7 +125,7 @@ export default function Navbar() {
                         </div>
                     ) : (
                         <Link
-                            href={route('login')}
+                            href={route('entrar')}
                             className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                         >
                             <CircleArrowRight />

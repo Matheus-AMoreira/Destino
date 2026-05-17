@@ -28,7 +28,7 @@ const MeioIcon = ({ meio }: { meio: string }) => {
 export default function Index({ transportes = [], success }: Props) {
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir este transporte?')) {
-            router.delete(`/administracao/transporte/${id}`);
+            router.delete(route('administracao.transporte.destroy', { id }));
         }
     };
 
@@ -43,7 +43,7 @@ export default function Index({ transportes = [], success }: Props) {
                 </div>
                 
                 <Link
-                    href="/administracao/transporte/registrar"
+                    href={route('administracao.transporte.create')}
                     className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
                 >
                     <Plus size={20} />
@@ -88,7 +88,7 @@ export default function Index({ transportes = [], success }: Props) {
                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                                         <div className="flex justify-end gap-2">
                                             <Link
-                                                href={`/administracao/transporte/editar/${transporte.id}`}
+                                                href={route('administracao.transporte.edit', { id: transporte.id })}
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                             >
                                                 <Pencil size={18} />

@@ -53,9 +53,7 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
     const handleComprar = () => {
         if (!temOfertasAtivas || !ofertaAtual) return;
-        router.get(route('checkout.index'), {
-            ofertaId: ofertaAtual.id,
-        });
+        router.get(route('checkout', { ofertaId: ofertaAtual.id }));
     };
 
     if (!pacote) {

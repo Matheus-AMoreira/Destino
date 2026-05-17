@@ -1,12 +1,22 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Publico\HomeController;
+use App\Http\Controllers\Publico\BuscaController;
+use App\Http\Controllers\Publico\PacoteController as PublicoPacoteController;
+use App\Http\Controllers\Usuario\CheckoutController;
+use App\Http\Controllers\Usuario\PerfilController;
+use App\Http\Controllers\Usuario\ViagemController;
 use App\Http\Controllers\Administracao\DashboardController;
 use App\Http\Controllers\Administracao\HotelController;
 use App\Http\Controllers\Administracao\OfertaController;
-use App\Http\Controllers\Administracao\PacoteController;
+use App\Http\Controllers\Administracao\PacoteController as AdminPacoteController;
 use App\Http\Controllers\Administracao\PacoteFotoController;
 use App\Http\Controllers\Administracao\TransporteController;
 use App\Http\Controllers\Administracao\UsuarioController;
+use App\Http\Middleware\CheckUserStatus;
+use App\Http\Middleware\AdminMiddleware;
+
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -14,15 +24,15 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\RouteController;
-use App\Http\Controllers\Usuario\PerfilController;
 use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
-use Illuminate\Support\Facades\Route;
 
-Route::get('/', [RouteController::class, 'index'])->name('home');
+// Públicas
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/contato', [HomeController::class, 'contato'])->name('contato');
+Route::get('/buscar', [BuscaController::class, 'buscar'])->name('buscar');
+Route::get('/pacote/{nome}', [PublicoPacoteController::class, 'detalhes'])->name('pacote.detalhes');
 
+// Auth Routes (Original Breeze)
 Route::middleware('guest')->group(function () {
     Route::get('cadastro', [RegisteredUserController::class, 'create'])->name('cadastro');
     Route::post('cadastro', [RegisteredUserController::class, 'store']);
@@ -52,102 +62,85 @@ Route::middleware([Authenticate::class])->group(function () {
         ->name('logout');
 });
 
-Route::get('/buscar', [RouteController::class, 'buscar'])->name('buscar');
-Route::get('/contato', [RouteController::class, 'contato'])->name('contato');
+// Checkout e Área do Usuário (Requer Auth)
+Route::middleware(['auth', 'verified', CheckUserStatus::class])->group(function () {
+    Route::get('/checkout/{ofertaId}', [CheckoutController::class, 'index'])->name('checkout');
+    Route::post('/checkout/{ofertaId}', [CheckoutController::class, 'process'])->name('checkout.process');
+    
+    // Perfil do Usuário
+    Route::get('/perfil', [PerfilController::class, 'edit'])->name('user.profile.edit');
+    Route::patch('/perfil', [PerfilController::class, 'update'])->name('user.profile.update');
+    Route::put('/perfil/senha', [PerfilController::class, 'updatePassword'])->name('user.profile.password');
+    
+    // Viagens do Usuário
+    Route::get('/minhas-viagens/detalhes/{id}', [ViagemController::class, 'show'])->name('usuario.viagem.detalhes');
+    Route::get('/minhas-viagens/{usuario?}', [ViagemController::class, 'index'])->name('usuario.viagem.listar');
+});
 
-Route::middleware([Authenticate::class, EnsureEmailIsVerified::class])->prefix('administracao')->name('administracao.')->group(function () {
-    // Dashboard (Acesso básico para quem pode ver algo na admin)
-    Route::middleware('authorize.ui:dashboard:read')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas');
-    });
+// Admin
+Route::middleware(['auth', 'verified', AdminMiddleware::class])->prefix('administracao')->name('administracao.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('authorize.ui:dashboard:read');
+    Route::get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas'])->name('dashboard.estatisticas')->middleware('authorize.ui:dashboard:read');
 
     // Hotéis
-    Route::middleware('authorize.ui:hotel:read')->group(function () {
-        Route::get('/hotel/listar', [HotelController::class, 'index'])->name('hotel.listar');
-        Route::get('/hotel/editar/{hotel}', [HotelController::class, 'edit'])->name('hotel.edit');
+    Route::prefix('hotel')->name('hotel.')->group(function () {
+        Route::get('/listar', [HotelController::class, 'index'])->name('index')->middleware('authorize.ui:hotel,read');
+        Route::get('/novo', [HotelController::class, 'create'])->name('create')->middleware('authorize.ui:hotel,create');
+        Route::post('/', [HotelController::class, 'store'])->name('store')->middleware('authorize.api:hotel,create');
+        Route::get('/{id}/editar', [HotelController::class, 'edit'])->name('edit')->middleware('authorize.ui:hotel,update');
+        Route::put('/{id}', [HotelController::class, 'update'])->name('update')->middleware('authorize.api:hotel,update');
+        Route::delete('/{id}', [HotelController::class, 'destroy'])->name('destroy')->middleware('authorize.api:hotel,delete');
     });
-    Route::middleware('authorize.api:hotel,create')->post('/hotel/registrar', [HotelController::class, 'store'])->name('hotel.store');
-    Route::middleware('authorize.api:hotel,update')->put('/hotel/editar/{hotel}', [HotelController::class, 'update'])->name('hotel.update');
-    Route::middleware('authorize.api:hotel,delete')->delete('/hotel/{hotel}', [HotelController::class, 'destroy'])->name('hotel.destroy');
-    Route::get('/hotel/registrar', [HotelController::class, 'create'])->name('hotel.registrar')->middleware('authorize.ui:hotel:create');
 
-    // Pacotes
-    Route::middleware('authorize.ui:package:read')->group(function () {
-        Route::get('/pacote/listar', [PacoteController::class, 'index'])->name('pacote.listar');
-        Route::get('/pacote/editar/{pacote}', [PacoteController::class, 'edit'])->name('pacote.edit');
-        Route::get('/pacote/{pacote}/compras', [PacoteController::class, 'compras'])->name('pacote.compras');
+    // Transportes
+    Route::prefix('transporte')->name('transporte.')->group(function () {
+        Route::get('/listar', [TransporteController::class, 'index'])->name('index')->middleware('authorize.ui:transport,read');
+        Route::get('/novo', [TransporteController::class, 'create'])->name('create')->middleware('authorize.ui:transport,create');
+        Route::post('/', [TransporteController::class, 'store'])->name('store')->middleware('authorize.api:transport,create');
+        Route::get('/{id}/editar', [TransporteController::class, 'edit'])->name('edit')->middleware('authorize.ui:transport,update');
+        Route::put('/{id}', [TransporteController::class, 'update'])->name('update')->middleware('authorize.api:transport,update');
+        Route::delete('/{id}', [TransporteController::class, 'destroy'])->name('destroy')->middleware('authorize.api:transport,delete');
     });
-    Route::middleware('authorize.api:package,create')->post('/pacote/registrar', [PacoteController::class, 'store'])->name('pacote.store');
-    Route::middleware('authorize.api:package,update')->put('/pacote/editar/{pacote}', [PacoteController::class, 'update'])->name('pacote.update');
-    Route::middleware('authorize.api:package,delete')->delete('/pacote/{pacote}', [PacoteController::class, 'destroy'])->name('pacote.destroy');
-    Route::get('/pacote/registrar', [PacoteController::class, 'create'])->name('pacote.registrar')->middleware('authorize.ui:package:create');
 
     // Pacotes de Fotos
-    Route::middleware('authorize.ui:package-photo:read')->group(function () {
-        Route::get('/pacotedefoto/listar', [PacoteFotoController::class, 'index'])->name('pacotedefoto.listar');
-        Route::get('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'edit'])->name('pacotedefoto.edit');
+    Route::prefix('pacote-foto')->name('pacote-foto.')->group(function () {
+        Route::get('/listar', [PacoteFotoController::class, 'index'])->name('index')->middleware('authorize.ui:package-photo,read');
+        Route::get('/novo', [PacoteFotoController::class, 'create'])->name('create')->middleware('authorize.ui:package-photo,create');
+        Route::post('/', [PacoteFotoController::class, 'store'])->name('store')->middleware('authorize.api:package-photo,create');
+        Route::get('/{id}/editar', [PacoteFotoController::class, 'edit'])->name('edit')->middleware('authorize.ui:package-photo,update');
+        Route::post('/{id}', [PacoteFotoController::class, 'update'])->name('update')->middleware('authorize.api:package-photo,update'); // POST com _method=PUT para file uploads
+        Route::delete('/{id}', [PacoteFotoController::class, 'destroy'])->name('destroy')->middleware('authorize.api:package-photo,delete');
     });
-    Route::middleware('authorize.api:package-photo,create')->post('/pacotedefoto/registrar', [PacoteFotoController::class, 'store'])->name('pacotedefoto.store');
-    Route::middleware('authorize.api:package-photo,update')->post('/pacotedefoto/editar/{pacotedefoto}', [PacoteFotoController::class, 'update'])->name('pacotedefoto.update');
-    Route::middleware('authorize.api:package-photo,delete')->delete('/pacotedefoto/{pacotedefoto}', [PacoteFotoController::class, 'destroy'])->name('pacotedefoto.destroy');
-    Route::get('/pacotedefoto/registrar', [PacoteFotoController::class, 'create'])->name('pacotedefoto.registrar')->middleware('authorize.ui:package-photo:create');
 
-    // Usuários (Gestão)
-    Route::get('/usuario/registrar', [UsuarioController::class, 'create'])->name('usuario.registrar')->middleware('authorize.ui:user:create');
-    Route::post('/usuario/registrar', [UsuarioController::class, 'store'])->name('usuario.store')->middleware('authorize.api:user,create');
-
-    Route::middleware('authorize.ui:user:read')->group(function () {
-        Route::get('/usuario/listar', [UsuarioController::class, 'index'])->name('usuario.listar');
-        Route::get('/usuario/{user}', [UsuarioController::class, 'show'])->name('usuario.show');
-        Route::get('/usuario/{user}/compras', [UsuarioController::class, 'compras'])->name('usuario.compras');
-    });
-    
-    Route::post('/usuario/{user}/resend-invitation', [UsuarioController::class, 'resendInvitation'])->name('usuario.resend-invitation')->middleware('authorize.api:user,update');
-    
-    Route::middleware('authorize.api:user,update')->group(function () {
-        Route::post('/usuario/{user}/aprovar', [UsuarioController::class, 'aprovar'])->name('usuario.aprovar');
-        Route::post('/usuario/{user}/block', [UsuarioController::class, 'toggleBlock'])->name('usuario.toggle-block');
-        Route::delete('/usuario/{user}', [UsuarioController::class, 'destroy'])->name('usuario.destroy');
-        Route::put('/usuario/{user}/access', [UsuarioController::class, 'updateAccess'])->name('usuario.update-access');
-        Route::put('/usuario/{user}/perfil', [PerfilController::class, 'adminUpdate'])->name('usuario.perfil-update');
+    // Pacotes
+    Route::prefix('pacote')->name('pacote.')->group(function () {
+        Route::get('/listar', [AdminPacoteController::class, 'index'])->name('index')->middleware('authorize.ui:package,read');
+        Route::get('/novo', [AdminPacoteController::class, 'create'])->name('create')->middleware('authorize.ui:package,create');
+        Route::post('/', [AdminPacoteController::class, 'store'])->name('store')->middleware('authorize.api:package,create');
+        Route::get('/{id}/editar', [AdminPacoteController::class, 'edit'])->name('edit')->middleware('authorize.ui:package,update');
+        Route::put('/{id}', [AdminPacoteController::class, 'update'])->name('update')->middleware('authorize.api:package,update');
+        Route::delete('/{id}', [AdminPacoteController::class, 'destroy'])->name('destroy')->middleware('authorize.api:package,delete');
+        Route::get('/{pacote}/compras', [AdminPacoteController::class, 'compras'])->name('compras')->middleware('authorize.api:package,read');
     });
 
     // Ofertas
-    Route::middleware('authorize.ui:offer:read')->group(function () {
-        Route::get('/oferta/listar', [OfertaController::class, 'index'])->name('oferta.listar');
-        Route::get('/oferta/editar/{oferta}', [OfertaController::class, 'edit'])->name('oferta.edit');
+    Route::prefix('oferta')->name('oferta.')->group(function () {
+        Route::get('/listar', [OfertaController::class, 'index'])->name('index')->middleware('authorize.ui:offer,read');
+        Route::get('/novo', [OfertaController::class, 'create'])->name('create')->middleware('authorize.ui:offer,create');
+        Route::post('/', [OfertaController::class, 'store'])->name('store')->middleware('authorize.api:offer,create');
+        Route::get('/{id}/editar', [OfertaController::class, 'edit'])->name('edit')->middleware('authorize.ui:offer,update');
+        Route::put('/{id}', [OfertaController::class, 'update'])->name('update')->middleware('authorize.api:offer,update');
+        Route::delete('/{id}', [OfertaController::class, 'destroy'])->name('destroy')->middleware('authorize.api:offer,delete');
     });
-    Route::middleware('authorize.api:offer,create')->post('/oferta/registrar', [OfertaController::class, 'store'])->name('offer.store');
-    Route::middleware('authorize.api:offer,update')->put('/oferta/editar/{oferta}', [OfertaController::class, 'update'])->name('offer.update');
-    Route::middleware('authorize.api:offer,delete')->delete('/oferta/{oferta}', [OfertaController::class, 'destroy'])->name('offer.destroy');
-    Route::get('/oferta/registrar', [OfertaController::class, 'create'])->name('oferta.registrar')->middleware('authorize.ui:offer:create');
 
-    // Transportes
-    Route::middleware('authorize.ui:transport:read')->group(function () {
-        Route::get('/transporte/listar', [TransporteController::class, 'index'])->name('transporte.listar');
-        Route::get('/transporte/editar/{transporte}', [TransporteController::class, 'edit'])->name('transporte.edit');
+    // Usuários
+    Route::prefix('usuario')->name('usuario.')->group(function () {
+        Route::get('/listar', [UsuarioController::class, 'index'])->name('index')->middleware('authorize.ui:user,read');
+        Route::get('/novo', [UsuarioController::class, 'create'])->name('create')->middleware('authorize.ui:user,create');
+        Route::post('/', [UsuarioController::class, 'store'])->name('store')->middleware('authorize.api:user,create');
+        Route::get('/editar/{nome}/{id}', [UsuarioController::class, 'edit'])->name('edit')->middleware('authorize.ui:user,update');
+        Route::put('/{id}', [UsuarioController::class, 'update'])->name('update')->middleware('authorize.api:user,update');
+        Route::patch('/{id}/status', [UsuarioController::class, 'updateStatus'])->name('update-status')->middleware('authorize.api:user,update');
+        Route::delete('/{id}', [UsuarioController::class, 'destroy'])->name('destroy')->middleware('authorize.api:user,delete');
     });
-    Route::middleware('authorize.api:transport,create')->post('/transporte/registrar', [TransporteController::class, 'store'])->name('transport.store');
-    Route::middleware('authorize.api:transport,update')->put('/transporte/editar/{transporte}', [TransporteController::class, 'update'])->name('transport.update');
-    Route::middleware('authorize.api:transport,delete')->delete('/transporte/{transporte}', [TransporteController::class, 'destroy'])->name('transport.destroy');
-    Route::get('/transporte/registrar', [TransporteController::class, 'create'])->name('transporte.registrar')->middleware('authorize.ui:transport:create');
 });
-
-Route::prefix('checkout')->name('checkout.')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', [CheckoutController::class, 'index'])->name('index')->middleware('authorize.ui:purchase:create');
-    Route::post('/processar', [CheckoutController::class, 'processar'])->name('processar')->middleware('authorize.api:purchase,create');
-    Route::get('/confirmacao/{compraId}', [CheckoutController::class, 'confirmacao'])->name('confirmacao')->middleware('authorize.ui:purchase:read');
-});
-
-Route::get('/pacote/{nome}', [RouteController::class, 'pacote'])->name('pacote.detalhes');
-
-Route::prefix('{user:slug}/viagens')->name('usuario.viagem.')->middleware(['auth', 'verified', 'authorize.ui:purchase:read'])->group(function () {
-    Route::get('/', [RouteController::class, 'usuarioViagemListar'])->name('listar');
-    Route::get('/detalhes/{compra}', [RouteController::class, 'usuarioViagemListarId'])->name('detalhes');
-});
-
-Route::get('{user:slug}/perfil', [PerfilController::class, 'edit'])->name('usuario.perfil.edit')->middleware(['auth', 'verified', 'authorize.ui:profile:update']);
-Route::put('{user:slug}/perfil', [PerfilController::class, 'update'])->name('usuario.perfil.update')->middleware(['auth', 'verified', 'authorize.api:profile,update']);
-Route::put('{user:slug}/perfil/senha', [PerfilController::class, 'updatePassword'])->name('usuario.perfil.password')->middleware(['auth', 'verified', 'authorize.api:profile,update']);
-Route::delete('{user:slug}/perfil', [PerfilController::class, 'destroy'])->name('usuario.perfil.destroy')->middleware(['auth', 'verified', 'authorize.api:profile,delete']);
