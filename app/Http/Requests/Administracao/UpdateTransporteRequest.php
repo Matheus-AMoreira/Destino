@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Administracao;
 
-use App\Enums\Meio;
+use App\Domain\Hospedagem\Enums\Meio;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

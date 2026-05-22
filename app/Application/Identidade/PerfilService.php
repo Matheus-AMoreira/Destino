@@ -19,7 +19,7 @@ class PerfilService
         $user = $this->repo->buscarPorId($userId);
         if (!$user) return null;
 
-        $cpfRaw = clone $user; // CPF is not in entity anymore directly
+        $cpfRaw = clone $user;
         $cpf = $this->repo->buscarCpfDescriptografado($userId) ?? '';
         
         $cpfMascarado = '';
@@ -53,7 +53,7 @@ class PerfilService
 
     public function atualizarSenha(string $userId, string $senhaAtual, string $novaSenha): bool
     {
-        $hashAtual = \Illuminate\Support\Facades\DB::table('users')->where('id', $userId)->value('password');
+        $hashAtual = $this->repo->buscarHashSenha($userId);
         
         if (!Hash::check($senhaAtual, $hashAtual)) {
             throw ValidationException::withMessages([

@@ -6,6 +6,10 @@ use App\Application\Shared\ActivityLogService;
 use App\Domain\Catalogo\Repositories\PacoteRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
+use App\Domain\Catalogo\DTOs\PacoteFotoAdminDTO;
+use App\Domain\Catalogo\DTOs\PacoteFotoEditDTO;
+use App\Domain\Catalogo\DTOs\PacoteFotoAlbumDTO;
+
 class PacoteFotoService
 {
     public function __construct(
@@ -13,36 +17,40 @@ class PacoteFotoService
         private readonly ActivityLogService $log,
     ) {}
 
+    /** @return PacoteFotoAdminDTO[] */
     public function listar(): array
     {
         $rows = $this->repo->listarAlbuns();
-        return array_map(fn($r) => [
-            'id' => $r->id,
-            'nome' => $r->nome,
-            'foto_capa' => $r->is_url ? $r->foto_capa : ($r->foto_capa ? Storage::url($r->foto_capa) : ''),
-            'storage_type' => $r->storage_type,
-            'items_count' => $r->fotos_count ?? 0,
-        ], $rows);
+        return array_map(fn($r) => new PacoteFotoAdminDTO(
+            id: $r->id,
+            nome: $r->nome,
+            fotoCapa: $r->is_url ? $r->foto_capa : ($r->foto_capa ? Storage::url($r->foto_capa) : ''),
+            storageType: $r->storage_type,
+            itemsCount: $r->fotos_count ?? 0,
+        ), $rows);
     }
 
-    public function buscarParaEdicao(int $id): ?array
+    public function buscarParaEdicao(int $id): ?PacoteFotoEditDTO
     {
         $album = $this->repo->buscarAlbumPorId($id);
         if (!$album) return null;
 
         $fotos = $this->repo->buscarFotosDoAlbum($id);
 
-        return [
-            'id' => $album->id,
-            'nome' => $album->nome,
-            'foto_capa' => $album->isUrl ? $album->fotoCapa : ($album->fotoCapa ? Storage::url($album->fotoCapa) : ''),
-            'is_url' => $album->isUrl,
-            'itens' => array_map(fn($f) => [
-                'id' => $f->id,
-                'caminho' => $f->isUrl ? $f->caminho : Storage::url($f->caminho),
-                'is_url' => $f->isUrl,
-            ], $fotos),
-        ];
+        $fotoAlbumDTOs = array_map(fn($f) => new PacoteFotoAlbumDTO(
+            id: $f->id,
+            caminhoUrl: $f->isUrl ? $f->caminho : Storage::url($f->caminho),
+            isUrl: $f->isUrl,
+            ordem: $f->ordem ?? 0,
+        ), $fotos);
+
+        return new PacoteFotoEditDTO(
+            id: $album->id,
+            nome: $album->nome,
+            fotoCapa: $album->isUrl ? $album->fotoCapa : ($album->fotoCapa ? Storage::url($album->fotoCapa) : ''),
+            isUrl: $album->isUrl,
+            itens: $fotoAlbumDTOs,
+        );
     }
 
     public function criar(string $nome, string $fotoCapa, bool $isUrl, array $itens = []): int

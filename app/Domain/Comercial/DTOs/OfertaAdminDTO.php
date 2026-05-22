@@ -2,12 +2,7 @@
 
 namespace App\Domain\Comercial\DTOs;
 
-use App\Domain\Comercial\Enums\OfertaStatus;
-
-/**
- * DTO de saída para ofertas (usado em detalhes de pacote e admin).
- */
-readonly class OfertaDTO implements \JsonSerializable
+readonly class OfertaAdminDTO implements \JsonSerializable
 {
     public function __construct(
         public int $id,
@@ -15,31 +10,26 @@ readonly class OfertaDTO implements \JsonSerializable
         public string $inicio,
         public string $fim,
         public int $disponibilidade,
-        public OfertaStatus $status,
+        public string $status,
         public bool $isAvailable,
-        public ?array $hotel,
-        public ?array $transporte,
-        public ?array $pacote = null,
+        public array $pacote,
+        public array $hotel,
+        public array $transporte,
     ) {}
 
     public function jsonSerialize(): array
     {
-        $data = [
+        return [
             'id' => $this->id,
             'preco' => $this->preco,
             'inicio' => $this->inicio,
             'fim' => $this->fim,
             'disponibilidade' => $this->disponibilidade,
-            'status' => $this->status->value,
+            'status' => $this->status,
             'is_available' => $this->isAvailable,
+            'pacote' => $this->pacote,
             'hotel' => $this->hotel,
             'transporte' => $this->transporte,
         ];
-
-        if ($this->pacote !== null) {
-            $data['pacote'] = $this->pacote;
-        }
-
-        return $data;
     }
 }

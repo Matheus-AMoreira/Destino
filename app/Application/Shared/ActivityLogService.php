@@ -2,7 +2,7 @@
 
 namespace App\Application\Shared;
 
-use Illuminate\Support\Facades\DB;
+use App\Domain\Shared\Repositories\ActivityLogRepositoryInterface;
 
 /**
  * Serviço explícito de log de atividades (DML).
@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
  */
 class ActivityLogService
 {
+    public function __construct(
+        private readonly ActivityLogRepositoryInterface $repo,
+    ) {}
+
     /**
      * @param string $event created|updated|deleted
      * @param string $subjectType Ex: 'Pacote', 'Hotel', 'Oferta'
@@ -24,21 +28,7 @@ class ActivityLogService
         array $changes = [],
         ?string $causerId = null,
     ): void {
-        $causerId = $causerId ?? auth()->id();
-
-        DB::table('activity_log')->insert([
-            'log_name' => 'default',
-            'description' => $event,
-            'subject_type' => $subjectType,
-            'subject_id' => (string) $subjectId,
-            'event' => $event,
-            'causer_type' => $causerId ? 'App\\Models\\User' : null,
-            'causer_id' => $causerId,
-            'attribute_changes' => !empty($changes) ? json_encode($changes) : null,
-            'properties' => !empty($changes) ? json_encode($changes) : null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $this->repo->registrar($event, $subjectType, $subjectId, $changes, $causerId);
     }
 
     public function logCreated(string $subjectType, string|int $subjectId, array $attributes = []): void

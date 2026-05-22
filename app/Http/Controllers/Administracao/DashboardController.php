@@ -34,11 +34,11 @@ class DashboardController extends Controller
 
         return Inertia::render('Administracao/Dashboard/Estatisticas', [
             'dados' => [], // O componente espera DadoCompra[], mas vamos usar os dados do gráfico
-            'destinosPopulares' => $graficos['destinosPopulares'],
-            'crescimentoUsuarios' => $graficos['crescimentoUsuarios'],
+            'destinosPopulares' => $graficos->destinosPopulares,
+            'crescimentoUsuarios' => $graficos->crescimentoUsuarios,
             'graficos' => $graficos, // Passando o objeto completo para garantir compatibilidade
             'ano' => (int) $ano,
-            'anosDisponiveis' => $graficos['anosDisponiveis'],
+            'anosDisponiveis' => $graficos->anosDisponiveis,
             'regioes' => $this->localizacaoService->listarRegioes(),
             'estados' => $this->localizacaoService->listarEstados(),
             'filtros' => [

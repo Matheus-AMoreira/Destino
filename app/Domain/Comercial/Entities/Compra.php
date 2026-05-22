@@ -2,9 +2,9 @@
 
 namespace App\Domain\Comercial\Entities;
 
-use App\Enums\Metodo;
-use App\Enums\Processador;
-use App\Enums\StatusCompra;
+use App\Domain\Comercial\Enums\Metodo;
+use App\Domain\Comercial\Enums\Processador;
+use App\Domain\Comercial\Enums\StatusCompra;
 
 readonly class Compra
 {

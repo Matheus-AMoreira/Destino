@@ -147,8 +147,14 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             DB::table('user_permissions')->insert($records);
         }
     }
-
-    // === Contadores ===
+    
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array
+    {
+        return DB::table('user_permissions')
+            ->where('user_id', $userId)
+            ->pluck('permission_id')
+            ->all();
+    }
 
     public function contarUsuarios(): int
     {
@@ -177,6 +183,40 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         } catch (\Exception) {
             return $encrypted;
         }
+    }
+
+    public function criar(array $dados): string
+    {
+        $id = $dados['id'] ?? (string) \Illuminate\Support\Str::uuid();
+        DB::table('users')->insert([
+            'id' => $id,
+            'nome' => $dados['nome'],
+            'sobre_nome' => $dados['sobre_nome'],
+            'cpf' => $dados['cpf'],
+            'telefone' => $dados['telefone'],
+            'email' => $dados['email'],
+            'password' => $dados['password'],
+            'role_id' => $dados['role_id'],
+            'is_valid' => $dados['is_valid'] ?? true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        return $id;
+    }
+
+    public function deletar(string $id): bool
+    {
+        return DB::table('users')->where('id', $id)->delete() > 0;
+    }
+
+    public function buscarHashSenha(string $userId): ?string
+    {
+        return DB::table('users')->where('id', $userId)->value('password');
+    }
+
+    public function listarTodasPermissoes(): array
+    {
+        return DB::table('permissions')->pluck('slug')->all();
     }
 
     private function hydrate(object $row): Usuario

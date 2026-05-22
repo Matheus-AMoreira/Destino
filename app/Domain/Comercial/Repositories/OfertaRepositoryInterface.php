@@ -12,4 +12,5 @@ interface OfertaRepositoryInterface
     public function atualizar(int $id, array $dados): bool;
     public function deletar(int $id): bool;
     public function contar(): int;
+    public function buscarDetalhesCheckout(int $ofertaId): ?object;
 }

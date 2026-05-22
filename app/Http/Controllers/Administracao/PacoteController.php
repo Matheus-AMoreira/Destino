@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StorePacoteRequest;
 use App\Http\Requests\Administracao\UpdatePacoteRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -84,7 +85,7 @@ class PacoteController extends Controller
         return redirect()->route('administracao.pacote.index')->with('success', 'Pacote deletado com sucesso.');
     }
 
-    public function compras(int $pacoteId): \Illuminate\Http\JsonResponse
+    public function compras(int $pacoteId): JsonResponse
     {
         $compras = $this->pacoteService->listarComprasDoPacote($pacoteId);
         return response()->json($compras);
