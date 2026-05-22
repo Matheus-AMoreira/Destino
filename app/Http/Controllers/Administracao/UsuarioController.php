@@ -5,12 +5,19 @@ namespace App\Http\Controllers\Administracao;
 use App\Application\Identidade\UsuarioService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use App\Application\Identidade\UsuarioService;
+use Illuminate\Routing\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class UsuarioController extends Controller
 {
+    public function __construct(
+        private readonly UsuarioService $usuarioService,
+    ) {}
+
     public function __construct(
         private readonly UsuarioService $usuarioService,
     ) {}
@@ -34,6 +41,7 @@ class UsuarioController extends Controller
             'tab' => $tab,
             'filters' => [
                 'q' => $termo,
+                'q' => $termo,
                 'tab' => $tab,
             ],
         ]);
@@ -48,7 +56,32 @@ class UsuarioController extends Controller
     }
 
     public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
+        $dados = $request->validate([
+            'nome' => ['required', 'string', 'max:50'],
+            'sobre_nome' => ['required', 'string', 'max:50'],
+            'telefone' => ['required', 'string', 'max:20'],
+            'cpf' => ['required', 'string', 'size:14'],
+            'email' => ['required', 'string', 'email', 'max:100'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role_id' => ['required', 'exists:roles,id'],
+            'permissions' => ['array'],
+            'permissions.*' => ['exists:permissions,id'],
+        ]);
+
+        $permissoesIds = $dados['permissions'] ?? [];
+        unset($dados['permissions'], $dados['password_confirmation']);
+
+        try {
+            $this->usuarioService->criarFuncionario($dados, $permissoesIds);
+            return redirect()->route('administracao.usuario.index', ['tab' => 'funcionarios'])->with('success', 'Funcionário criado.');
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['email' => $e->getMessage()])->withInput();
+        }
+    }
+
+    public function edit(string $nome, string $id): Response
         $dados = $request->validate([
             'nome' => ['required', 'string', 'max:50'],
             'sobre_nome' => ['required', 'string', 'max:50'],
@@ -104,7 +137,22 @@ class UsuarioController extends Controller
             'telefone' => ['sometimes', 'required', 'string', 'max:20'],
             'role_id' => ['sometimes', 'required', 'exists:roles,id'],
             'permissions' => ['array'],
+        $dados = $request->validate([
+            'nome' => ['sometimes', 'required', 'string', 'max:50'],
+            'sobre_nome' => ['sometimes', 'required', 'string', 'max:50'],
+            'telefone' => ['sometimes', 'required', 'string', 'max:20'],
+            'role_id' => ['sometimes', 'required', 'exists:roles,id'],
+            'permissions' => ['array'],
             'permissions.*' => ['exists:permissions,id'],
+            'is_valid' => ['sometimes', 'boolean'],
+        ]);
+
+        $permissoesIds = $dados['permissions'] ?? [];
+        unset($dados['permissions']);
+
+        $this->usuarioService->atualizarFuncionario($id, $dados, $permissoesIds);
+
+        return redirect()->route('administracao.usuario.index', ['tab' => 'funcionarios'])->with('success', 'Funcionário atualizado.');
             'is_valid' => ['sometimes', 'boolean'],
         ]);
 
@@ -117,6 +165,7 @@ class UsuarioController extends Controller
     }
 
     public function updateStatus(Request $request, string $id): RedirectResponse
+    public function updateStatus(Request $request, string $id): RedirectResponse
     {
         $isValid = $request->input('is_valid');
         $this->usuarioService->bloquearOuDesbloquear($id, $isValid);
@@ -125,7 +174,16 @@ class UsuarioController extends Controller
     }
 
     public function destroy(string $id): RedirectResponse
+        $isValid = $request->input('is_valid');
+        $this->usuarioService->bloquearOuDesbloquear($id, $isValid);
+        
+        return back()->with('success', 'Status atualizado com sucesso.');
+    }
+
+    public function destroy(string $id): RedirectResponse
     {
+        $this->usuarioService->deletar($id);
+        return back()->with('success', 'Usuário deletado com sucesso.');
         $this->usuarioService->deletar($id);
         return back()->with('success', 'Usuário deletado com sucesso.');
     }
