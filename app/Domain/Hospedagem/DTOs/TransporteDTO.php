@@ -2,7 +2,7 @@
 
 namespace App\Domain\Hospedagem\DTOs;
 
-use App\Enums\Meio;
+use App\Domain\Hospedagem\Enums\Meio;
 
 /**
  * DTO de saída para transportes.

@@ -8,7 +8,10 @@ use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
 use App\Domain\Hospedagem\Repositories\HotelRepositoryInterface;
 use App\Domain\Hospedagem\Repositories\TransporteRepositoryInterface;
 use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
-use Illuminate\Support\Facades\DB;
+use App\Domain\Shared\Repositories\ActivityLogRepositoryInterface;
+use App\Domain\Shared\DTOs\EstatisticasDTO;
+use App\Domain\Shared\DTOs\AtividadeRecenteDTO;
+use App\Domain\Shared\DTOs\DadosGraficosDTO;
 
 class EstatisticasService
 {
@@ -19,42 +22,31 @@ class EstatisticasService
         private readonly PacoteRepositoryInterface $pacoteRepo,
         private readonly OfertaRepositoryInterface $ofertaRepo,
         private readonly CompraRepositoryInterface $compraRepo,
+        private readonly ActivityLogRepositoryInterface $activityLogRepo,
     ) {}
 
-    public function obterEstatisticasGerais(): array
+    public function obterEstatisticasGerais(): EstatisticasDTO
     {
-        return [
-            'usuarios' => $this->usuarioRepo->contarUsuarios(),
-            'hoteis' => $this->hotelRepo->contar(),
-            'transportes' => $this->transporteRepo->contar(),
-            'pacotes' => $this->pacoteRepo->contar(),
-            'ofertas' => $this->ofertaRepo->contar(),
-        ];
+        return new EstatisticasDTO(
+            usuarios: $this->usuarioRepo->contarUsuarios(),
+            hoteis: $this->hotelRepo->contar(),
+            transportes: $this->transporteRepo->contar(),
+            pacotes: $this->pacoteRepo->contar(),
+            ofertas: $this->ofertaRepo->contar(),
+        );
     }
 
+    /** @return AtividadeRecenteDTO[] */
     public function obterAtividadesRecentes(int $limit = 5): array
     {
-        return DB::table('activity_log')
-            ->leftJoin('users', function($join) {
-                $join->on(DB::raw('activity_log.causer_id::uuid'), '=', 'users.id');
-            })
-            ->select(
-                'activity_log.id',
-                'activity_log.description',
-                'activity_log.created_at',
-                'users.nome as causer_nome',
-                'users.sobre_nome as causer_sobrenome'
-            )
-            ->orderByDesc('activity_log.created_at')
-            ->limit($limit)
-            ->get()
-            ->map(fn($row) => [
-                'id' => $row->id,
-                'description' => $this->formatarDescricao($row->description),
-                'time' => \Carbon\Carbon::parse($row->created_at)->diffForHumans(),
-                'causer' => $row->causer_nome ? "{$row->causer_nome} {$row->causer_sobrenome}" : 'Sistema',
-            ])
-            ->toArray();
+        $rows = $this->activityLogRepo->listarRecentes($limit);
+
+        return array_map(fn($row) => new AtividadeRecenteDTO(
+            id: $row->id,
+            description: $this->formatarDescricao($row->description),
+            time: \Carbon\Carbon::parse($row->created_at)->diffForHumans(),
+            causer: $row->causer_nome ? "{$row->causer_nome} {$row->causer_sobrenome}" : 'Sistema',
+        ), $rows);
     }
 
     private function formatarDescricao(string $event): string
@@ -67,7 +59,7 @@ class EstatisticasService
         };
     }
 
-    public function obterDadosGraficos(int $anoSelecionado, ?int $regiaoId = null, ?int $estadoId = null): array
+    public function obterDadosGraficos(int $anoSelecionado, ?int $regiaoId = null, ?int $estadoId = null): DadosGraficosDTO
     {
         $comprasMesStatus = $this->compraRepo->comprasPorMesEStatus($anoSelecionado);
         $destinosPopulares = $this->compraRepo->destinosPopulares($anoSelecionado, $regiaoId, $estadoId);
@@ -86,14 +78,14 @@ class EstatisticasService
             }
         }
 
-        return [
-            'compras' => $dadosCompras,
-            'destinosPopulares' => $destinosPopulares,
-            'crescimentoUsuarios' => [
+        return new DadosGraficosDTO(
+            compras: $dadosCompras,
+            destinosPopulares: $destinosPopulares,
+            crescimentoUsuarios: [
                 'anos' => array_column($crescimentoUsuarios, 'ano'),
                 'totais' => array_column($crescimentoUsuarios, 'total'),
             ],
-            'anosDisponiveis' => $this->compraRepo->anosComCompras(),
-        ];
+            anosDisponiveis: $this->compraRepo->anosComCompras(),
+        );
     }
 }

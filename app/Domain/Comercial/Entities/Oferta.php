@@ -2,7 +2,7 @@
 
 namespace App\Domain\Comercial\Entities;
 
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 
 readonly class Oferta
 {

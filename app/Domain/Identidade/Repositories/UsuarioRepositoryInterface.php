@@ -30,6 +30,8 @@ interface UsuarioRepositoryInterface
     /** @return string[] slugs */
     public function buscarPermissoesDaRole(int $roleId): array;
     public function sincronizarPermissoesDoUsuario(string $userId, array $permissionIds): void;
+    /** @return int[] */
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array;
 
     // === Contadores ===
     public function contarUsuarios(): int;
@@ -39,4 +41,10 @@ interface UsuarioRepositoryInterface
 
     // === CPF (descriptografar para perfil) ===
     public function buscarCpfDescriptografado(string $userId): ?string;
+
+    public function criar(array $dados): string;
+    public function deletar(string $id): bool;
+    public function buscarHashSenha(string $userId): ?string;
+    /** @return string[] slugs */
+    public function listarTodasPermissoes(): array;
 }

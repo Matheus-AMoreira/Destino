@@ -11,6 +11,7 @@ use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
 use App\Domain\Hospedagem\Repositories\HotelRepositoryInterface;
 use App\Domain\Hospedagem\Repositories\TransporteRepositoryInterface;
 use App\Domain\Geografia\Repositories\LocalizacaoRepositoryInterface;
+use App\Domain\Shared\Repositories\ActivityLogRepositoryInterface;
 
 use App\Infrastructure\Persistence\Catalogo\PacoteRepository;
 use App\Infrastructure\Persistence\Comercial\OfertaRepository;
@@ -19,6 +20,7 @@ use App\Infrastructure\Persistence\Identidade\UsuarioRepository;
 use App\Infrastructure\Persistence\Hospedagem\HotelRepository;
 use App\Infrastructure\Persistence\Hospedagem\TransporteRepository;
 use App\Infrastructure\Persistence\Geografia\LocalizacaoRepository;
+use App\Infrastructure\Persistence\Shared\ActivityLogRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -31,5 +33,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HotelRepositoryInterface::class, HotelRepository::class);
         $this->app->bind(TransporteRepositoryInterface::class, TransporteRepository::class);
         $this->app->bind(LocalizacaoRepositoryInterface::class, LocalizacaoRepository::class);
+        $this->app->bind(ActivityLogRepositoryInterface::class, ActivityLogRepository::class);
     }
 }

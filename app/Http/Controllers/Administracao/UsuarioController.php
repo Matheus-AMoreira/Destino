@@ -6,7 +6,6 @@ use App\Application\Identidade\UsuarioService;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,7 +17,7 @@ class UsuarioController extends Controller
 
     public function index(Request $request): Response
     {
-        $tab = $request->input('tab', 'funcionarios'); // 'funcionarios' ou 'clientes'
+        $tab = $request->input('tab', 'funcionarios');
         $termo = $request->input('q', '');
         $page = $request->integer('page', 1);
 
@@ -30,7 +29,7 @@ class UsuarioController extends Controller
                 'current_page' => $result->page,
                 'last_page' => $result->lastPage(),
                 'total' => $result->total,
-                'links' => [], // Add empty links if not used for now to avoid crashes
+                'links' => [],
             ],
             'tab' => $tab,
             'filters' => [
@@ -43,8 +42,8 @@ class UsuarioController extends Controller
     public function create(): Response
     {
         return Inertia::render('Administracao/Usuario/Registrar', [
-            'roles' => $this->usuarioService->listarRoles(true, true), // Staff only, exclude Admin
-            'permissions' => $this->usuarioService->listarPermissions(true), // Staff perms
+            'roles' => $this->usuarioService->listarRoles(true, true),
+            'permissions' => $this->usuarioService->listarPermissions(true), 
         ]);
     }
 
@@ -79,7 +78,7 @@ class UsuarioController extends Controller
         $usuario = $this->usuarioService->buscarPorId($realId);
         if (!$usuario) abort(404);
 
-        $userPerms = \Illuminate\Support\Facades\DB::table('user_permissions')->where('user_id', $realId)->pluck('permission_id')->all();
+        $userPerms = $this->usuarioService->buscarIdsPermissoesDiretasDoUsuario($realId);
 
         return Inertia::render('Administracao/Usuario/Detalhes', [
             'usuario' => [

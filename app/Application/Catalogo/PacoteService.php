@@ -9,8 +9,7 @@ use App\Domain\Catalogo\DTOs\PacoteDetalhesDTO;
 use App\Domain\Catalogo\Repositories\PacoteRepositoryInterface;
 use App\Domain\Comercial\DTOs\OfertaDTO;
 use App\Domain\Shared\PaginatedResult;
-use App\Enums\Meio;
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 use Illuminate\Support\Facades\Storage;
 
 class PacoteService

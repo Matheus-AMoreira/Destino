@@ -4,7 +4,7 @@ namespace App\Infrastructure\Persistence\Comercial;
 
 use App\Domain\Comercial\Entities\Oferta;
 use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 use Illuminate\Support\Facades\DB;
 
 class OfertaRepository implements OfertaRepositoryInterface
@@ -70,6 +70,28 @@ class OfertaRepository implements OfertaRepositoryInterface
     public function contar(): int
     {
         return DB::table('ofertas')->count();
+    }
+
+    public function buscarDetalhesCheckout(int $ofertaId): ?object
+    {
+        return DB::table('ofertas')
+            ->where('ofertas.id', $ofertaId)
+            ->where('ofertas.is_available', true)
+            ->leftJoin('pacotes', 'ofertas.pacote_id', '=', 'pacotes.id')
+            ->leftJoin('pacote_fotos', 'pacotes.pacote_foto_id', '=', 'pacote_fotos.id')
+            ->leftJoin('hotels', 'ofertas.hotel_id', '=', 'hotels.id')
+            ->leftJoin('cidades', 'hotels.cidade_id', '=', 'cidades.id')
+            ->leftJoin('estados', 'cidades.estado_id', '=', 'estados.id')
+            ->select(
+                'ofertas.*',
+                'pacotes.nome as pacote_nome',
+                'pacote_fotos.foto_capa as pf_foto_capa',
+                'pacote_fotos.is_url as pf_is_url',
+                'hotels.nome as hotel_nome',
+                'cidades.nome as cidade_nome',
+                'estados.sigla as estado_sigla'
+            )
+            ->first();
     }
 
     private function hydrate(object $row): Oferta

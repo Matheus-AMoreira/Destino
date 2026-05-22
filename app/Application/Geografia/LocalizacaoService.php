@@ -4,8 +4,6 @@ namespace App\Application\Geografia;
 
 use App\Domain\Geografia\DTOs\LocalizacaoDTO;
 use App\Domain\Geografia\Repositories\LocalizacaoRepositoryInterface;
-use Illuminate\Support\Facades\DB;
-
 class LocalizacaoService
 {
     public function __construct(
@@ -15,17 +13,9 @@ class LocalizacaoService
     public function listarAgrupado(): array
     {
         // Pega todos os dados numa query só para montar o DTO hierárquico
-        $rows = DB::table('cidades')
-            ->join('estados', 'cidades.estado_id', '=', 'estados.id')
-            ->leftJoin('regiaos', 'estados.regiao_id', '=', 'regiaos.id')
-            ->select(
-                'cidades.id as cidade_id', 'cidades.nome as cidade_nome',
-                'estados.id as estado_id', 'estados.nome as estado_nome', 'estados.sigla as estado_sigla',
-                'regiaos.id as regiao_id', 'regiaos.nome as regiao_nome', 'regiaos.sigla as regiao_sigla',
-            )
-            ->get();
+        $rows = $this->repo->listarAgrupado();
 
-        return $rows->map(fn($r) => new LocalizacaoDTO(
+        return array_map(fn($r) => new LocalizacaoDTO(
             cidadeId: $r->cidade_id,
             cidadeNome: $r->cidade_nome,
             estadoId: $r->estado_id,
@@ -34,7 +24,7 @@ class LocalizacaoService
             regiaoId: $r->regiao_id,
             regiaoNome: $r->regiao_nome,
             regiaoSigla: $r->regiao_sigla,
-        ))->all();
+        ), $rows);
     }
 
     public function listarRegioes(): array

@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Application\Identidade\AuthService;
-use App\Enums\UserRole;
+use App\Domain\Identidade\Enums\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -2,8 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Permission;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\Hotel;
 use App\Models\Cidade;
@@ -13,6 +11,7 @@ use App\Models\Regiao;
 use App\Models\Estado;
 use Database\Seeders\AuthorizationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AuthorizationTest extends TestCase
@@ -28,7 +27,7 @@ class AuthorizationTest extends TestCase
     public function test_admin_can_access_administration_dashboard()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id,
             'email_verified_at' => now(),
         ]);
 
@@ -39,7 +38,7 @@ class AuthorizationTest extends TestCase
     public function test_regular_user_cannot_access_administration_dashboard()
     {
         $user = User::factory()->create([
-            'role_id' => Role::where('name', 'USUARIO')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'USUARIO')->first()->id,
             'email_verified_at' => now(),
         ]);
 
@@ -50,18 +49,18 @@ class AuthorizationTest extends TestCase
     public function test_cannot_promote_customer_to_staff()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id,
             'email_verified_at' => now(),
         ]);
 
         $user = User::factory()->create([
-            'role_id' => Role::where('name', 'USUARIO')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'USUARIO')->first()->id,
         ]);
 
-        $staffRole = Role::where('name', 'FUNCIONARIO')->first();
+        $staffRole = DB::table('roles')->where('name', 'FUNCIONARIO')->first();
 
         // Tentativa de promover cliente para funcionário (Deve ser bloqueado)
-        $response = $this->actingAs($admin)->put(route('administracao.usuario.update-access', $user), [
+        $response = $this->actingAs($admin)->put(route('administracao.usuario.update-status', $user), [
             'role_id' => $staffRole->id,
         ]);
 
@@ -72,12 +71,12 @@ class AuthorizationTest extends TestCase
     public function test_staff_cannot_be_deleted()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id,
             'email_verified_at' => now(),
         ]);
 
         $funcionario = User::factory()->create([
-            'role_id' => Role::where('name', 'FUNCIONARIO')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'FUNCIONARIO')->first()->id,
         ]);
 
         // Tentativa de deletar um funcionário (Deve ser bloqueado pelo modelo)
@@ -90,11 +89,11 @@ class AuthorizationTest extends TestCase
     public function test_admin_can_create_new_staff_but_not_admin()
     {
         $admin = User::factory()->create([
-            'role_id' => Role::where('name', 'ADMINISTRADOR')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'ADMINISTRADOR')->first()->id,
             'email_verified_at' => now(),
         ]);
 
-        $staffRole = Role::where('name', 'FUNCIONARIO')->first();
+        $staffRole = DB::table('roles')->where('name', 'FUNCIONARIO')->first();
 
         // Criar novo funcionário (Permitido)
         $response = $this->actingAs($admin)->post(route('administracao.usuario.store'), [
@@ -111,7 +110,7 @@ class AuthorizationTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'novo@destino.com', 'role_id' => $staffRole->id]);
 
         // Tentar criar outro Admin (Bloqueado)
-        $adminRole = Role::where('name', 'ADMINISTRADOR')->first();
+        $adminRole = DB::table('roles')->where('name', 'ADMINISTRADOR')->first();
         $response = $this->actingAs($admin)->post(route('administracao.usuario.store'), [
             'nome' => 'Hack',
             'sobre_nome' => 'Admin',
@@ -128,7 +127,7 @@ class AuthorizationTest extends TestCase
     public function test_user_can_access_their_own_profile_and_travels()
     {
         $user = User::factory()->create([
-            'role_id' => Role::where('name', 'USUARIO')->first()->id,
+            'role_id' => DB::table('roles')->where('name', 'USUARIO')->first()->id,
             'email_verified_at' => now(),
         ]);
 
@@ -146,7 +145,7 @@ class AuthorizationTest extends TestCase
             'diaria' => 100
         ]);
 
-        $staff = User::factory()->create(['role_id' => Role::where('is_staff', true)->first()->id]);
+        $staff = User::factory()->create(['role_id' => DB::table('roles')->where('is_staff', true)->first()->id]);
 
         $pacote = Pacote::create([
             'id' => 1,
@@ -177,9 +176,9 @@ class AuthorizationTest extends TestCase
         ]);
 
         // Perfil
-        $this->actingAs($user)->get(route('usuario.perfil.edit', $user->name_slug))->assertStatus(200);
+        $this->actingAs($user)->get(route('user.profile.edit'))->assertStatus(200);
         
         // Checkout
-        $this->actingAs($user)->get(route('checkout.index', ['ofertaId' => 1]))->assertStatus(200);
+        $this->actingAs($user)->get(route('checkout', ['ofertaId' => 1]))->assertStatus(200);
     }
 }

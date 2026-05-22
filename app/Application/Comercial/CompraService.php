@@ -4,8 +4,9 @@ namespace App\Application\Comercial;
 
 use App\Domain\Comercial\DTOs\CompraDTO;
 use App\Domain\Comercial\DTOs\OfertaDTO;
+use App\Domain\Comercial\DTOs\CompraDetalhesDTO;
 use App\Domain\Comercial\Repositories\CompraRepositoryInterface;
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 
 class CompraService
 {
@@ -20,7 +21,7 @@ class CompraService
         return array_map(fn($r) => $this->mapRowToDTO($r), $rows);
     }
 
-    public function buscarDetalhesDaViagem(string $id, string $userId): ?array
+    public function buscarDetalhesDaViagem(string $id, string $userId): ?CompraDetalhesDTO
     {
         return $this->repo->buscarDetalhesCompleto($id, $userId);
     }

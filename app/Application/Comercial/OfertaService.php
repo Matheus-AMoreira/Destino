@@ -5,7 +5,7 @@ namespace App\Application\Comercial;
 use App\Application\Shared\ActivityLogService;
 use App\Domain\Comercial\DTOs\OfertaAdminDTO;
 use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 
 class OfertaService
 {
@@ -19,21 +19,22 @@ class OfertaService
         return $this->repo->buscarPorId($id);
     }
 
+    /** @return OfertaAdminDTO[] */
     public function listarAdmin(): array
     {
         $rows = $this->repo->listarAdmin();
-        return array_map(fn($r) => [
-            'id' => $r->id,
-            'preco' => (float) $r->preco,
-            'inicio' => $r->inicio,
-            'fim' => $r->fim,
-            'disponibilidade' => $r->disponibilidade,
-            'status' => $r->status,
-            'is_available' => (bool) $r->is_available,
-            'pacote' => ['nome' => $r->pacote_nome],
-            'hotel' => ['nome' => $r->hotel_nome],
-            'transporte' => ['empresa' => $r->transporte_empresa, 'meio' => $r->transporte_meio],
-        ], $rows);
+        return array_map(fn($r) => new OfertaAdminDTO(
+            id: $r->id,
+            preco: (float) $r->preco,
+            inicio: $r->inicio,
+            fim: $r->fim,
+            disponibilidade: $r->disponibilidade,
+            status: $r->status,
+            isAvailable: (bool) $r->is_available,
+            pacote: ['nome' => $r->pacote_nome],
+            hotel: ['nome' => $r->hotel_nome],
+            transporte: ['empresa' => $r->transporte_empresa, 'meio' => $r->transporte_meio],
+        ), $rows);
     }
 
     public function criar(array $dados): int

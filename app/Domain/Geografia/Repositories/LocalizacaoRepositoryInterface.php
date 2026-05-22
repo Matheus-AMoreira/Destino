@@ -26,4 +26,6 @@ interface LocalizacaoRepositoryInterface
     public function salvarRegiao(Regiao $regiao): void;
     public function salvarEstado(Estado $estado): void;
     public function salvarCidade(Cidade $cidade): void;
+
+    public function listarAgrupado(): array;
 }

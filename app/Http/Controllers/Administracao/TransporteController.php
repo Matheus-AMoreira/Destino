@@ -6,7 +6,7 @@ use App\Application\Hospedagem\TransporteService;
 use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StoreTransporteRequest;
 use App\Http\Requests\Administracao\UpdateTransporteRequest;
-use App\Enums\Meio;
+use App\Domain\Hospedagem\Enums\Meio;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;

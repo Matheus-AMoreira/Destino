@@ -8,8 +8,6 @@ use App\Domain\Catalogo\Entities\FotoItem;
 use App\Domain\Catalogo\Entities\Tag;
 use App\Domain\Catalogo\Repositories\PacoteRepositoryInterface;
 use App\Domain\Shared\PaginatedResult;
-use App\Enums\Meio;
-use App\Enums\OfertaStatus;
 use Illuminate\Support\Facades\DB;
 
 class PacoteRepository implements PacoteRepositoryInterface

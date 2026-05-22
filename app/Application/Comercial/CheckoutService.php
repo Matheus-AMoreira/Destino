@@ -6,9 +6,9 @@ use App\Domain\Comercial\DTOs\CheckoutDTO;
 use App\Domain\Comercial\Repositories\CompraRepositoryInterface;
 use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
 use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
-use App\Enums\Metodo;
-use App\Enums\Processador;
-use App\Enums\StatusCompra;
+use App\Domain\Comercial\Enums\Metodo;
+use App\Domain\Comercial\Enums\Processador;
+use App\Domain\Comercial\Enums\StatusCompra;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
@@ -23,25 +23,7 @@ class CheckoutService
 
     public function buscarDetalhes(int $ofertaId): ?CheckoutDTO
     {
-        // Neste caso específico, faremos a query direta para pegar todos os relacionamentos
-        $row = DB::table('ofertas')
-            ->where('ofertas.id', $ofertaId)
-            ->where('ofertas.is_available', true)
-            ->leftJoin('pacotes', 'ofertas.pacote_id', '=', 'pacotes.id')
-            ->leftJoin('pacote_fotos', 'pacotes.pacote_foto_id', '=', 'pacote_fotos.id')
-            ->leftJoin('hotels', 'ofertas.hotel_id', '=', 'hotels.id')
-            ->leftJoin('cidades', 'hotels.cidade_id', '=', 'cidades.id')
-            ->leftJoin('estados', 'cidades.estado_id', '=', 'estados.id')
-            ->select(
-                'ofertas.*',
-                'pacotes.nome as pacote_nome',
-                'pacote_fotos.foto_capa as pf_foto_capa',
-                'pacote_fotos.is_url as pf_is_url',
-                'hotels.nome as hotel_nome',
-                'cidades.nome as cidade_nome',
-                'estados.sigla as estado_sigla'
-            )
-            ->first();
+        $row = $this->ofertaRepo->buscarDetalhesCheckout($ofertaId);
 
         if (!$row) return null;
 

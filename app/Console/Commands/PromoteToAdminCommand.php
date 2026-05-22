@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class PromoteToAdminCommand extends Command
 {

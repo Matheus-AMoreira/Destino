@@ -87,4 +87,18 @@ class LocalizacaoRepository implements LocalizacaoRepositoryInterface
             ]
         );
     }
+
+    public function listarAgrupado(): array
+    {
+        return DB::table('cidades')
+            ->join('estados', 'cidades.estado_id', '=', 'estados.id')
+            ->leftJoin('regiaos', 'estados.regiao_id', '=', 'regiaos.id')
+            ->select(
+                'cidades.id as cidade_id', 'cidades.nome as cidade_nome',
+                'estados.id as estado_id', 'estados.nome as estado_nome', 'estados.sigla as estado_sigla',
+                'regiaos.id as regiao_id', 'regiaos.nome as regiao_nome', 'regiaos.sigla as regiao_sigla',
+            )
+            ->get()
+            ->all();
+    }
 }

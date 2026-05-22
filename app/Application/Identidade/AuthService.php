@@ -4,7 +4,7 @@ namespace App\Application\Identidade;
 
 use App\Domain\Identidade\DTOs\AuthDTO;
 use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
-use Illuminate\Support\Facades\DB;
+
 
 /**
  * Serviço de autorização (permissões).
@@ -82,7 +82,7 @@ class AuthService
         $roleName = $role?->name;
 
         if ($roleName === 'ADMINISTRADOR') {
-            $allPerms = DB::table('permissions')->pluck('slug')->all();
+            $allPerms = $this->usuarioRepo->listarTodasPermissoes();
             $this->cache[$userId] = ['role' => $roleName, 'permissions' => $allPerms];
             return $this->cache[$userId];
         }

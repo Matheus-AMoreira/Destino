@@ -4,7 +4,7 @@ namespace App\Infrastructure\Persistence\Hospedagem;
 
 use App\Domain\Hospedagem\Entities\Transporte;
 use App\Domain\Hospedagem\Repositories\TransporteRepositoryInterface;
-use App\Enums\Meio;
+use App\Domain\Hospedagem\Enums\Meio;
 use Illuminate\Support\Facades\DB;
 
 class TransporteRepository implements TransporteRepositoryInterface

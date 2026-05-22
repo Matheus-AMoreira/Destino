@@ -2,7 +2,7 @@
 
 namespace App\Domain\Hospedagem\Entities;
 
-use App\Enums\Meio;
+use App\Domain\Hospedagem\Enums\Meio;
 
 readonly class Transporte
 {

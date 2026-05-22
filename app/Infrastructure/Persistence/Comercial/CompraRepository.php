@@ -4,9 +4,10 @@ namespace App\Infrastructure\Persistence\Comercial;
 
 use App\Domain\Comercial\Entities\Compra;
 use App\Domain\Comercial\Repositories\CompraRepositoryInterface;
-use App\Enums\Metodo;
-use App\Enums\Processador;
-use App\Enums\StatusCompra;
+use App\Domain\Comercial\Enums\Metodo;
+use App\Domain\Comercial\Enums\Processador;
+use App\Domain\Comercial\Enums\StatusCompra;
+use App\Domain\Comercial\DTOs\CompraDetalhesDTO;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -60,7 +61,7 @@ class CompraRepository implements CompraRepositoryInterface
             ->all();
     }
 
-    public function buscarDetalhesCompleto(string $id, string $userId): ?array
+    public function buscarDetalhesCompleto(string $id, string $userId): ?CompraDetalhesDTO
     {
         $compra = DB::table('compras')
             ->join('ofertas', 'compras.oferta_id', '=', 'ofertas.id')
@@ -99,15 +100,15 @@ class CompraRepository implements CompraRepositoryInterface
             ->get()
             ->all();
 
-        return [
-            'id' => $compra->id,
-            'valor_final' => (float) $compra->valor_final,
-            'status' => $compra->status,
-            'data_compra' => $compra->data_compra,
-            'metodo' => $compra->metodo,
-            'processador_pagamento' => $compra->processador_pagamento,
-            'parcelas' => $compra->parcelas,
-            'oferta' => [
+        return new CompraDetalhesDTO(
+            id: $compra->id,
+            valorFinal: (float) $compra->valor_final,
+            status: $compra->status,
+            dataCompra: $compra->data_compra,
+            metodo: $compra->metodo,
+            processadorPagamento: $compra->processador_pagamento,
+            parcelas: $compra->parcelas,
+            oferta: [
                 'id' => $compra->oferta_id,
                 'inicio' => $compra->oferta_inicio,
                 'fim' => $compra->oferta_fim,
@@ -132,8 +133,8 @@ class CompraRepository implements CompraRepositoryInterface
                     ],
                     'tags' => array_map(fn($t) => ['nome' => $t->nome], $tags),
                 ],
-            ],
-        ];
+            ]
+        );
     }
 
     public function listarPorPacote(int $pacoteId): array

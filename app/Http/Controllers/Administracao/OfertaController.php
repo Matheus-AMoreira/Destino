@@ -6,7 +6,7 @@ use App\Application\Comercial\OfertaService;
 use App\Application\Catalogo\PacoteService;
 use App\Application\Hospedagem\HotelService;
 use App\Application\Hospedagem\TransporteService;
-use App\Enums\OfertaStatus;
+use App\Domain\Comercial\Enums\OfertaStatus;
 use Illuminate\Routing\Controller;
 use App\Http\Requests\Administracao\StoreOfertaRequest;
 use App\Http\Requests\Administracao\UpdateOfertaRequest;

@@ -53,10 +53,7 @@ class UsuarioService
         $dados['password'] = \Illuminate\Support\Facades\Hash::make($dados['password']);
         $dados['email_verified_at'] = now();
 
-        \Illuminate\Support\Facades\DB::table('users')->insert(array_merge($dados, [
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]));
+        $this->repo->criar($dados);
 
         $this->repo->sincronizarPermissoesDoUsuario($dados['id'], $permissoesIds);
 
@@ -86,7 +83,7 @@ class UsuarioService
     public function deletar(string $id): bool
     {
         $this->log->logDeleted('User', $id);
-        return \Illuminate\Support\Facades\DB::table('users')->where('id', $id)->delete() > 0;
+        return $this->repo->deletar($id);
     }
 
     public function bloquearOuDesbloquear(string $id, bool $isValid): bool
@@ -110,4 +107,8 @@ class UsuarioService
         return $this->repo->listarFuncionarios();
     }
 
+    public function buscarIdsPermissoesDiretasDoUsuario(string $userId): array
+    {
+        return $this->repo->buscarIdsPermissoesDiretasDoUsuario($userId);
+    }
 }
