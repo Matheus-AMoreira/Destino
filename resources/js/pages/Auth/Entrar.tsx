@@ -1,10 +1,10 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { useRoute } from 'ziggy-js';
 import AuthLogo from '@/components/auth/AuthLogo';
+import Image from '@/components/Image';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
-import Image from '@/components/Image';
-import { useRoute } from 'ziggy-js';
 
 export default function Entrar() {
     const route = useRoute();
