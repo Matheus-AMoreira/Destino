@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Avaliacao\DTOs;
+namespace App\Domain\Comercial\DTOs;
 
 class AvaliacaoDTO
 {
@@ -25,36 +25,6 @@ class AvaliacaoDTO
         $this->dataAvaliacao = $dataAvaliacao;
         $this->usuarioId = $usuarioId;
         $this->destinoId = $destinoId;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getNota(): int
-    {
-        return $this->nota;
-    }
-
-    public function getComentario(): ?string
-    {
-        return $this->comentario;
-    }
-
-    public function getDataAvaliacao(): ?string
-    {
-        return $this->dataAvaliacao;
-    }
-
-    public function getUsuarioId(): ?int
-    {
-        return $this->usuarioId;
-    }
-
-    public function getDestinoId(): ?int
-    {
-        return $this->destinoId;
     }
 
     public static function fromArray(array $data): self
