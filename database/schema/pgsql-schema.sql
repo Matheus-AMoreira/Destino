@@ -264,6 +264,8 @@ CREATE TABLE public.hotels (
     endereco        varchar(100)    NOT NULL,
     diaria          integer         NOT NULL,
     cidade_id       bigint          NOT NULL,
+    cep             varchar(9),
+    cep_data        json,
     created_at      timestamp(0),
     updated_at      timestamp(0),
 

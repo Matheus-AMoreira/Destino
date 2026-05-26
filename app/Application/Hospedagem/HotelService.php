@@ -18,6 +18,27 @@ class HotelService
         return $this->repo->buscarPorId($id);
     }
 
+    public function buscarDTO(int $id): ?HotelDTO
+    {
+        $r = $this->repo->buscarComLocalizacao($id);
+        if (!$r) return null;
+        return new HotelDTO(
+            id: $r->id,
+            nome: $r->nome,
+            endereco: $r->endereco,
+            diaria: $r->diaria,
+            cidadeNome: $r->cidade_nome,
+            estadoNome: $r->estado_nome,
+            estadoSigla: $r->estado_sigla,
+            regiaoNome: $r->regiao_nome,
+            cidadeId: $r->cidade_id,
+            estadoId: $r->estado_id,
+            regiaoId: $r->regiao_id,
+            cep: $r->cep ?? null,
+            cepData: $r->cep_data ?? null,
+        );
+    }
+
     /** @return HotelDTO[] */
     public function listarComLocalizacao(): array
     {
@@ -34,6 +55,8 @@ class HotelService
             cidadeId: $r->cidade_id,
             estadoId: $r->estado_id,
             regiaoId: $r->regiao_id,
+            cep: $r->cep ?? null,
+            cepData: $r->cep_data ?? null,
         ), $rows);
     }
 

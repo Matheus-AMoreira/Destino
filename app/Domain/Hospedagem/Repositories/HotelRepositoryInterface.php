@@ -7,6 +7,7 @@ use App\Domain\Hospedagem\Entities\Hotel;
 interface HotelRepositoryInterface
 {
     public function buscarPorId(int $id): ?Hotel;
+    public function buscarComLocalizacao(int $id): ?object;
     public function listarComLocalizacao(): array;
     public function criar(array $dados): int;
     public function atualizar(int $id, array $dados): bool;
