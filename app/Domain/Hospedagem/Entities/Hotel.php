@@ -12,5 +12,7 @@ readonly class Hotel
         public int $cidadeId,
         public ?string $createdAt = null,
         public ?string $updatedAt = null,
+        public ?string $cep = null,
+        public ?string $cepData = null,
     ) {}
 }

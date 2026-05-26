@@ -27,6 +27,8 @@ interface HotelData {
     endereco: string;
     diaria: number;
     cidade_id: number;
+    cep?: string;
+    cep_data?: any;
     cidade: {
         id: number;
         estado: {
@@ -53,7 +55,12 @@ export default function Edit({ hotel, regioes, estados, cidades }: Props) {
         cidade_id: hotel.cidade_id as string | number,
         regiao_id: (hotel.cidade?.estado?.regiao?.id || '') as string | number,
         estado_id: (hotel.cidade?.estado?.id || '') as string | number,
+        cep: hotel.cep || '',
+        cep_data: hotel.cep_data || null,
     });
+
+    const [isFetchingCep, setIsFetchingCep] = React.useState(false);
+    const [cepError, setCepError] = React.useState('');
 
     const filteredEstados = useMemo(() => {
         if (!data.regiao_id) return [];
@@ -64,6 +71,81 @@ export default function Edit({ hotel, regioes, estados, cidades }: Props) {
         if (!data.estado_id) return [];
         return cidades.filter(c => c.estadoId === Number(data.estado_id));
     }, [data.estado_id, cidades]);
+
+    const handleCepChange = async (value: string) => {
+        const raw = value.replace(/\D/g, '');
+        let formatted = raw;
+        if (raw.length > 5) {
+            formatted = `${raw.slice(0, 5)}-${raw.slice(5, 8)}`;
+        }
+        setData(d => ({ ...d, cep: formatted }));
+        setCepError('');
+
+        if (raw.length === 8) {
+            setIsFetchingCep(true);
+            try {
+                const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${raw}`);
+                if (!response.ok) {
+                    throw new Error('CEP não encontrado');
+                }
+                const resData = await response.json();
+
+                const addressFields: any = {
+                    cep: formatted,
+                    cep_data: resData
+                };
+
+                let fullAddress = '';
+                if (resData.street) fullAddress += resData.street;
+                if (resData.neighborhood) {
+                    fullAddress += (fullAddress ? ' - ' : '') + resData.neighborhood;
+                }
+                if (fullAddress) {
+                    addressFields.endereco = fullAddress;
+                }
+
+                if (resData.state) {
+                    const matchedEstado = estados.find(
+                        e => e.sigla.toUpperCase() === resData.state.toUpperCase()
+                    );
+                    if (matchedEstado) {
+                        addressFields.regiao_id = matchedEstado.regiaoId;
+                        addressFields.estado_id = matchedEstado.id;
+
+                        if (resData.city) {
+                            const normalizeStr = (str: string) =>
+                                str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+                            const normalizedCityName = normalizeStr(resData.city);
+                            const matchedCidade = cidades.find(
+                                c => c.estadoId === matchedEstado.id && normalizeStr(c.nome) === normalizedCityName
+                            );
+                            if (matchedCidade) {
+                                addressFields.cidade_id = matchedCidade.id;
+                            } else {
+                                addressFields.cidade_id = '';
+                            }
+                        } else {
+                            addressFields.cidade_id = '';
+                        }
+                    } else {
+                        addressFields.regiao_id = '';
+                        addressFields.estado_id = '';
+                        addressFields.cidade_id = '';
+                    }
+                }
+
+                setData(d => ({
+                    ...d,
+                    ...addressFields
+                }));
+            } catch (err: any) {
+                setCepError(err.message || 'Erro ao buscar CEP');
+            } finally {
+                setIsFetchingCep(false);
+            }
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -104,18 +186,28 @@ export default function Edit({ hotel, regioes, estados, cidades }: Props) {
                             {errors.nome && <p className="mt-1 text-xs text-red-500">{errors.nome}</p>}
                         </div>
 
-                        <div className="md:col-span-2">
+                        <div>
                             <label className={labelClasses}>
                                 <MapPin size={16} className="text-blue-500" />
-                                Endereço Completo
+                                CEP
                             </label>
-                            <input
-                                type="text"
-                                value={data.endereco}
-                                onChange={e => setData('endereco', e.target.value)}
-                                className={inputClasses}
-                            />
-                            {errors.endereco && <p className="mt-1 text-xs text-red-500">{errors.endereco}</p>}
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={data.cep}
+                                    onChange={e => handleCepChange(e.target.value)}
+                                    className={inputClasses}
+                                    placeholder="00000-000"
+                                    maxLength={9}
+                                />
+                                {isFetchingCep && (
+                                    <span className="absolute right-3 top-3 text-xs text-gray-400 animate-pulse">
+                                        Buscando...
+                                    </span>
+                                )}
+                            </div>
+                            {cepError && <p className="mt-1 text-xs text-red-500">{cepError}</p>}
+                            {errors.cep && <p className="mt-1 text-xs text-red-500">{errors.cep}</p>}
                         </div>
 
                         <div>
@@ -131,6 +223,20 @@ export default function Edit({ hotel, regioes, estados, cidades }: Props) {
                                 min="0"
                             />
                             {errors.diaria && <p className="mt-1 text-xs text-red-500">{errors.diaria}</p>}
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <label className={labelClasses}>
+                                <MapPin size={16} className="text-blue-500" />
+                                Endereço Completo
+                            </label>
+                            <input
+                                type="text"
+                                value={data.endereco}
+                                onChange={e => setData('endereco', e.target.value)}
+                                className={inputClasses}
+                            />
+                            {errors.endereco && <p className="mt-1 text-xs text-red-500">{errors.endereco}</p>}
                         </div>
                     </div>
 

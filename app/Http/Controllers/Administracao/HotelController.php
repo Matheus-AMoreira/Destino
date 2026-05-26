@@ -42,7 +42,7 @@ class HotelController extends Controller
 
     public function edit(int $id): Response
     {
-        $hotel = $this->hotelService->buscarPorId($id);
+        $hotel = $this->hotelService->buscarDTO($id);
         if (!$hotel) abort(404);
 
         return Inertia::render('Administracao/Hotel/Edit', [

@@ -27,6 +27,8 @@ class UpdateHotelRequest extends FormRequest
             'endereco' => ['sometimes', 'required', 'string', 'max:100'],
             'diaria' => ['sometimes', 'required', 'integer', 'min:0'],
             'cidade_id' => ['sometimes', 'required', 'exists:cidades,id'],
+            'cep' => ['sometimes', 'nullable', 'string', 'max:9'],
+            'cep_data' => ['sometimes', 'nullable', 'array'],
         ];
     }
 }

@@ -27,6 +27,8 @@ class StoreHotelRequest extends FormRequest
             'endereco' => ['required', 'string', 'max:100'],
             'diaria' => ['required', 'integer', 'min:0'],
             'cidade_id' => ['required', 'exists:cidades,id'],
+            'cep' => ['nullable', 'string', 'max:9'],
+            'cep_data' => ['nullable', 'array'],
         ];
     }
 }

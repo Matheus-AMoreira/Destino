@@ -19,6 +19,8 @@ readonly class HotelDTO implements \JsonSerializable
         public ?int $cidadeId = null,
         public ?int $estadoId = null,
         public ?int $regiaoId = null,
+        public ?string $cep = null,
+        public ?string $cepData = null,
     ) {}
 
     public function jsonSerialize(): array
@@ -42,6 +44,8 @@ readonly class HotelDTO implements \JsonSerializable
                 ],
             ] : null,
             'cidade_id' => $this->cidadeId,
+            'cep' => $this->cep,
+            'cep_data' => $this->cepData ? json_decode($this->cepData, true) : null,
         ];
     }
 }
