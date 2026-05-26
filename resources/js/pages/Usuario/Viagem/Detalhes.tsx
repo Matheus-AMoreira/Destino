@@ -15,6 +15,9 @@ import react from 'react';
 import { useRoute } from 'ziggy-js';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
+import BotaoAvaliacao from '@/components/Avaliacao/BotaoAvaliacao';
+import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
+import { tempoPassou } from '@/utils/dataUtils';
 
 interface Compra {
     id: string;
@@ -411,6 +414,24 @@ export default function Detalhes({ compra, auth }: Props) {
                                 </Link>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div className="border-t border-gray-200 bg-gray-50 py-12">
+                    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                        {tempoPassou(compra.oferta.fim) && (
+                            <div className="mb-8">
+                                <h3 className="text-lg font-bold mb-4 text-gray-900">Avaliar Esta Viagem</h3>
+                                <BotaoAvaliacao
+                                    pacoteId={compra.oferta.pacote.id}
+                                    compraId={compra.id}
+                                />
+                            </div>
+                        )}
+                        <SecaoAvaliacoes
+                            pacoteId={compra.oferta.pacote.id}
+                            userId={auth.user?.id?.toString()}
+                        />
                     </div>
                 </div>
             </div>

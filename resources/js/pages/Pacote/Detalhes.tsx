@@ -1,7 +1,7 @@
 import GuestLayout from '@/layouts/GuestLayout';
 import { formatarData } from '@/lib/formatarData';
 import { Pacote } from '@/types/Pacote';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
     Building2,
     Calendar,
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from '@/components/Image';
+import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
 
 interface DetalhesProps {
     nome: string;
@@ -38,7 +39,6 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
         }
     }, [pacote]);
 
-    const temOfertasAtivas = (pacote.ofertas?.length ?? 0) > 0;
     const ofertaAtual =
         pacote?.ofertas?.find((o) => o.id === ofertaSelecionadaId) ||
         pacote?.ofertas?.[0] ||
@@ -75,6 +75,9 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
             </GuestLayout>
         );
     }
+
+    const temOfertasAtivas = (pacote.ofertas?.length ?? 0) > 0;
+
 
     const todasFotos = [
         { id: -1, url: pacote.fotos_do_pacote?.foto_capa_url, nome: 'Principal' },
@@ -388,6 +391,12 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div className="border-t border-gray-200 py-8">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <SecaoAvaliacoes pacoteId={Number(pacote.id)} />
                     </div>
                 </div>
             </div>
