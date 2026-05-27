@@ -405,6 +405,8 @@ class PacoteRepository implements PacoteRepositoryInterface
             funcionarioId: $row->funcionario_id,
             pacoteFotoId: $row->pacote_foto_id ? (int) $row->pacote_foto_id : null,
             tagIds: $tagIds,
+            mediaAvaliacao: isset($row->media_avaliacao) ? (float) $row->media_avaliacao : null,
+            totalAvaliacoes: isset($row->total_avaliacoes) ? (int) $row->total_avaliacoes : 0,
             createdAt: $row->created_at,
             updatedAt: $row->updated_at,
         );

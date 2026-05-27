@@ -5,9 +5,9 @@ namespace App\Application\Comercial;
 use App\Domain\Comercial\Repositories\AvaliacaoRepositoryInterface;
 use App\Domain\Comercial\Repositories\CompraRepositoryInterface;
 use App\Domain\Comercial\Repositories\OfertaRepositoryInterface;
+use App\Domain\Comercial\Entities\Avaliacao;
 use App\Domain\Comercial\DTOs\AvaliacaoDTO;
 use App\Domain\Comercial\DTOs\AvaliacaoPacoteDTO;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class AvaliacaoService
@@ -32,9 +32,9 @@ class AvaliacaoService
             throw new InvalidArgumentException("Você só pode avaliar após o término da viagem.");
         }
 
-        // Validar que o usuário ainda não avaliou este pacote
-        if ($this->avaliacaoRepo->jaAvaliadaPorUsuario($userId, $pacoteId)) {
-            throw new InvalidArgumentException("Você já avaliou este pacote.");
+        // Validar que o usuário ainda não avaliou esta compra
+        if ($this->avaliacaoRepo->jaAvaliadaPorCompra($compraId)) {
+            throw new InvalidArgumentException("Você já avaliou esta viagem.");
         }
 
         // Validar nota
@@ -108,6 +108,15 @@ class AvaliacaoService
             return false;
         }
 
-        return !$this->avaliacaoRepo->jaAvaliadaPorUsuario($userId, $oferta->pacoteId);
+        return !$this->avaliacaoRepo->jaAvaliadaPorCompra($compraId);
+    }
+
+    public function buscarPorCompra(string $compraId, string $userId): ?Avaliacao
+    {
+        $avaliacao = $this->avaliacaoRepo->buscarPorCompra($compraId);
+        if ($avaliacao && $avaliacao->userId !== $userId) {
+            throw new InvalidArgumentException("Você não tem permissão para acessar esta avaliação.");
+        }
+        return $avaliacao;
     }
 }

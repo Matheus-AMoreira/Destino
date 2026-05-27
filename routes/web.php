@@ -75,6 +75,8 @@ Route::middleware(['auth', 'verified', CheckUserStatus::class])->group(function 
     
     // Viagens do Usuário
     Route::get('/minhas-viagens/detalhes/{id}', [ViagemController::class, 'show'])->name('usuario.viagem.detalhes');
+    Route::get('/minhas-viagens/detalhes/{id}/avaliar', [ViagemController::class, 'avaliar'])->name('usuario.viagem.avaliar');
+    Route::post('/minhas-viagens/detalhes/{id}/avaliar', [ViagemController::class, 'salvarAvaliacao'])->name('usuario.viagem.salvar_avaliacao');
     Route::get('/minhas-viagens/{usuario?}', [ViagemController::class, 'index'])->name('usuario.viagem.listar');
 
     // API de Avaliações

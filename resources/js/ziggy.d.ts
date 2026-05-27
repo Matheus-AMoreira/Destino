@@ -56,6 +56,18 @@ declare module 'ziggy-js' {
             "required": true
         }
     ],
+    "usuario.viagem.avaliar": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
+    "usuario.viagem.salvar_avaliacao": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
     "usuario.viagem.listar": [
         {
             "name": "usuario",

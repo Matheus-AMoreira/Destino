@@ -53,6 +53,8 @@ export interface Pacote {
     cheapest_active_offer?: any;
     latest_offer?: any;
     active_ofertas_count?: number;
+    media_avaliacao?: number | null;
+    total_avaliacoes?: number;
     created_at?: string;
     updated_at?: string;
 }

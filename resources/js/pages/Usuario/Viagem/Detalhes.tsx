@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeftFromLine,
     BaggageClaim,
@@ -10,12 +10,12 @@ import {
     Phone,
     Plane,
     Receipt,
+    Star,
 } from 'lucide-react';
 import react from 'react';
 import { useRoute } from 'ziggy-js';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
-import BotaoAvaliacao from '@/components/Avaliacao/BotaoAvaliacao';
 import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
 import { tempoPassou } from '@/utils/dataUtils';
 
@@ -62,6 +62,7 @@ interface Props {
 
 export default function Detalhes({ compra, auth }: Props) {
     const route = useRoute();
+    const { flash } = usePage().props as any;
     const todasFotos = [
         ...(compra.oferta.pacote.fotos_do_pacote?.foto_capa_url
             ? [
@@ -111,6 +112,16 @@ export default function Detalhes({ compra, auth }: Props) {
 
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {flash?.success && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-3xl font-bold shadow-xs">
+                            🎉 {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-3xl font-bold shadow-xs">
+                            ⚠️ {flash.error}
+                        </div>
+                    )}
                     <div className="animate-fade-in mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                         <div>
                             <Link
@@ -422,10 +433,13 @@ export default function Detalhes({ compra, auth }: Props) {
                         {tempoPassou(compra.oferta.fim) && (
                             <div className="mb-8">
                                 <h3 className="text-lg font-bold mb-4 text-gray-900">Avaliar Esta Viagem</h3>
-                                <BotaoAvaliacao
-                                    pacoteId={compra.oferta.pacote.id}
-                                    compraId={compra.id}
-                                />
+                                <Link
+                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                    className="inline-flex items-center gap-2 rounded-2xl bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 text-sm font-black text-gray-900 shadow-md transition-all hover:shadow-lg active:scale-95"
+                                >
+                                    <Star className="fill-gray-900" size={18} />
+                                    Avaliar / Editar Avaliação
+                                </Link>
                             </div>
                         )}
                         <SecaoAvaliacoes
