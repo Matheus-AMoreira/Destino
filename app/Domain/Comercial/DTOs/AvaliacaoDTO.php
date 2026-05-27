@@ -2,52 +2,41 @@
 
 namespace App\Domain\Comercial\DTOs;
 
-class AvaliacaoDTO
+readonly class AvaliacaoDTO implements \JsonSerializable
 {
-    private ?int $id;
-    private int $nota;
-    private ?string $comentario;
-    private ?string $dataAvaliacao;
-    private ?int $usuarioId;
-    private ?int $destinoId;
-
     public function __construct(
-        ?int $id,
-        int $nota,
-        ?string $comentario,
-        ?string $dataAvaliacao,
-        ?int $usuarioId,
-        ?int $destinoId
-    ) {
-        $this->id = $id;
-        $this->nota = $nota;
-        $this->comentario = $comentario;
-        $this->dataAvaliacao = $dataAvaliacao;
-        $this->usuarioId = $usuarioId;
-        $this->destinoId = $destinoId;
-    }
+        public int $id,
+        public int $nota,
+        public ?string $comentario,
+        public string $userId,
+        public string $nomeUsuario,
+        public int $pacoteId,
+        public string $createdAt,
+    ) {}
 
-    public static function fromArray(array $data): self
+    public static function fromRow(object $row, string $nomeUsuario): self
     {
         return new self(
-            $data['id'] ?? null,
-            $data['nota'] ?? 0,
-            $data['comentario'] ?? null,
-            $data['data_avaliacao'] ?? null,
-            $data['usuario_id'] ?? null,
-            $data['destino_id'] ?? null
+            id: $row->id,
+            nota: $row->nota,
+            comentario: $row->comentario,
+            userId: $row->user_id,
+            nomeUsuario: $nomeUsuario,
+            pacoteId: $row->pacote_id,
+            createdAt: $row->created_at,
         );
     }
 
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
             'nota' => $this->nota,
             'comentario' => $this->comentario,
-            'data_avaliacao' => $this->dataAvaliacao,
-            'usuario_id' => $this->usuarioId,
-            'destino_id' => $this->destinoId,
+            'user_id' => $this->userId,
+            'nomeUsuario' => $this->nomeUsuario,
+            'pacote_id' => $this->pacoteId,
+            'created_at' => $this->createdAt,
         ];
     }
 }

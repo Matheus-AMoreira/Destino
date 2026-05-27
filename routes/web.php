@@ -7,6 +7,7 @@ use App\Http\Controllers\Publico\PacoteController as PublicoPacoteController;
 use App\Http\Controllers\Usuario\CheckoutController;
 use App\Http\Controllers\Usuario\PerfilController;
 use App\Http\Controllers\Usuario\ViagemController;
+use App\Http\Controllers\Usuario\AvaliacaoController;
 use App\Http\Controllers\Administracao\DashboardController;
 use App\Http\Controllers\Administracao\HotelController;
 use App\Http\Controllers\Administracao\OfertaController;
@@ -75,6 +76,15 @@ Route::middleware(['auth', 'verified', CheckUserStatus::class])->group(function 
     // Viagens do Usuário
     Route::get('/minhas-viagens/detalhes/{id}', [ViagemController::class, 'show'])->name('usuario.viagem.detalhes');
     Route::get('/minhas-viagens/{usuario?}', [ViagemController::class, 'index'])->name('usuario.viagem.listar');
+
+    // API de Avaliações
+    Route::prefix('api')->group(function () {
+        Route::post('/avaliacoes', [AvaliacaoController::class, 'store']);
+        Route::get('/pacotes/{pacoteId}/avaliacoes', [AvaliacaoController::class, 'show']);
+        Route::put('/avaliacoes/{id}', [AvaliacaoController::class, 'update']);
+        Route::delete('/avaliacoes/{id}', [AvaliacaoController::class, 'destroy']);
+        Route::get('/avaliacoes/permissao/{compraId}', [AvaliacaoController::class, 'verificarPermissao']);
+    });
 });
 
 // Admin

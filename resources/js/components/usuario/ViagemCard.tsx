@@ -8,6 +8,8 @@ import {
 import { useState } from 'react';
 import Image from '@/components/Image';
 import ImageCarousel from '@/components/ImageCarousel';
+import BotaoAvaliacao from '@/components/Avaliacao/BotaoAvaliacao';
+import { tempoPassou } from '@/utils/dataUtils';
 
 interface ViagemCardProps {
     grupo: any;
@@ -57,9 +59,9 @@ export default function ViagemCard({
                     )}
                 </div>
 
-                <ImageCarousel 
-                    photos={todasFotos} 
-                    onImageChange={setImagemSelecionada} 
+                <ImageCarousel
+                    photos={todasFotos}
+                    onImageChange={setImagemSelecionada}
                 />
 
                 <div className="absolute bottom-4 left-6">
@@ -82,43 +84,58 @@ export default function ViagemCard({
                 </p>
 
                 <div className="mt-auto space-y-4 border-t border-gray-100 pt-6">
-                    {grupo.tickets.map((compra: any, idx: number) => (
-                        <div key={compra.id} className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}>
-                            <div className="mb-4 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}>
-                                        {isHistorico ? 'CONCLUÍDA' : compra.status}
-                                    </span>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase">
-                                        Ticket #{compra.id.split('-')[0]}
-                                    </span>
-                                </div>
-                                <div className="text-right">
-                                    <span className="block text-xs font-black text-gray-900">
-                                        {formatarValor(compra.valor_final)}
-                                    </span>
-                                </div>
-                            </div>
+                    {grupo.tickets.map((compra: any, idx: number) => {
+                        const podeAvaliar = isHistorico || tempoPassou(compra.oferta.fim);
 
-                            <div className="flex items-center justify-between rounded-2xl border border-transparent bg-gray-50 p-4 transition-colors group-hover:border-blue-100/50 group-hover:bg-blue-50/50">
-                                <div className="flex items-center gap-3">
-                                    <CalendarDays className="text-blue-500" size={18} />
-                                    <span className="text-sm font-bold text-gray-700">
-                                        {formatarData(compra.oferta.inicio)} - {formatarData(compra.oferta.fim)}
-                                    </span>
+                        return (
+                            <div key={compra.id} className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}>
+                                <div className="mb-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <span className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}>
+                                            {isHistorico ? 'CONCLUÍDA' : compra.status}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase">
+                                            Ticket #{compra.id.split('-')[0]}
+                                        </span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="block text-xs font-black text-gray-900">
+                                            {formatarValor(compra.valor_final)}
+                                        </span>
+                                    </div>
                                 </div>
-                                <Link
-                                    href={route('usuario.viagem.detalhes', {
-                                        id: compra.id,
-                                    })}
-                                    className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
-                                >
-                                    Detalhes
-                                    <ArrowRightFromLine size={16} />
-                                </Link>
+
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex items-center justify-between rounded-2xl border border-transparent bg-gray-50 p-4 transition-colors group-hover:border-blue-100/50 group-hover:bg-blue-50/50">
+                                        <div className="flex items-center gap-3">
+                                            <CalendarDays className="text-blue-500" size={18} />
+                                            <span className="text-sm font-bold text-gray-700">
+                                                {formatarData(compra.oferta.inicio)} - {formatarData(compra.oferta.fim)}
+                                            </span>
+                                        </div>
+                                        <Link
+                                            href={route('usuario.viagem.detalhes', {
+                                                id: compra.id,
+                                            })}
+                                            className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
+                                        >
+                                            Detalhes
+                                            <ArrowRightFromLine size={16} />
+                                        </Link>
+                                    </div>
+
+                                    {podeAvaliar && (
+                                        <div className="flex justify-end">
+                                            <BotaoAvaliacao
+                                                pacoteId={grupo.pacote.id}
+                                                compraId={compra.id}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
