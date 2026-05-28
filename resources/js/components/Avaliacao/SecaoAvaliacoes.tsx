@@ -74,7 +74,7 @@ export default function SecaoAvaliacoes({
 
     return (
         <section className="bg-gray-50 p-6 rounded-lg">
-            <h3 className="text-2xl font-bold mb-6">Avaliações e Comentários</h3>
+            <h3 className="text-2xl font-bold mb-6">Avaliação e Comentário</h3>
 
             <div className="bg-white p-6 rounded-lg mb-6 border border-gray-200">
                 <div className="flex items-center gap-4">

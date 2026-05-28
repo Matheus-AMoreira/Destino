@@ -13,6 +13,7 @@ readonly class CompraDetalhesDTO implements \JsonSerializable
         public string $processadorPagamento,
         public int $parcelas,
         public array $oferta,
+        public ?array $avaliacao = null,
     ) {}
 
     public function jsonSerialize(): array
@@ -26,6 +27,7 @@ readonly class CompraDetalhesDTO implements \JsonSerializable
             'processador_pagamento' => $this->processadorPagamento,
             'parcelas' => $this->parcelas,
             'oferta' => $this->oferta,
+            'avaliacao' => $this->avaliacao,
         ];
     }
 }

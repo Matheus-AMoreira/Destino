@@ -28,6 +28,7 @@ class CompraRepository implements CompraRepositoryInterface
             ->leftJoin('hotels', 'ofertas.hotel_id', '=', 'hotels.id')
             ->leftJoin('cidades', 'hotels.cidade_id', '=', 'cidades.id')
             ->leftJoin('estados', 'cidades.estado_id', '=', 'estados.id')
+            ->leftJoin('avaliacoes', 'compras.id', '=', 'avaliacoes.compra_id')
             ->where('compras.user_id', $userId);
 
         if ($view === 'concluidas') {
@@ -54,7 +55,9 @@ class CompraRepository implements CompraRepositoryInterface
                 'hotels.id as hotel_id',
                 'hotels.nome as hotel_nome',
                 'cidades.nome as cidade_nome',
-                'estados.sigla as estado_sigla'
+                'estados.sigla as estado_sigla',
+                'avaliacoes.id as avaliacao_id',
+                'avaliacoes.nota as avaliacao_nota'
             )
             ->latest('compras.data_compra')
             ->get()
@@ -71,6 +74,7 @@ class CompraRepository implements CompraRepositoryInterface
             ->leftJoin('cidades', 'hotels.cidade_id', '=', 'cidades.id')
             ->leftJoin('estados', 'cidades.estado_id', '=', 'estados.id')
             ->leftJoin('transportes', 'ofertas.transporte_id', '=', 'transportes.id')
+            ->leftJoin('avaliacoes', 'compras.id', '=', 'avaliacoes.compra_id')
             ->where('compras.id', $id)
             ->where('compras.user_id', $userId)
             ->select(
@@ -87,7 +91,9 @@ class CompraRepository implements CompraRepositoryInterface
                 'pacote_fotos.is_url as pf_is_url',
                 'hotels.nome as hotel_nome',
                 'cidades.nome as cidade_nome',
-                'estados.sigla as estado_sigla'
+                'estados.sigla as estado_sigla',
+                'avaliacoes.id as avaliacao_id',
+                'avaliacoes.nota as avaliacao_nota'
             )
             ->first();
 
@@ -99,6 +105,14 @@ class CompraRepository implements CompraRepositoryInterface
             ->select('tags.nome')
             ->get()
             ->all();
+
+        $avaliacaoData = null;
+        if (isset($compra->avaliacao_id)) {
+            $avaliacaoData = [
+                'id' => $compra->avaliacao_id,
+                'nota' => (int) $compra->avaliacao_nota,
+            ];
+        }
 
         return new CompraDetalhesDTO(
             id: $compra->id,
@@ -133,7 +147,8 @@ class CompraRepository implements CompraRepositoryInterface
                     ],
                     'tags' => array_map(fn($t) => ['nome' => $t->nome], $tags),
                 ],
-            ]
+            ],
+            avaliacao: $avaliacaoData
         );
     }
 

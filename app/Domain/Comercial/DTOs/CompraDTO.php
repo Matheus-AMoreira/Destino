@@ -16,6 +16,7 @@ readonly class CompraDTO implements \JsonSerializable
         public int $parcelas,
         public float $valorFinal,
         public ?OfertaDTO $oferta = null,
+        public ?array $avaliacao = null,
     ) {}
 
     public function jsonSerialize(): array
@@ -29,6 +30,7 @@ readonly class CompraDTO implements \JsonSerializable
             'parcelas' => $this->parcelas,
             'valor_final' => $this->valorFinal,
             'oferta' => $this->oferta,
+            'avaliacao' => $this->avaliacao,
         ];
     }
 }
