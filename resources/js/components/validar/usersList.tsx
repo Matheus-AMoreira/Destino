@@ -8,7 +8,7 @@ interface UsersListProps {
 export default function UsersList({ user }: UsersListProps) {
     const handleValidar = () => {
         if (confirm(`Deseja validar o usuário ${user.nome}?`)) {
-            router.post(route('administracao.usuario.aprovar', { user: user.id }));
+            router.patch(route('administracao.usuario.update-status', { id: user.id }), { is_valid: true });
         }
     };
 

@@ -82,7 +82,9 @@ export default function Listar({ usuarios, filters, auth }: Props) {
     };
 
     const handleAprovar = (id: string) => {
-        router.post(route('administracao.usuario.aprovar', { user: id }), {}, {
+        router.patch(route('administracao.usuario.update-status', { id }), {
+            is_valid: true
+        }, {
             onSuccess: () => setModal({ show: true, mensagem: 'Usuário aprovado com sucesso!', url: null })
         });
     };
