@@ -25,6 +25,8 @@ readonly class PacoteDetalhesDTO implements \JsonSerializable
         public array $fotos,
         public int $ofertasAtivas,
         public ?float $menorPreco,
+        public ?float $mediaAvaliacao = null,
+        public int $totalAvaliacoes = 0,
     ) {}
 
     public function jsonSerialize(): array
@@ -40,6 +42,8 @@ readonly class PacoteDetalhesDTO implements \JsonSerializable
             'tags' => $this->tags,
             'ofertas' => $this->ofertas,
             'active_ofertas_count' => $this->ofertasAtivas,
+            'media_avaliacao' => $this->mediaAvaliacao,
+            'total_avaliacoes' => $this->totalAvaliacoes,
             'cheapest_active_offer' => $this->menorPreco !== null ? [
                 'preco' => $this->menorPreco,
             ] : null,

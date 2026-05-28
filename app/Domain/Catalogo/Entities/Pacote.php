@@ -12,6 +12,8 @@ readonly class Pacote
         public ?int $pacoteFotoId = null,
         /** @var int[] */
         public array $tagIds = [],
+        public ?float $mediaAvaliacao = null,
+        public ?int $totalAvaliacoes = 0,
         public ?string $createdAt = null,
         public ?string $updatedAt = null,
     ) {}

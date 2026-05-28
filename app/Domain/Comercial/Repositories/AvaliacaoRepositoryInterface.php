@@ -20,7 +20,9 @@ interface AvaliacaoRepositoryInterface
 
     public function listarPorUsuario(string $userId): array;
 
-    public function jaAvaliadaPorUsuario(string $userId, int $pacoteId): bool;
+    public function jaAvaliadaPorCompra(string $compraId): bool;
+
+    public function buscarPorCompra(string $compraId): ?Avaliacao;
 
     public function calcularMedia(int $pacoteId): ?float;
 

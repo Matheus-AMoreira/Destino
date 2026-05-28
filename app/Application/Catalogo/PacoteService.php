@@ -120,6 +120,8 @@ class PacoteService
             fotos: $fotos,
             ofertasAtivas: count($ofertaDTOs),
             menorPreco: $menorPreco,
+            mediaAvaliacao: $pacote->mediaAvaliacao,
+            totalAvaliacoes: $pacote->totalAvaliacoes,
         );
     }
 

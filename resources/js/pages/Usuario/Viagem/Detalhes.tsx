@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowLeftFromLine,
     BaggageClaim,
@@ -10,12 +10,12 @@ import {
     Phone,
     Plane,
     Receipt,
+    Star,
 } from 'lucide-react';
 import react from 'react';
 import { useRoute } from 'ziggy-js';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
-import BotaoAvaliacao from '@/components/Avaliacao/BotaoAvaliacao';
 import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
 import { tempoPassou } from '@/utils/dataUtils';
 
@@ -27,6 +27,10 @@ interface Compra {
     metodo: string;
     processador_pagamento: string;
     parcelas: number;
+    avaliacao?: {
+        id: number;
+        nota: number;
+    } | null;
     oferta: {
         id: number;
         inicio: string;
@@ -62,6 +66,7 @@ interface Props {
 
 export default function Detalhes({ compra, auth }: Props) {
     const route = useRoute();
+    const { flash } = usePage().props as any;
     const todasFotos = [
         ...(compra.oferta.pacote.fotos_do_pacote?.foto_capa_url
             ? [
@@ -111,6 +116,16 @@ export default function Detalhes({ compra, auth }: Props) {
 
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {flash?.success && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-3xl font-bold shadow-xs">
+                            🎉 {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-3xl font-bold shadow-xs">
+                            ⚠️ {flash.error}
+                        </div>
+                    )}
                     <div className="animate-fade-in mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                         <div>
                             <Link
@@ -142,6 +157,19 @@ export default function Detalhes({ compra, auth }: Props) {
                         </div>
 
                         <div className="flex gap-4">
+                            {tempoPassou(compra.oferta.fim) && (
+                                <Link
+                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                    className={`flex items-center gap-2 rounded-2xl border-2 px-8 py-4 text-sm font-black transition-all shadow-sm hover:shadow-xl active:scale-95 ${
+                                        compra.avaliacao
+                                            ? 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                                            : 'bg-yellow-400 text-gray-900 border-yellow-400 hover:bg-yellow-500 hover:border-yellow-500'
+                                    }`}
+                                >
+                                    <Star className={compra.avaliacao ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-900 text-gray-900'} size={18} />
+                                    {compra.avaliacao ? 'Editar Avaliação' : 'Avaliar Viagem'}
+                                </Link>
+                            )}
                             <button
                                 onClick={() => window.print()}
                                 className="flex items-center gap-2 rounded-2xl border-2 border-gray-100 bg-white px-8 py-4 text-sm font-black text-gray-900 shadow-sm transition-all hover:border-blue-100 hover:shadow-xl"
@@ -419,15 +447,6 @@ export default function Detalhes({ compra, auth }: Props) {
 
                 <div className="border-t border-gray-200 bg-gray-50 py-12">
                     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                        {tempoPassou(compra.oferta.fim) && (
-                            <div className="mb-8">
-                                <h3 className="text-lg font-bold mb-4 text-gray-900">Avaliar Esta Viagem</h3>
-                                <BotaoAvaliacao
-                                    pacoteId={compra.oferta.pacote.id}
-                                    compraId={compra.id}
-                                />
-                            </div>
-                        )}
                         <SecaoAvaliacoes
                             pacoteId={compra.oferta.pacote.id}
                             userId={auth.user?.id?.toString()}

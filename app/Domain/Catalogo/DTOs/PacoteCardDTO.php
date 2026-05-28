@@ -25,6 +25,8 @@ readonly class PacoteCardDTO implements \JsonSerializable
         public ?float $menorPreco,
         public ?string $dataInicio,
         public ?string $dataFim,
+        public ?float $mediaAvaliacao,
+        public int $totalAvaliacoes,
     ) {}
 
     public static function fromRow(
@@ -51,6 +53,8 @@ readonly class PacoteCardDTO implements \JsonSerializable
             menorPreco: $cheapestOffer ? (float) $cheapestOffer->preco : null,
             dataInicio: $cheapestOffer->inicio ?? null,
             dataFim: $cheapestOffer->fim ?? null,
+            mediaAvaliacao: isset($pacote->media_avaliacao) ? (float) $pacote->media_avaliacao : null,
+            totalAvaliacoes: isset($pacote->total_avaliacoes) ? (int) $pacote->total_avaliacoes : 0,
         );
     }
 
@@ -63,6 +67,8 @@ readonly class PacoteCardDTO implements \JsonSerializable
             'fotos_do_pacote' => $this->fotoCapa ? ['foto_capa_url' => $this->fotoCapa] : null,
             'tags' => $this->tags,
             'active_ofertas_count' => $this->ofertasAtivas,
+            'media_avaliacao' => $this->mediaAvaliacao,
+            'total_avaliacoes' => $this->totalAvaliacoes,
             'cheapest_active_offer' => $this->menorPreco !== null ? [
                 'preco' => $this->menorPreco,
                 'inicio' => $this->dataInicio,

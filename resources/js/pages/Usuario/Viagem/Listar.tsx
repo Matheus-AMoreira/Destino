@@ -18,6 +18,10 @@ interface Compra {
     valor_final: number;
     status: string;
     data_compra: string;
+    avaliacao?: {
+        id: number;
+        nota: number;
+    } | null;
     oferta: {
         id: number;
         inicio: string;

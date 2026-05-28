@@ -69,6 +69,14 @@ class CompraService
             );
         }
 
+        $avaliacaoData = null;
+        if (isset($r->avaliacao_id)) {
+            $avaliacaoData = [
+                'id' => $r->avaliacao_id,
+                'nota' => (int) $r->avaliacao_nota,
+            ];
+        }
+
         return new CompraDTO(
             id: $r->id,
             dataCompra: $r->data_compra,
@@ -78,6 +86,7 @@ class CompraService
             parcelas: $r->parcelas,
             valorFinal: (float) $r->valor_final,
             oferta: $ofertaDTO,
+            avaliacao: $avaliacaoData,
         );
     }
 }

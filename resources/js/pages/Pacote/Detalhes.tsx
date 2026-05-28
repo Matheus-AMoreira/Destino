@@ -182,6 +182,22 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 <h1 className="mb-2 text-3xl font-bold text-gray-900">
                                     {pacote.nome}
                                 </h1>
+                                {pacote.total_avaliacoes && pacote.total_avaliacoes > 0 ? (
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <div className="flex text-yellow-400">
+                                            {[...Array(5)].map((_, i) => (
+                                                <span key={i} className="text-lg">
+                                                    {i < Math.round(pacote.media_avaliacao ?? 0) ? '★' : '☆'}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-600">
+                                            {(Number(pacote.media_avaliacao) || 0).toFixed(1)} ({pacote.total_avaliacoes} {pacote.total_avaliacoes === 1 ? 'avaliação' : 'avaliações'})
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="text-sm text-gray-400 mb-3 font-semibold">Sem avaliações ainda</div>
+                                )}
                                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-1">
                                         <Building2 className="text-xl" />

@@ -4,11 +4,11 @@ import {
     CalendarDays,
     MapPin,
     Ticket,
+    Star,
 } from 'lucide-react';
 import { useState } from 'react';
 import Image from '@/components/Image';
 import ImageCarousel from '@/components/ImageCarousel';
-import BotaoAvaliacao from '@/components/Avaliacao/BotaoAvaliacao';
 import { tempoPassou } from '@/utils/dataUtils';
 
 interface ViagemCardProps {
@@ -126,10 +126,35 @@ export default function ViagemCard({
 
                                     {podeAvaliar && (
                                         <div className="flex justify-end">
-                                            <BotaoAvaliacao
-                                                pacoteId={grupo.pacote.id}
-                                                compraId={compra.id}
-                                            />
+                                            {compra.avaliacao ? (
+                                                <Link
+                                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                                    className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 px-4 py-2 text-xs font-black text-gray-700 hover:bg-gray-100 transition-colors"
+                                                >
+                                                    <span className="uppercase tracking-wider">Avaliado</span>
+                                                    <div className="flex items-center gap-0.5">
+                                                        {[1, 2, 3, 4, 5].map((estrela) => (
+                                                            <Star
+                                                                key={estrela}
+                                                                size={14}
+                                                                className={
+                                                                    estrela <= compra.avaliacao.nota
+                                                                        ? 'fill-yellow-400 text-yellow-400'
+                                                                        : 'text-gray-300'
+                                                                }
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </Link>
+                                            ) : (
+                                                <Link
+                                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                                    className="flex items-center gap-2 rounded-xl bg-yellow-50 border border-yellow-300 px-4 py-2 text-xs font-black text-yellow-700 hover:bg-yellow-100 transition-colors"
+                                                >
+                                                    <Star size={14} className="fill-yellow-500 text-yellow-500" />
+                                                    <span className="uppercase tracking-wider">Avaliar Viagem</span>
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>

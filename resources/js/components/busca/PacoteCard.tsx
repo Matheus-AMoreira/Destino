@@ -47,6 +47,22 @@ export default function PacoteCard({ pacote }: { pacote: Pacote }) {
                 <h3 className="mb-1 line-clamp-1 text-lg font-bold text-gray-900">
                     {pacote.nome}
                 </h3>
+                <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex text-yellow-400">
+                        {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-sm">
+                                {i < Math.round(pacote.media_avaliacao ?? 0) ? '★' : '☆'}
+                            </span>
+                        ))}
+                    </div>
+                    {pacote.total_avaliacoes && pacote.total_avaliacoes > 0 ? (
+                        <span className="text-xs font-bold text-gray-500">
+                            ({(Number(pacote.media_avaliacao) || 0).toFixed(1)})
+                        </span>
+                    ) : (
+                        <span className="text-xs font-semibold text-gray-400">Sem avaliações</span>
+                    )}
+                </div>
                 <p className="mb-2 flex items-center text-sm text-gray-500">
                     <LocateFixed className="mr-1 text-xl" />
                     {destino}
