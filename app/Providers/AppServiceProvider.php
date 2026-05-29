@@ -19,6 +19,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        \Illuminate\Database\Connection::resolverFor('pgsql', function ($connection, $database, $prefix, $config) {
+            return new class($connection, $database, $prefix, $config) extends \Illuminate\Database\PostgresConnection {
+                public function prepareBindings(array $bindings)
+                {
+                    $grammar = $this->getQueryGrammar();
+
+                    foreach ($bindings as $key => $value) {
+                        if ($value instanceof \DateTimeInterface) {
+                            $bindings[$key] = $value->format($grammar->getDateFormat());
+                        } elseif (is_bool($value)) {
+                            $bindings[$key] = $value ? 'true' : 'false';
+                        }
+                    }
+
+                    return $bindings;
+                }
+            };
+        });
+
         $this->app->singleton(\App\Application\Identidade\AuthService::class, function ($app) {
             return new \App\Application\Identidade\AuthService(
                 $app->make(\App\Domain\Identidade\Repositories\UsuarioRepositoryInterface::class)
