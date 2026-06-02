@@ -32,7 +32,12 @@ export default function Navbar() {
                 </Link>
                 <nav className="flex gap-6 pr-0 pl-0 text-lg">
                     <Link
-                        href={route('buscar', { termo: '', precoMax: 0, page: 0, size: 12 })}
+                        href={route('buscar', {
+                            termo: '',
+                            precoMax: 0,
+                            page: 0,
+                            size: 12,
+                        })}
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
                         <PackageSearch className="text-xl" />
@@ -51,7 +56,8 @@ export default function Navbar() {
                                 className="flex items-center space-x-2 py-2 font-bold text-white transition-colors hover:text-[#2071b3] focus:outline-none"
                                 type="button"
                             >
-                                {auth?.user?.role?.name === 'ADMINISTRADOR' || 'FUNCIONARIO' ? (
+                                {auth?.user?.role?.name === 'ADMINISTRADOR' ||
+                                auth?.user?.role?.name === 'FUNCIONARIO' ? (
                                     <ShieldUser />
                                 ) : (
                                     <User />
@@ -70,7 +76,8 @@ export default function Navbar() {
                                     </p>
                                 </div>
 
-                                {auth?.user?.role?.name === 'ADMINISTRADOR' || 'FUNCIONARIO' && (
+                                {(auth?.user?.role?.name === 'ADMINISTRADOR' ||
+                                    auth?.user?.role?.name === 'FUNCIONARIO') && (
                                     <Link
                                         href={route('administracao.dashboard')}
                                         className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
