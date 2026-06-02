@@ -21,7 +21,7 @@ interface PacoteFotoData {
     foto_capa: string | null;
     storage_type: 'local' | 'cloud' | 'url';
     is_url: boolean;
-    itens: { id: number; caminho: string; is_url: boolean }[];
+    itens: { id: number; caminho_url: string; is_url: boolean }[];
 }
 
 interface Props {
@@ -39,8 +39,8 @@ export default function Edit({ pacoteFoto, isUploadAvailable }: Props) {
         itens: (pacoteFoto.itens || []).map(item => ({
             id: item.id,
             file: null,
-            url: item.is_url ? item.caminho : '',
-            preview: item.caminho,
+            url: item.is_url ? item.caminho_url : '',
+            preview: item.caminho_url,
             is_url: item.is_url
         })) as PhotoItem[],
     });
