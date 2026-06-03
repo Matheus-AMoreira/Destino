@@ -28,7 +28,38 @@ class CompraService
 
     public function listarComprasDoUsuarioParaAdmin(string $userId): array
     {
-        return $this->repo->listarPorUsuarioAdmin($userId);
+        $rows = $this->repo->listarPorUsuarioAdmin($userId);
+        return array_map(function ($r) {
+            $fotoCapaUrl = null;
+            if (isset($r->pf_foto_capa)) {
+                $fotoCapaUrl = $r->pf_is_url ? $r->pf_foto_capa : \Illuminate\Support\Facades\Storage::url($r->pf_foto_capa);
+            }
+            return [
+                'id' => $r->id,
+                'valor_final' => (float) $r->valor_final,
+                'data_compra' => $r->data_compra,
+                'status' => $r->status,
+                'oferta' => [
+                    'inicio' => $r->oferta_inicio,
+                    'fim' => $r->oferta_fim,
+                    'pacote' => [
+                        'id' => $r->pacote_id,
+                        'nome' => $r->pacote_nome,
+                        'fotos_do_pacote' => $fotoCapaUrl ? [
+                            'fotos' => [
+                                ['url' => $fotoCapaUrl]
+                            ]
+                        ] : null
+                    ],
+                    'hotel' => [
+                        'nome' => $r->hotel_nome,
+                        'cidade' => [
+                            'nome' => $r->cidade_nome,
+                        ]
+                    ]
+                ]
+            ];
+        }, $rows);
     }
 
     public function listarComprasDoPacote(int $pacoteId): array

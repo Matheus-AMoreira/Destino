@@ -19,7 +19,7 @@ import AdminLayout from '@/layouts/AdminLayout';
 import type { Auth, User, Role, PermissionType } from '@/types/auth';
 import { useRoute } from 'ziggy-js';
 import { formatarCPF, formatarTelefone, limparNaoNumericos } from '@/lib/masks';
-import { schemaPerfil } from '@/lib/schemas';
+import { schemaPerfilAdmin } from '@/lib/schemas';
 
 interface Compra {
     id: string;
@@ -65,8 +65,9 @@ interface AcessoForm {
     permissions: number[];
 }
 
-export default function Detalhes({ usuario, compras = [], roles, permissions }: Props) {
+export default function Detalhes({ usuario, compras = [], roles, permissions, auth }: Props) {
     const route = useRoute();
+    const isAdmin = auth.user?.role?.name === 'ADMINISTRADOR';
     const [activeTab, setActiveTab] = useState<'perfil' | 'acesso' | 'historico'>('historico');
     const [statusFilter, setStatusFilter] = useState<string>('TODOS');
     const [modal, setModal] = useState<ModalData>({
@@ -81,16 +82,24 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
         nome: usuario.nome,
         sobre_nome: usuario.sobre_nome,
         email: usuario.email,
-        cpf: usuario.cpf || usuario.cpf_mascarado || '',
+        cpf: '',
         telefone: usuario.telefone || '',
     });
 
     useEffect(() => {
-        perfilForm.transform((data) => ({
-            ...data,
-            cpf: limparNaoNumericos(data.cpf),
-            telefone: limparNaoNumericos(data.telefone)
-        }));
+        perfilForm.transform((data) => {
+            const transformed: Record<string, string> = {
+                ...data,
+                telefone: limparNaoNumericos(data.telefone),
+            };
+            const cpfClean = limparNaoNumericos(data.cpf);
+            if (cpfClean.length > 0) {
+                transformed.cpf = cpfClean;
+            } else {
+                delete transformed.cpf;
+            }
+            return transformed as any;
+        });
     }, [perfilForm.data.cpf, perfilForm.data.telefone]);
 
     const acessoForm = useForm<AcessoForm>({
@@ -107,7 +116,7 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
     const handleUpdatePerfil = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const result = schemaPerfil.safeParse(perfilForm.data);
+        const result = schemaPerfilAdmin.safeParse(perfilForm.data);
         if (!result.success) {
             const errs: Record<string, string> = {};
             result.error.issues.forEach((issue) => {
@@ -149,11 +158,6 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
     };
 
     const handlePerfilChange = (campo: keyof PerfilForm, valor: string) => {
-        if (campo === 'cpf' && valor.includes('*')) {
-            perfilForm.setData('cpf', valor);
-            return;
-        }
-
         const rawValue = limparNaoNumericos(valor);
         if (campo === 'cpf') {
             perfilForm.setData('cpf', rawValue.substring(0, 11));
@@ -356,9 +360,9 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    value={perfilForm.data.cpf.includes('*') ? perfilForm.data.cpf : formatarCPF(perfilForm.data.cpf)}
+                                                    value={formatarCPF(perfilForm.data.cpf)}
                                                     onChange={e => handlePerfilChange('cpf', e.target.value)}
-                                                    placeholder="Novo CPF para alterar"
+                                                    placeholder="Digite o CPF completo para alterar"
                                                     className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900 text-lg"
                                                 />
                                                 {(zodErrors.cpf || perfilForm.errors.cpf) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.cpf || perfilForm.errors.cpf}</p>}
@@ -397,10 +401,11 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
                                         <p className="text-gray-500 font-medium text-sm">Gerencie o cargo e as permissões individuais.</p>
                                     </div>
                                     <form onSubmit={handleUpdateAccess} className="p-10 space-y-12">
+                                        {isAdmin && (
                                         <div>
                                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 block mb-6">Cargo Atribuído</label>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                {roles.filter(r => r.is_staff === usuario.role?.is_staff).map(role => (
+                                                {roles.filter(r => r.name !== 'ADMINISTRADOR').map(role => (
                                                     <label
                                                         key={role.id}
                                                         className={`p-6 border-2 rounded-3xl cursor-pointer transition-all ${Number(acessoForm.data.role_id) === role.id
@@ -423,6 +428,7 @@ export default function Detalhes({ usuario, compras = [], roles, permissions }: 
                                                 ))}
                                             </div>
                                         </div>
+                                        )}
 
                                         {filteredPermissions.length > 0 && (
                                             <div>

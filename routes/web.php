@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified', CheckUserStatus::class])->group(function 
     
     // Perfil do Usuário
     Route::get('/perfil', [PerfilController::class, 'edit'])->name('user.profile.edit');
-    Route::patch('/perfil', [PerfilController::class, 'update'])->name('user.profile.update');
+    Route::match(['put', 'patch'], '/perfil', [PerfilController::class, 'update'])->name('user.profile.update');
     Route::put('/perfil/senha', [PerfilController::class, 'updatePassword'])->name('user.profile.password');
     
     // Viagens do Usuário

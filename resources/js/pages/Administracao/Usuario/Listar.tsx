@@ -212,7 +212,7 @@ export default function Listar({ usuarios, filters, auth }: Props) {
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Link
                                                     href={route('administracao.usuario.edit', { 
-                                                        id: btoa(usuario.id),
+                                                        id: usuario.id,
                                                         nome: `${usuario.nome}-${usuario.sobre_nome || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
                                                     })}
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"

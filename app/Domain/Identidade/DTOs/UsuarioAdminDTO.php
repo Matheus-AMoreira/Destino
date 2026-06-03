@@ -51,7 +51,7 @@ readonly class UsuarioAdminDTO implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->id,
+            'id' => \App\Application\Identidade\UsuarioService::encryptId($this->id),
             'nome' => $this->nome,
             'sobre_nome' => $this->sobreNome,
             'email' => $this->email,
