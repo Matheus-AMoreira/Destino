@@ -111,4 +111,35 @@ class UsuarioService
     {
         return $this->repo->buscarIdsPermissoesDiretasDoUsuario($userId);
     }
+
+    public function buscarRolePorId(int $id): ?\App\Domain\Identidade\Entities\Role
+    {
+        return $this->repo->buscarRolePorId($id);
+    }
+
+    public function buscarCpfDescriptografado(string $userId): ?string
+    {
+        return $this->repo->buscarCpfDescriptografado($userId);
+    }
+
+    public static function encryptId(string $id): string
+    {
+        $encrypted = \Illuminate\Support\Facades\Crypt::encryptString($id);
+        return str_replace(['+', '/', '='], ['-', '_', ''], $encrypted);
+    }
+
+    public static function decryptId(string $encrypted): string
+    {
+        try {
+            $base64 = str_replace(['-', '_'], ['+', '/'], $encrypted);
+            $padding = strlen($base64) % 4;
+            if ($padding > 0) {
+                $base64 .= str_repeat('=', 4 - $padding);
+            }
+            return \Illuminate\Support\Facades\Crypt::decryptString($base64);
+        } catch (\Exception) {
+            $decoded = base64_decode($encrypted, true);
+            return ($decoded !== false) ? $decoded : $encrypted;
+        }
+    }
 }

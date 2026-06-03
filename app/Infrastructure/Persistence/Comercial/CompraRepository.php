@@ -184,7 +184,10 @@ class CompraRepository implements CompraRepositoryInterface
             ->where('compras.user_id', $userId)
             ->select(
                 'compras.*',
+                'ofertas.inicio as oferta_inicio',
+                'ofertas.fim as oferta_fim',
                 'ofertas.preco as oferta_preco',
+                'pacotes.id as pacote_id',
                 'pacotes.nome as pacote_nome',
                 'pacote_fotos.foto_capa as pf_foto_capa',
                 'pacote_fotos.is_url as pf_is_url',

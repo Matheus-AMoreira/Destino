@@ -31,6 +31,14 @@ export const schemaPerfil = z.object({
     ...userBaseSchema,
 });
 
+export const schemaPerfilAdmin = z.object({
+    nome: userBaseSchema.nome,
+    sobre_nome: userBaseSchema.sobre_nome,
+    cpf: z.string().refine(val => val === '' || val.length === 11, { message: 'CPF deve ter 11 dígitos ou ficar vazio' }),
+    telefone: userBaseSchema.telefone,
+    email: userBaseSchema.email,
+});
+
 export const schemaSenha = z.object({
     current_password: z.string().min(1, 'Senha atual é obrigatória'),
     password: passwordRules,
