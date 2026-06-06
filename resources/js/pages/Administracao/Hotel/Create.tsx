@@ -12,13 +12,13 @@ interface Estado {
     id: number;
     nome: string;
     sigla: string;
-    regiaoId: number;
+    regiao_id: number;
 }
 
 interface Cidade {
     id: number;
     nome: string;
-    estadoId: number;
+    estado_id: number;
 }
 
 interface Props {
@@ -44,12 +44,12 @@ export default function Create({ regioes, estados, cidades }: Props) {
 
     const filteredEstados = useMemo(() => {
         if (!data.regiao_id) return [];
-        return estados.filter(e => e.regiaoId === Number(data.regiao_id));
+        return estados.filter(e => e.regiao_id === Number(data.regiao_id));
     }, [data.regiao_id, estados]);
 
     const filteredCidades = useMemo(() => {
         if (!data.estado_id) return [];
-        return cidades.filter(c => c.estadoId === Number(data.estado_id));
+        return cidades.filter(c => c.estado_id === Number(data.estado_id));
     }, [data.estado_id, cidades]);
 
     const handleCepChange = async (value: string) => {
@@ -89,7 +89,7 @@ export default function Create({ regioes, estados, cidades }: Props) {
                         e => e.sigla.toUpperCase() === resData.state.toUpperCase()
                     );
                     if (matchedEstado) {
-                        addressFields.regiao_id = matchedEstado.regiaoId;
+                        addressFields.regiao_id = matchedEstado.regiao_id;
                         addressFields.estado_id = matchedEstado.id;
 
                         if (resData.city) {
@@ -98,7 +98,7 @@ export default function Create({ regioes, estados, cidades }: Props) {
 
                             const normalizedCityName = normalizeStr(resData.city);
                             const matchedCidade = cidades.find(
-                                c => c.estadoId === matchedEstado.id && normalizeStr(c.nome) === normalizedCityName
+                                c => c.estado_id === matchedEstado.id && normalizeStr(c.nome) === normalizedCityName
                             );
                             if (matchedCidade) {
                                 addressFields.cidade_id = matchedCidade.id;

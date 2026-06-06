@@ -2,8 +2,22 @@
 
 namespace App\Providers;
 
+use App\Models\Catalogo\Pacote;
+use App\Models\Catalogo\PacoteFoto;
+use App\Models\Comercial\Oferta;
+use App\Models\Hospedagem\Hotel;
+use App\Models\Hospedagem\Transporte;
+use App\Models\Identidade\Usuario;
+use App\Observers\Catalogo\PacoteFotoObserver;
+use App\Observers\Catalogo\PacoteObserver;
+use App\Observers\Comercial\OfertaObserver;
+use App\Observers\Hospedagem\HotelObserver;
+use App\Observers\Hospedagem\TransporteObserver;
+use App\Observers\Identidade\UsuarioObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Connection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +33,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        \Illuminate\Database\Connection::resolverFor('pgsql', function ($connection, $database, $prefix, $config) {
-            return new class($connection, $database, $prefix, $config) extends \Illuminate\Database\PostgresConnection {
+        Connection::resolverFor('pgsql', function ($connection, $database, $prefix, $config) {
+            return new class($connection, $database, $prefix, $config) extends PostgresConnection {
                 public function prepareBindings(array $bindings)
                 {
                     $grammar = $this->getQueryGrammar();
@@ -37,12 +51,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             };
         });
-
-        $this->app->singleton(\App\Application\Identidade\AuthService::class, function ($app) {
-            return new \App\Application\Identidade\AuthService(
-                $app->make(\App\Domain\Identidade\Repositories\UsuarioRepositoryInterface::class)
-            );
-        });
+        //
     }
 
     /**
@@ -60,6 +69,13 @@ class AppServiceProvider extends ServiceProvider
                 $request->input('email') . '|' . $request->ip()
             );
         });
+
+        Pacote::observe(PacoteObserver::class);
+        PacoteFoto::observe(PacoteFotoObserver::class);
+        Oferta::observe(OfertaObserver::class);
+        Hotel::observe(HotelObserver::class);
+        Transporte::observe(TransporteObserver::class);
+        Usuario::observe(UsuarioObserver::class);
     }
 
     /**

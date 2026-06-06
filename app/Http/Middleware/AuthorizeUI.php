@@ -13,9 +13,10 @@ class AuthorizeUI
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $permission): Response
+    public function handle(Request $request, Closure $next, string $resource, ?string $action = null): Response
     {
         $user = $request->user();
+        $permission = $action ? "{$resource}:{$action}" : $resource;
 
         if (!$user || !$user->hasPermission($permission)) {
             // Em áreas administrativas e UI protegida, retornamos 403 explicitamente

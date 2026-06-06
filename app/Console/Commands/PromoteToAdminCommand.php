@@ -2,7 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
+use App\Models\Identidade\Usuario;
+use App\Models\Identidade\Role;
 use Illuminate\Console\Command;
 
 class PromoteToAdminCommand extends Command
@@ -24,7 +25,7 @@ class PromoteToAdminCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle(UsuarioRepositoryInterface $repo)
+    public function handle()
     {
         $email = $this->argument('email');
         $roleName = $this->option('role');
@@ -34,21 +35,21 @@ class PromoteToAdminCommand extends Command
             return 1;
         }
 
-        $user = $repo->buscarPorEmail($email);
+        $user = Usuario::where('email', $email)->first();
 
         if (!$user) {
             $this->error("Usuário com email {$email} não encontrado.");
             return 1;
         }
 
-        $role = $repo->buscarRolePorNome($roleName);
+        $role = Role::where('nome', $roleName)->first();
         if (!$role) {
             $this->error("Role {$roleName} não encontrada no banco de dados.");
             return 1;
         }
 
         // Atualizar a role do usuário
-        $repo->atualizar($user->id, ['role_id' => $role->id]);
+        $user->update(['role_id' => $role->id]);
 
         // Se for administrador, não precisa associar permissões diretas, a role já dá acesso a tudo via AuthService
         if ($roleName === 'ADMINISTRADOR') {

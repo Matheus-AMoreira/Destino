@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Publico\HomeController;
-use App\Http\Controllers\Publico\BuscaController;
-use App\Http\Controllers\Publico\PacoteController as PublicoPacoteController;
-use App\Http\Controllers\Usuario\AvaliacaoController;
+use App\Http\Controllers\Catalogo\PublicHomeController;
+use App\Http\Controllers\Catalogo\PublicoBuscaController;
+use App\Http\Controllers\Catalogo\PublicoPacoteController;
+use App\Http\Controllers\Comercial\AvaliacaoController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -15,9 +15,9 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Auth\Middleware\Authenticate;
 
 // Públicas
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/contato', [HomeController::class, 'contato'])->name('contato');
-Route::get('/buscar', [BuscaController::class, 'buscar'])->name('buscar');
+Route::get('/', [PublicHomeController::class, 'index'])->name('home');
+Route::get('/contato', [PublicHomeController::class, 'contato'])->name('contato');
+Route::get('/buscar', [PublicoBuscaController::class, 'buscar'])->name('buscar');
 Route::get('/pacote/{nome}', [PublicoPacoteController::class, 'detalhes'])->name('pacote.detalhes');
 
 // API de Avaliações Públicas

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Administracao;
 
-use App\Application\Dashboard\EstatisticasService;
-use App\Application\Geografia\LocalizacaoService;
+use App\Services\Shared\EstatisticasService;
+use App\Models\Geografia\Regiao;
+use App\Models\Geografia\Estado;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,7 +14,6 @@ class DashboardController extends Controller
 {
     public function __construct(
         private readonly EstatisticasService $estatisticasService,
-        private readonly LocalizacaoService $localizacaoService,
     ) {}
 
     public function index(Request $request): Response
@@ -39,8 +39,8 @@ class DashboardController extends Controller
             'graficos' => $graficos, // Passando o objeto completo para garantir compatibilidade
             'ano' => (int) $ano,
             'anosDisponiveis' => $graficos->anosDisponiveis,
-            'regioes' => $this->localizacaoService->listarRegioes(),
-            'estados' => $this->localizacaoService->listarEstados(),
+            'regioes' => Regiao::all(),
+            'estados' => Estado::all(),
             'filtros' => [
                 'regiao_id' => $regiaoId,
                 'estado_id' => $estadoId,

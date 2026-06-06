@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Identidade\Usuario as User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -10,6 +10,12 @@ use Tests\TestCase;
 class UserCreationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\AuthorizationSeeder::class);
+    }
 
     public function test_staff_can_create_new_employee_with_auto_password()
     {
@@ -28,7 +34,7 @@ class UserCreationTest extends TestCase
                 'role_id' => $roleFuncionario->id,
             ]);
 
-        $response->assertRedirect(route('administracao.usuario.listar'));
+        $response->assertRedirect(route('administracao.usuario.index', ['tab' => 'funcionarios']));
         
         $this->assertDatabaseHas('users', [
             'email' => 'novo@destino.com',

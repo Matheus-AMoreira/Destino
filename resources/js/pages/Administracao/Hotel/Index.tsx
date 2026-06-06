@@ -1,6 +1,7 @@
 import AdminLayout from '@/layouts/AdminLayout';
 import { Link, router } from '@inertiajs/react';
-import { Hotel, Plus, Pencil, Trash2, MapPin } from 'lucide-react';
+import { Hotel, Plus, Pencil, Trash2, MapPin, Search } from 'lucide-react';
+import { useState } from 'react';
 
 interface Cidade {
     id: number;
@@ -22,9 +23,19 @@ interface HotelData {
 interface Props {
     hotels: HotelData[];
     success?: string;
+    filters?: {
+        termo?: string;
+    };
 }
 
-export default function Index({ hotels = [], success }: Props) {
+export default function Index({ hotels = [], success, filters = {} }: Props) {
+    const [termo, setTermo] = useState(filters.termo || '');
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get(route('administracao.hotel.index'), { q: termo }, { preserveState: true });
+    };
+
     const handleDelete = (id: number) => {
         if (confirm('Deseja realmente excluir este hotel?')) {
             router.delete(route('administracao.hotel.destroy', { id }));
@@ -55,6 +66,24 @@ export default function Index({ hotels = [], success }: Props) {
                     {success}
                 </div>
             )}
+
+            {/* Barra de Filtros */}
+            <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <form onSubmit={handleSearch} className="relative w-full sm:w-96">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Buscar por nome, endereço ou localização..."
+                        value={termo}
+                        onChange={(e) => setTermo(e.target.value)}
+                        className="w-full rounded-lg border-gray-300 pl-10 pr-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500 outline-none"
+                    />
+                </form>
+                
+                <div className="text-xs text-gray-400 font-medium">
+                    Exibindo {hotels.length} registro{hotels.length !== 1 ? 's' : ''}
+                </div>
+            </div>
 
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -108,7 +137,20 @@ export default function Index({ hotels = [], success }: Props) {
                         ) : (
                             <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500">
-                                    Nenhum hotel cadastrado.
+                                    {termo ? (
+                                        <div className="flex flex-col items-center gap-2 text-gray-400">
+                                            <Search size={48} className="opacity-20" />
+                                            <p className="text-sm font-medium">Nenhum hotel encontrado para "{termo}".</p>
+                                            <button
+                                                onClick={() => { setTermo(''); router.get(route('administracao.hotel.index'), { q: '' }); }}
+                                                className="text-xs text-blue-600 hover:underline mt-1 font-semibold"
+                                            >
+                                                Limpar filtro
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        'Nenhum hotel cadastrado.'
+                                    )}
                                 </td>
                             </tr>
                         )}

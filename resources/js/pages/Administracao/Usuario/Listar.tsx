@@ -41,9 +41,11 @@ interface Props {
     roles: Role[];
     permissions: PermissionType[];
     auth: Auth;
+    canViewStaff: boolean;
+    canCreateStaff: boolean;
 }
 
-export default function Listar({ usuarios, filters, auth }: Props) {
+export default function Listar({ usuarios, filters, auth, canViewStaff, canCreateStaff }: Props) {
     const route = useRoute();
     const [termo, setTermo] = useState(filters.termo || '');
     const [modal, setModal] = useState<ModalData>({
@@ -107,27 +109,31 @@ export default function Listar({ usuarios, filters, auth }: Props) {
                     <h1 className="text-2xl font-bold text-gray-900">Gerenciar Usuários</h1>
                 </div>
 
-                <Link
-                    href={route('administracao.usuario.create')}
-                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95"
-                >
-                    <Plus size={18} />
-                    Novo Funcionário
-                </Link>
+                {canCreateStaff && (
+                    <Link
+                        href={route('administracao.usuario.create')}
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95"
+                    >
+                        <Plus size={18} />
+                        Novo Funcionário
+                    </Link>
+                )}
             </div>
 
             {/* Abas de Navegação */}
             <div className="mb-6 flex border-b border-gray-200">
-                <button
-                    onClick={() => handleTabChange('funcionarios')}
-                    className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${
-                        filters.tab === 'funcionarios' 
-                            ? 'border-blue-600 text-blue-600' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
-                >
-                    Funcionários (Staff)
-                </button>
+                {canViewStaff && (
+                    <button
+                        onClick={() => handleTabChange('funcionarios')}
+                        className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${
+                            filters.tab === 'funcionarios' 
+                                ? 'border-blue-600 text-blue-600' 
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                    >
+                        Funcionários (Staff)
+                    </button>
+                )}
                 <button
                     onClick={() => handleTabChange('clientes')}
                     className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${

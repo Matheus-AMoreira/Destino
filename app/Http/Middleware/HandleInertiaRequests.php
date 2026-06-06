@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Application\Identidade\AuthService;
+use App\Services\Identidade\AuthService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;

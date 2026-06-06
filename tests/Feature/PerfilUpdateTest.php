@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Identidade\Usuario as User;
 use Database\Seeders\AuthorizationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
@@ -44,7 +44,7 @@ class PerfilUpdateTest extends TestCase
             'nome' => 'Original',
             'sobre_nome' => 'Silva',
             'email' => 'original@destino.com',
-            'cpf' => Crypt::encryptString('12345678901'),
+            'cpf' => '12345678901',
             'telefone' => '11999999999',
         ]);
 
@@ -137,7 +137,7 @@ class PerfilUpdateTest extends TestCase
         $user = User::factory()->create([
             'role_id' => DB::table('roles')->where('name', 'USUARIO')->first()->id,
             'email_verified_at' => now(),
-            'cpf' => Crypt::encryptString($originalCpf),
+            'cpf' => $originalCpf,
         ]);
 
         $response = $this->actingAs($user)->patch(route('user.profile.update'), [

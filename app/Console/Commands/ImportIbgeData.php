@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Domain\Geografia\Entities\Regiao;
-use App\Domain\Geografia\Entities\Estado;
-use App\Domain\Geografia\Entities\Cidade;
-use App\Domain\Geografia\Repositories\LocalizacaoRepositoryInterface;
+use App\Models\Geografia\Regiao;
+use App\Models\Geografia\Estado;
+use App\Models\Geografia\Cidade;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -29,9 +28,9 @@ class ImportIbgeData extends Command
     /**
      * Execute the console command.
      */
-    public function handle(LocalizacaoRepositoryInterface $repo)
+    public function handle()
     {
-        if ($repo->contarCidades() > 0) {
+        if (Cidade::count() > 0) {
             $this->info('Dados de localização já existem no banco.');
 
             return;
@@ -45,13 +44,11 @@ class ImportIbgeData extends Command
             $regioesDTO = $responseRegioes->json();
 
             foreach ($regioesDTO as $rDto) {
-                $regiao = new Regiao(
-                    id: $rDto['id'],
-                    sigla: $rDto['sigla'],
-                    nome: $rDto['nome'],
-                );
-
-                $repo->salvarRegiao($regiao);
+                $regiao = Regiao::create([
+                    'id' => $rDto['id'],
+                    'sigla' => $rDto['sigla'],
+                    'nome' => $rDto['nome'],
+                ]);
 
                 $this->info("Processando Região: {$regiao->nome}");
 
@@ -60,14 +57,12 @@ class ImportIbgeData extends Command
                 $estadosDTO = $responseEstados->json();
 
                 foreach ($estadosDTO as $eDto) {
-                    $estado = new Estado(
-                        id: $eDto['id'],
-                        sigla: $eDto['sigla'],
-                        nome: $eDto['nome'],
-                        regiaoId: $regiao->id,
-                    );
-
-                    $repo->salvarEstado($estado);
+                    $estado = Estado::create([
+                        'id' => $eDto['id'],
+                        'sigla' => $eDto['sigla'],
+                        'nome' => $eDto['nome'],
+                        'regiao_id' => $regiao->id,
+                    ]);
 
                     $this->info("  -> Estado: {$estado->nome}");
 
@@ -76,13 +71,11 @@ class ImportIbgeData extends Command
                     $cidadesDTO = $responseCidades->json();
 
                     foreach ($cidadesDTO as $cDto) {
-                        $cidade = new Cidade(
-                            id: $cDto['id'],
-                            nome: $cDto['nome'],
-                            estadoId: $estado->id,
-                        );
-
-                        $repo->salvarCidade($cidade);
+                        Cidade::create([
+                            'id' => $cDto['id'],
+                            'nome' => $cDto['nome'],
+                            'estado_id' => $estado->id,
+                        ]);
                     }
                 }
             }

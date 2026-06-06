@@ -50,6 +50,9 @@ interface Props {
     roles: Role[];
     permissions: PermissionType[];
     auth: Auth;
+    canManageRole: boolean;
+    canManagePermissions: boolean;
+    canEditProfile: boolean;
 }
 
 interface PerfilForm {
@@ -65,9 +68,9 @@ interface AcessoForm {
     permissions: number[];
 }
 
-export default function Detalhes({ usuario, compras = [], roles, permissions, auth }: Props) {
+export default function Detalhes({ usuario, compras = [], roles, permissions, auth, canManageRole, canManagePermissions, canEditProfile }: Props) {
     const route = useRoute();
-    const isAdmin = auth.user?.role?.name === 'ADMINISTRADOR';
+    const canManageAccess = canManageRole || canManagePermissions;
     const [activeTab, setActiveTab] = useState<'perfil' | 'acesso' | 'historico'>('historico');
     const [statusFilter, setStatusFilter] = useState<string>('TODOS');
     const [modal, setModal] = useState<ModalData>({
@@ -233,16 +236,18 @@ export default function Detalhes({ usuario, compras = [], roles, permissions, au
                                         <UserIcon size={20} />
                                         <span className="text-sm">Perfil</span>
                                     </button>
-                                    <button
-                                        onClick={() => setActiveTab('acesso')}
-                                        className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'acesso'
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                                            : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
-                                            }`}
-                                    >
-                                        <Shield size={20} />
-                                        <span className="text-sm">Acessos</span>
-                                    </button>
+                                    {canManageAccess && (
+                                        <button
+                                            onClick={() => setActiveTab('acesso')}
+                                            className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${activeTab === 'acesso'
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
+                                                : 'text-gray-500 hover:bg-gray-50 hover:text-blue-600'
+                                                }`}
+                                        >
+                                            <Shield size={20} />
+                                            <span className="text-sm">Acessos</span>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -384,7 +389,7 @@ export default function Detalhes({ usuario, compras = [], roles, permissions, au
                                         <div className="flex justify-end pt-4">
                                             <button
                                                 type="submit"
-                                                disabled={perfilForm.processing}
+                                                disabled={perfilForm.processing || !canEditProfile}
                                                 className="bg-blue-600 text-white px-12 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all disabled:opacity-50 disabled:scale-95"
                                             >
                                                 {perfilForm.processing ? 'Salvando...' : 'Salvar Alterações'}
@@ -401,7 +406,7 @@ export default function Detalhes({ usuario, compras = [], roles, permissions, au
                                         <p className="text-gray-500 font-medium text-sm">Gerencie o cargo e as permissões individuais.</p>
                                     </div>
                                     <form onSubmit={handleUpdateAccess} className="p-10 space-y-12">
-                                        {isAdmin && (
+                                        {canManageRole && (
                                         <div>
                                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 block mb-6">Cargo Atribuído</label>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -430,7 +435,7 @@ export default function Detalhes({ usuario, compras = [], roles, permissions, au
                                         </div>
                                         )}
 
-                                        {filteredPermissions.length > 0 && (
+                                        {canManagePermissions && filteredPermissions.length > 0 && (
                                             <div>
                                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4 block mb-6">Permissões Diretas</label>
                                                 <div className="flex flex-wrap gap-3">

@@ -2,12 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Administracao\DashboardController;
-use App\Http\Controllers\Administracao\HotelController;
-use App\Http\Controllers\Administracao\OfertaController;
-use App\Http\Controllers\Administracao\PacoteController as AdminPacoteController;
-use App\Http\Controllers\Administracao\PacoteFotoController;
-use App\Http\Controllers\Administracao\TransporteController;
-use App\Http\Controllers\Administracao\UsuarioController;
+use App\Http\Controllers\Hospedagem\AdminHotelController as HotelController;
+use App\Http\Controllers\Comercial\AdminOfertaController as OfertaController;
+use App\Http\Controllers\Catalogo\AdminPacoteController;
+use App\Http\Controllers\Catalogo\AdminPacoteFotoController as PacoteFotoController;
+use App\Http\Controllers\Hospedagem\AdminTransporteController as TransporteController;
+use App\Http\Controllers\Identidade\AdminUsuarioController as UsuarioController;
 use App\Http\Middleware\AdminMiddleware;
 
 // Admin
@@ -68,12 +68,12 @@ Route::middleware(['auth', 'verified', AdminMiddleware::class])->prefix('adminis
 
     // Usuários
     Route::prefix('usuario')->name('usuario.')->group(function () {
-        Route::get('/listar', [UsuarioController::class, 'index'])->name('index')->middleware('authorize.ui:user,read');
-        Route::get('/novo', [UsuarioController::class, 'create'])->name('create')->middleware('authorize.ui:user,create');
-        Route::post('/', [UsuarioController::class, 'store'])->name('store')->middleware('authorize.api:user,create');
-        Route::get('/editar/{nome}/{id}', [UsuarioController::class, 'edit'])->name('edit')->middleware('authorize.ui:user,update');
-        Route::put('/{id}', [UsuarioController::class, 'update'])->name('update')->middleware('authorize.api:user,update');
-        Route::patch('/{id}/status', [UsuarioController::class, 'updateStatus'])->name('update-status')->middleware('authorize.api:user,update');
-        Route::delete('/{id}', [UsuarioController::class, 'destroy'])->name('destroy')->middleware('authorize.api:user,delete');
+        Route::get('/listar', [UsuarioController::class, 'index'])->name('index')->middleware('authorize.ui:user-client,read');
+        Route::get('/novo', [UsuarioController::class, 'create'])->name('create')->middleware('authorize.ui:user-staff,create');
+        Route::post('/', [UsuarioController::class, 'store'])->name('store')->middleware('authorize.api:user-staff,create');
+        Route::get('/editar/{nome}/{id}', [UsuarioController::class, 'edit'])->name('edit'); // Permissão verificada no controller (staff vs cliente)
+        Route::put('/{id}', [UsuarioController::class, 'update'])->name('update'); // Permissão verificada no controller
+        Route::patch('/{id}/status', [UsuarioController::class, 'updateStatus'])->name('update-status'); // Permissão verificada no controller
+        Route::delete('/{id}', [UsuarioController::class, 'destroy'])->name('destroy')->middleware('authorize.api:user-client,delete');
     });
 });

@@ -14,11 +14,21 @@ class AuthorizationSeeder extends Seeder
             // Dashboard
             ['slug' => 'dashboard:read', 'description' => 'Acessar painel administrativo', 'is_staff' => true],
 
-            // Usuários
-            ['slug' => 'user:read', 'description' => 'Visualizar usuários', 'is_staff' => true],
-            ['slug' => 'user:create', 'description' => 'Cadastrar novos funcionários', 'is_staff' => true],
-            ['slug' => 'user:update', 'description' => 'Editar usuários', 'is_staff' => true],
-            ['slug' => 'user:delete', 'description' => 'Deletar usuários', 'is_staff' => true],
+            // Usuários — Clientes
+            ['slug' => 'user-client:read', 'description' => 'Visualizar clientes', 'is_staff' => true],
+            ['slug' => 'user-client:update', 'description' => 'Editar perfil de clientes', 'is_staff' => true],
+            ['slug' => 'user-client:delete', 'description' => 'Deletar clientes', 'is_staff' => true],
+            ['slug' => 'user-client:status', 'description' => 'Alterar status de clientes (bloquear/liberar)', 'is_staff' => true],
+
+            // Usuários — Funcionários (somente Admin)
+            ['slug' => 'user-staff:read', 'description' => 'Visualizar funcionários', 'is_staff' => true],
+            ['slug' => 'user-staff:create', 'description' => 'Cadastrar novos funcionários', 'is_staff' => true],
+            ['slug' => 'user-staff:update', 'description' => 'Editar perfil de funcionários', 'is_staff' => true],
+            ['slug' => 'user-staff:status', 'description' => 'Alterar status de funcionários (bloquear/liberar)', 'is_staff' => true],
+
+            // Usuários — Controle de Acesso (somente Admin)
+            ['slug' => 'user:manage-role', 'description' => 'Alterar cargo de usuários (promover/rebaixar)', 'is_staff' => true],
+            ['slug' => 'user:manage-permissions', 'description' => 'Alterar permissões diretas de usuários', 'is_staff' => true],
 
             // Hotéis
             ['slug' => 'hotel:read', 'description' => 'Visualizar hotéis', 'is_staff' => true],
@@ -56,6 +66,10 @@ class AuthorizationSeeder extends Seeder
             ['slug' => 'purchase:create', 'description' => 'Realizar compras', 'is_staff' => false],
             ['slug' => 'purchase:read', 'description' => 'Visualizar próprias compras', 'is_staff' => false],
         ];
+
+        // Remover permissões antigas que foram substituídas
+        $oldSlugs = ['user:read', 'user:create', 'user:update', 'user:delete'];
+        DB::table('permissions')->whereIn('slug', $oldSlugs)->delete();
 
         foreach ($permissions as $p) {
             $exists = DB::table('permissions')->where('slug', $p['slug'])->first();
@@ -111,10 +125,12 @@ class AuthorizationSeeder extends Seeder
         $allPermissionIds = DB::table('permissions')->pluck('id')->all();
         $this->syncRolePermissions($adminRole->id, $allPermissionIds);
 
-        // Funcionário: permissões específicas
+        // Funcionário: permissões específicas (sem gerenciamento de staff, cargos ou permissões)
         $funcSlugs = [
             'dashboard:read',
-            'user:read',
+            // Clientes — visualizar, editar, deletar, alterar status
+            'user-client:read', 'user-client:update', 'user-client:delete', 'user-client:status',
+            // Hotéis, pacotes, fotos, ofertas, transportes — CRUD sem delete
             'hotel:read', 'hotel:create', 'hotel:update',
             'package:read', 'package:create', 'package:update',
             'package-photo:read', 'package-photo:create', 'package-photo:update',

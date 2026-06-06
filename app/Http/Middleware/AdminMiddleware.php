@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Application\Identidade\AuthService;
-use App\Domain\Identidade\Enums\UserRole;
+use App\Services\Identidade\AuthService;
+use App\Enums\Identidade\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +29,7 @@ class AdminMiddleware
 
         $authDTO = $this->authService->buildAuthDTO($user->id);
 
-        if (!$authDTO || !in_array($authDTO->roleName, [UserRole::ADMINISTRADOR->value, UserRole::FUNCIONARIO->value])) {
+        if (!$authDTO || !in_array($authDTO['role_name'], [UserRole::ADMINISTRADOR->value, UserRole::FUNCIONARIO->value])) {
             abort(403, 'Acesso negado.');
         }
 

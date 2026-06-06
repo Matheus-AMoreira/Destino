@@ -2,13 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Hotel;
-use App\Models\Cidade;
-use App\Models\Pacote;
-use App\Models\Oferta;
-use App\Models\Regiao;
-use App\Models\Estado;
+use App\Models\Identidade\Usuario as User;
+use App\Models\Hospedagem\Hotel;
+use App\Models\Geografia\Cidade;
+use App\Models\Catalogo\Pacote;
+use App\Models\Comercial\Oferta;
+use App\Models\Geografia\Regiao;
+use App\Models\Geografia\Estado;
+use App\Models\Hospedagem\Transporte;
 use Database\Seeders\AuthorizationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -59,8 +60,7 @@ class AuthorizationTest extends TestCase
 
         $staffRole = DB::table('roles')->where('name', 'FUNCIONARIO')->first();
 
-        // Tentativa de promover cliente para funcionário (Deve ser bloqueado)
-        $response = $this->actingAs($admin)->put(route('administracao.usuario.update-status', $user), [
+        $response = $this->actingAs($admin)->put(route('administracao.usuario.update', $user), [
             'role_id' => $staffRole->id,
         ]);
 
@@ -132,8 +132,8 @@ class AuthorizationTest extends TestCase
         ]);
 
         // Mock de dados para o Checkout
-        \App\Models\Regiao::create(['id' => 1, 'nome' => 'Norte', 'sigla' => 'N']);
-        \App\Models\Estado::create(['id' => 1, 'nome' => 'Amazonas', 'sigla' => 'AM', 'regiao_id' => 1]);
+        Regiao::create(['id' => 1, 'nome' => 'Norte', 'sigla' => 'N']);
+        Estado::create(['id' => 1, 'nome' => 'Amazonas', 'sigla' => 'AM', 'regiao_id' => 1]);
         $cidade = Cidade::create(['id' => 1, 'nome' => 'Manaus', 'estado_id' => 1]);
         
         $hotel = Hotel::create([
@@ -156,7 +156,7 @@ class AuthorizationTest extends TestCase
             'funcionario_id' => $staff->id
         ]);
 
-        $transporte = \App\Models\Transporte::create([
+        $transporte = Transporte::create([
             'id' => 1,
             'empresa' => 'Empresa Teste',
             'meio' => 'AEREO',

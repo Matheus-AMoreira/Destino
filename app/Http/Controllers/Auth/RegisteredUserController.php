@@ -2,30 +2,22 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Domain\Shared\ValueObjects\Cpf;
-use App\Domain\Shared\ValueObjects\Email;
-use App\Domain\Shared\ValueObjects\Telefone;
-use App\Domain\Identidade\Enums\UserRole;
+use App\Models\Identidade\Usuario;
+use App\Models\Identidade\Role;
 use Illuminate\Routing\Controller;
-use App\Domain\Identidade\Repositories\UsuarioRepositoryInterface;
-use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use InvalidArgumentException;
 
 class RegisteredUserController extends Controller
 {
-    public function __construct(
-        private readonly UsuarioRepositoryInterface $usuarioRepo,
-    ) {}
+    public function __construct() {}
 
     /**
      * Display the registration view.
@@ -56,47 +48,30 @@ class RegisteredUserController extends Controller
             'password'   => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        // Value Objects — validação de domínio
-        try {
-            $emailVO    = new Email($request->email);
-            $cpfVO      = new Cpf($request->cpf);
-            $telefoneVO = new Telefone($request->telefone);
-        } catch (\InvalidArgumentException $e) {
-            throw ValidationException::withMessages(['email' => $e->getMessage()]);
-        }
+        $emailExists = Usuario::where('email', $request->email)->exists();
+        $cpfExists = Usuario::all()->contains(fn($u) => $u->cpf?->value === $request->cpf);
 
-        // Verificação de unicidade com mensagem genérica para não revelar quais dados já existem
-        $jaExiste = $this->usuarioRepo->existePorEmailOuCpf($emailVO->value, $cpfVO->value);
-
-        if ($jaExiste) {
+        if ($emailExists || $cpfExists) {
             throw ValidationException::withMessages([
-                'email' => 'Os dados informados já estão associados a uma conta. Verifique o e-mail ou CPF e tente novamente.',
+                'email' => 'Usuário com este email ou cpf já existe.'
             ]);
         }
 
-        $role = $this->usuarioRepo->buscarRolePorNome(UserRole::USUARIO->value);
-        $roleId = $role?->id;
+        $role = Role::where('name', 'USUARIO')->firstOrFail();
 
-        $id = (string) Str::uuid();
-
-        $this->usuarioRepo->criar([
-            'id'         => $id,
-            'nome'       => $request->nome,
+        $user = Usuario::create([
+            'nome' => $request->nome,
             'sobre_nome' => $request->sobre_nome,
-            'cpf'        => Crypt::encryptString($cpfVO->value),
-            'telefone'   => $telefoneVO->value,
-            'email'      => $emailVO->value,
-            'password'   => Hash::make($request->password),
-            'role_id'    => $roleId,
-            'is_valid'   => true,
+            'cpf' => $request->cpf,
+            'telefone' => $request->telefone,
+            'email' => $request->email,
+            'password' => $request->password,
+            'is_valid' => true,
+            'role_id' => $role->id,
         ]);
 
-        $user = User::find($id);
-
-        if ($user) {
-            event(new Registered($user));
-            Auth::login($user);
-        }
+        event(new Registered($user));
+        Auth::login($user);
 
         return redirect(route('verification.notice', absolute: false));
     }

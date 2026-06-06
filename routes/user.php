@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Usuario\CheckoutController;
-use App\Http\Controllers\Usuario\PerfilController;
-use App\Http\Controllers\Usuario\ViagemController;
-use App\Http\Controllers\Usuario\AvaliacaoController;
+use App\Http\Controllers\Comercial\CheckoutController;
+use App\Http\Controllers\Identidade\PerfilController;
+use App\Http\Controllers\Comercial\ViagemController;
+use App\Http\Controllers\Comercial\AvaliacaoController;
 use App\Http\Middleware\CheckUserStatus;
 
 // Checkout e Área do Usuário (Requer Auth)

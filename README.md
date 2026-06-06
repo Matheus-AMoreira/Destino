@@ -18,6 +18,44 @@
 
 ---
 
+## 📁 Estrutura do Projeto
+
+O backend do projeto adota uma arquitetura de **Monólito Modular Pragmático**, onde as classes do Laravel são categorizadas por sua responsabilidade técnica e organizadas internamente por **módulos de negócio**. 
+
+### Divisão de Pastas no Laravel (`app/`)
+
+Abaixo está o detalhamento de cada diretório e seu papel na arquitetura:
+
+*   **`Actions/`**: Concentra a lógica de escrita do sistema. Cada ação representa um caso de uso de escrita único e focado (ex: `CriarHotelAction`), isolando mutações e facilitando testes unitários.
+*   **`Casts/`**: Classes de mapeamento de tipos customizados do Eloquent. Utilizado para criptografar/descriptografar CPF de forma invisível (`CpfCast`).
+*   **`Console/`**: Comandos customizados do Artisan executados via CLI (ex: comando de importação de dados geográficos).
+*   **`DTOs/`**: *Data Transfer Objects* responsáveis por estruturar o tráfego de dados de forma fortemente tipada entre controladores, ações e repositórios.
+*   **`Enums/`**: Enums nativos do PHP que centralizam estados fixos e categorizações do sistema (ex: status de ofertas).
+*   **`Http/`**: Camada HTTP que lida com a entrega externa:
+    *   `Controllers/`: Processam as requisições e renderizam telas do React ou respondem requisições de API.
+    *   `Middleware/`: Filtros de requisições, como proteção de rotas administrativas e controle de acessos da UI.
+    *   `Requests/`: Validações de formulários e regras de input robustas.
+*   **`Models/`**: Entidades e mapeamento de tabelas utilizando o Eloquent ORM.
+*   **`Observers/`**: Eventos Eloquent que interceptam ações do ciclo de vida dos modelos para automações colaterais (ex: logs de auditoria).
+*   **`Providers/`**: Inicializadores e registradores de serviços do framework.
+*   **`Repositories/`**: Encapsulam consultas e lógica de leitura de dados, desacoplando o controller do acesso direto à query builders complexos.
+*   **`Services/`**: Agrupam serviços de infraestrutura ou lógicas transversais que não pertencem a uma única entidade (ex: geração de gráficos e relatórios).
+*   **`ValueObjects/`**: Objetos de valor imutáveis que garantem consistência e integridade a um dado (ex: `Cpf`).
+*   **`ViewModels/`**: Preparam e transformam dados estruturados especificamente para as telas do React (Inertia), aliviando lógica de mapeamento dos controllers.
+
+### Módulos de Negócio (Organização Interna)
+
+Para facilitar a manutenibilidade e escalabilidade do código, todas as pastas técnicas listadas acima dividem seus arquivos internamente nos seguintes **módulos**:
+
+1.  **`Catalogo`**: Gerenciamento de Pacotes de Viagem, Álbuns de Fotos e Tags.
+2.  **`Comercial`**: Fluxos de Compra, Ofertas, Carrinho, Checkout e Avaliações de usuários.
+3.  **`Geografia`**: Estrutura territorial com Regiões, Estados e Cidades (populadas via IBGE).
+4.  **`Hospedagem`**: Gestão de Hotéis e Transportes.
+5.  **`Identidade`**: Usuários, Perfis, Controle de Acesso (Roles e Permissões).
+6.  **`Shared`**: Componentes e utilitários transversais consumidos por múltiplos módulos.
+
+---
+
 ## 🚀 Guia de Início Rápido
 
 Siga os passos abaixo para configurar o projeto em seu ambiente local.

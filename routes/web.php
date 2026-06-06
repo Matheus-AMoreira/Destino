@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 // Rotas Públicas (Home, Busca, Detalhes, Autenticação de Convidados, etc.)
 require __DIR__.'/public.php';
 
