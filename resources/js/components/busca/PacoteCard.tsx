@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Banknote, LocateFixed } from 'lucide-react';
-import { useRoute } from 'ziggy-js';
+import { detalhes as detalhesPacote } from '@/routes/pacote';
 import type { Pacote } from '@/types/Pacote';
 import Image from '../Image';
 
@@ -12,7 +12,6 @@ const formatarValor = (valor: number) => {
 };
 
 export default function PacoteCard({ pacote }: { pacote: Pacote }) {
-    const route = useRoute();
     const ofertaExibida = pacote.cheapest_active_offer || pacote.latest_offer;
     const destino =
         ofertaExibida?.hotel?.cidade?.nome || 'Destino Desconhecido';
@@ -51,7 +50,9 @@ export default function PacoteCard({ pacote }: { pacote: Pacote }) {
                     <div className="flex text-yellow-400">
                         {[...Array(5)].map((_, i) => (
                             <span key={i} className="text-sm">
-                                {i < Math.round(pacote.media_avaliacao ?? 0) ? '★' : '☆'}
+                                {i < Math.round(pacote.media_avaliacao ?? 0)
+                                    ? '★'
+                                    : '☆'}
                             </span>
                         ))}
                     </div>
@@ -60,7 +61,9 @@ export default function PacoteCard({ pacote }: { pacote: Pacote }) {
                             ({(Number(pacote.media_avaliacao) || 0).toFixed(1)})
                         </span>
                     ) : (
-                        <span className="text-xs font-semibold text-gray-400">Sem avaliações</span>
+                        <span className="text-xs font-semibold text-gray-400">
+                            Sem avaliações
+                        </span>
                     )}
                 </div>
                 <p className="mb-2 flex items-center text-sm text-gray-500">
@@ -96,7 +99,7 @@ export default function PacoteCard({ pacote }: { pacote: Pacote }) {
                         )}
                     </div>
                     <Link
-                        href={route('pacote.detalhes', { nome: pacote.nome })}
+                        href={detalhesPacote({ nome: pacote.nome }).url}
                         className="mt-2 block w-full rounded-lg bg-blue-50 py-2 text-center text-sm font-bold text-blue-600 hover:bg-blue-100"
                     >
                         Detalhes

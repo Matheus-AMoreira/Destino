@@ -1,28 +1,31 @@
-import { Head, Link, useForm, router } from '@inertiajs/react';
-import { 
+import { Head, Link } from '@inertiajs/react';
+import {
     AlertCircle,
+    ArrowRight,
     CheckCircle,
     Clock,
-    Eye, 
+    Eye,
     Filter,
+    Lock,
     Plus,
     Search,
-    User as UserIcon,
-    ArrowRight,
+    Send,
     Shield,
     Trash2,
-    Lock,
     Unlock,
-    Send,
     UserCheck,
-    Users
+    User as UserIcon,
+    Users,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import type { ModalData } from '@/components/Modal';
 import CustomModal from '@/components/Modal';
 import AdminLayout from '@/layouts/AdminLayout';
-import type { Auth, User, Role, PermissionType } from '@/types/auth';
-import { useRoute } from 'ziggy-js';
+import type { Auth, PermissionType, Role, User } from '@/types/auth';
+import { useUsuarioList } from '@/services/identidade/usuarioService';
+import {
+    create as createUsuario,
+    edit as editUsuario,
+} from '@/routes/administracao/usuario';
 
 interface UsuariosPaginados {
     data: User[];
@@ -45,57 +48,25 @@ interface Props {
     canCreateStaff: boolean;
 }
 
-export default function Listar({ usuarios, filters, auth, canViewStaff, canCreateStaff }: Props) {
-    const route = useRoute();
-    const [termo, setTermo] = useState(filters.termo || '');
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.get(route('administracao.usuario.index'), { 
-            termo, 
-            tab: filters.tab 
-        }, { preserveState: true });
-    };
-
-    const handleTabChange = (newTab: string) => {
-        router.get(route('administracao.usuario.index'), { 
-            termo, 
-            tab: newTab 
-        }, { preserveState: true });
-    };
-
-    const handleResendInvitation = (id: string) => {
-        router.post(route('administracao.usuario.resend-invitation', { user: id }), {}, {
-            onSuccess: () => setModal({ show: true, mensagem: 'Novo convite enviado!', url: null })
-        });
-    };
-
-    const handleToggleBlock = (id: string, currentStatus: boolean) => {
-        router.patch(route('administracao.usuario.update-status', { id }), {
-            is_valid: !currentStatus
-        }, {
-            onSuccess: () => setModal({ show: true, mensagem: 'Status do usuário atualizado.', url: null })
-        });
-    };
-
-    const handleAprovar = (id: string) => {
-        router.patch(route('administracao.usuario.update-status', { id }), {
-            is_valid: true
-        }, {
-            onSuccess: () => setModal({ show: true, mensagem: 'Usuário aprovado com sucesso!', url: null })
-        });
-    };
-
-    const handleDelete = (id: string) => {
-        router.delete(route('administracao.usuario.destroy', { id }), {
-            onSuccess: () => setModal({ show: true, mensagem: 'Usuário removido.', url: null })
-        });
-    };
+export default function Listar({
+    usuarios,
+    filters,
+    auth,
+    canViewStaff,
+    canCreateStaff,
+}: Props) {
+    const {
+        termo,
+        setTermo,
+        modal,
+        setModal,
+        handleSearch,
+        handleTabChange,
+        handleResendInvitation,
+        handleToggleBlock,
+        handleAprovar,
+        handleDelete,
+    } = useUsuarioList(filters.termo, filters.tab);
 
     return (
         <AdminLayout title="Gerenciar Usuários">
@@ -106,12 +77,14 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                     <div className="bg-blue-600 p-2 rounded-lg text-white shadow-lg shadow-blue-200">
                         <Users size={24} />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Gerenciar Usuários</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Gerenciar Usuários
+                    </h1>
                 </div>
 
                 {canCreateStaff && (
                     <Link
-                        href={route('administracao.usuario.create')}
+                        href={createUsuario().url}
                         className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg active:scale-95"
                     >
                         <Plus size={18} />
@@ -126,8 +99,8 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                     <button
                         onClick={() => handleTabChange('funcionarios')}
                         className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${
-                            filters.tab === 'funcionarios' 
-                                ? 'border-blue-600 text-blue-600' 
+                            filters.tab === 'funcionarios'
+                                ? 'border-blue-600 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                     >
@@ -137,8 +110,8 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                 <button
                     onClick={() => handleTabChange('clientes')}
                     className={`px-6 py-3 text-sm font-bold transition-all border-b-2 ${
-                        filters.tab === 'clientes' 
-                            ? 'border-blue-600 text-blue-600' 
+                        filters.tab === 'clientes'
+                            ? 'border-blue-600 text-blue-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                     }`}
                 >
@@ -148,8 +121,14 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
 
             {/* Barra de Filtros */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                <form onSubmit={handleSearch} className="relative w-full sm:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <form
+                    onSubmit={handleSearch}
+                    className="relative w-full sm:w-96"
+                >
+                    <Search
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={18}
+                    />
                     <input
                         type="text"
                         placeholder="Buscar por nome, e-mail ou CPF..."
@@ -158,9 +137,10 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                         className="w-full rounded-lg border-gray-200 pl-10 pr-4 py-2 text-sm focus:border-blue-500 focus:ring-blue-500"
                     />
                 </form>
-                
+
                 <div className="text-xs text-gray-400 font-medium">
-                    Exibindo {usuarios.data.length} de {usuarios.total} registros
+                    Exibindo {usuarios.data.length} de {usuarios.total}{' '}
+                    registros
                 </div>
             </div>
 
@@ -169,16 +149,27 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-gray-100 bg-gray-50/50 text-left">
-                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Usuário</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cargo</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ações</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Usuário
+                                </th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Cargo
+                                </th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Ações
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {usuarios.data.length > 0 ? (
                                 usuarios.data.map((usuario) => (
-                                    <tr key={usuario.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr
+                                        key={usuario.id}
+                                        className="hover:bg-gray-50/50 transition-colors group"
+                                    >
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-sm border border-blue-100">
@@ -186,41 +177,63 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                        {usuario.nome} {usuario.sobre_nome}
+                                                        {usuario.nome}{' '}
+                                                        {usuario.sobre_nome}
                                                     </p>
-                                                    <p className="text-xs text-gray-500">{usuario.email}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {usuario.email}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border ${
-                                                usuario.role?.name === 'ADMINISTRADOR' 
-                                                    ? 'bg-purple-50 text-purple-700 border-purple-100' 
-                                                    : 'bg-blue-50 text-blue-700 border-blue-100'
-                                            }`}>
-                                                {usuario.role?.name || 'Cliente'}
+                                            <span
+                                                className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase border ${
+                                                    usuario.role?.name ===
+                                                    'ADMINISTRADOR'
+                                                        ? 'bg-purple-50 text-purple-700 border-purple-100'
+                                                        : 'bg-blue-50 text-blue-700 border-blue-100'
+                                                }`}
+                                            >
+                                                {usuario.role?.name ||
+                                                    'Cliente'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {usuario.is_valid ? (
                                                 <div className="flex items-center gap-1.5 text-green-600">
                                                     <CheckCircle size={14} />
-                                                    <span className="text-[10px] font-bold uppercase">Ativo</span>
+                                                    <span className="text-[10px] font-bold uppercase">
+                                                        Ativo
+                                                    </span>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-amber-500">
                                                     <AlertCircle size={14} />
-                                                    <span className="text-[10px] font-bold uppercase">Pendente</span>
+                                                    <span className="text-[10px] font-bold uppercase">
+                                                        Pendente
+                                                    </span>
                                                 </div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Link
-                                                    href={route('administracao.usuario.edit', { 
-                                                        id: usuario.id,
-                                                        nome: `${usuario.nome}-${usuario.sobre_nome || ''}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-                                                    })}
+                                                    href={
+                                                        editUsuario({
+                                                            id: usuario.id,
+                                                            nome: `${usuario.nome}-${usuario.sobre_nome || ''}`
+                                                                .toLowerCase()
+                                                                .replace(
+                                                                    /[^a-z0-9]+/g,
+                                                                    '-',
+                                                                )
+                                                                .replace(
+                                                                    /(^-|-$)/g,
+                                                                    '',
+                                                                ),
+                                                        }).url
+                                                    }
                                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                                                     title="Ver Detalhes"
                                                 >
@@ -228,43 +241,74 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                                                 </Link>
 
                                                 {/* Botões contextuais baseados no status e papel */}
-                                                {!usuario.is_valid && usuario.role?.is_staff && (
-                                                    <button
-                                                        onClick={() => handleResendInvitation(usuario.id)}
-                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-gray-100"
-                                                        title="Reenviar Convite"
-                                                    >
-                                                        <Send size={16} />
-                                                    </button>
-                                                )}
+                                                {!usuario.is_valid &&
+                                                    usuario.role?.is_staff && (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleResendInvitation(
+                                                                    usuario.id,
+                                                                )
+                                                            }
+                                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-gray-100"
+                                                            title="Reenviar Convite"
+                                                        >
+                                                            <Send size={16} />
+                                                        </button>
+                                                    )}
 
-                                                {!usuario.is_valid && !usuario.role?.is_staff && (
-                                                    <button
-                                                        onClick={() => handleAprovar(usuario.id)}
-                                                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-gray-100"
-                                                        title="Validar Conta"
-                                                    >
-                                                        <UserCheck size={16} />
-                                                    </button>
-                                                )}
-                                                
+                                                {!usuario.is_valid &&
+                                                    !usuario.role?.is_staff && (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleAprovar(
+                                                                    usuario.id,
+                                                                )
+                                                            }
+                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-gray-100"
+                                                            title="Validar Conta"
+                                                        >
+                                                            <UserCheck
+                                                                size={16}
+                                                            />
+                                                        </button>
+                                                    )}
+
                                                 <button
-                                                    onClick={() => handleToggleBlock(usuario.id, usuario.is_valid)}
+                                                    onClick={() =>
+                                                        handleToggleBlock(
+                                                            usuario.id,
+                                                            usuario.is_valid,
+                                                        )
+                                                    }
                                                     className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors border border-gray-100"
-                                                    title={usuario.is_valid ? 'Suspender' : 'Liberar'}
+                                                    title={
+                                                        usuario.is_valid
+                                                            ? 'Suspender'
+                                                            : 'Liberar'
+                                                    }
                                                 >
-                                                    {usuario.is_valid ? <Lock size={16} /> : <Unlock size={16} />}
+                                                    {usuario.is_valid ? (
+                                                        <Lock size={16} />
+                                                    ) : (
+                                                        <Unlock size={16} />
+                                                    )}
                                                 </button>
 
                                                 {!usuario.role?.is_staff && (
                                                     <button
-                                                        onClick={() => setModal({
-                                                            show: true,
-                                                            mensagem: 'Tem certeza que deseja excluir este cliente?',
-                                                            url: null,
-                                                            method: 'DELETE',
-                                                            action: () => handleDelete(usuario.id)
-                                                        })}
+                                                        onClick={() =>
+                                                            setModal({
+                                                                show: true,
+                                                                mensagem:
+                                                                    'Tem certeza que deseja excluir este cliente?',
+                                                                url: null,
+                                                                method: 'DELETE',
+                                                                action: () =>
+                                                                    handleDelete(
+                                                                        usuario.id,
+                                                                    ),
+                                                            })
+                                                        }
                                                         className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                         title="Excluir"
                                                     >
@@ -277,11 +321,28 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center">
+                                    <td
+                                        colSpan={4}
+                                        className="px-6 py-12 text-center"
+                                    >
                                         <div className="flex flex-col items-center gap-2 text-gray-400">
-                                            <Search size={48} className="opacity-20" />
-                                            <p className="text-sm font-medium">Nenhum {filters.tab === 'funcionarios' ? 'funcionário' : 'cliente'} encontrado.</p>
-                                            {termo && <p className="text-xs">Tente mudar o termo da busca: "{termo}"</p>}
+                                            <Search
+                                                size={48}
+                                                className="opacity-20"
+                                            />
+                                            <p className="text-sm font-medium">
+                                                Nenhum{' '}
+                                                {filters.tab === 'funcionarios'
+                                                    ? 'funcionário'
+                                                    : 'cliente'}{' '}
+                                                encontrado.
+                                            </p>
+                                            {termo && (
+                                                <p className="text-xs">
+                                                    Tente mudar o termo da
+                                                    busca: "{termo}"
+                                                </p>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -298,10 +359,12 @@ export default function Listar({ usuarios, filters, auth, canViewStaff, canCreat
                                 <Link
                                     key={i}
                                     href={link.url || '#'}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: link.label,
+                                    }}
                                     className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
-                                        link.active 
-                                            ? 'bg-blue-600 text-white' 
+                                        link.active
+                                            ? 'bg-blue-600 text-white'
                                             : 'bg-white text-gray-500 border border-gray-200 hover:border-blue-300'
                                     } ${!link.url && 'opacity-50 cursor-not-allowed'}`}
                                 />

@@ -1,145 +1,43 @@
-import GuestLayout from '@/layouts/GuestLayout';
-import { useForm, usePage } from '@inertiajs/react';
-import { 
-    User as UserIcon, 
-    Mail, 
-    CreditCard, 
-    Lock, 
-    Save, 
-    ShieldCheck, 
+import {
     AlertCircle,
-    Phone as PhoneIcon,
+    CreditCard,
     Eye,
-    EyeOff
+    EyeOff,
+    Lock,
+    Mail,
+    Phone as PhoneIcon,
+    Save,
+    ShieldCheck,
+    User as UserIcon,
 } from 'lucide-react';
-import React, { FormEventHandler, useState, useEffect } from 'react';
+import { useState } from 'react';
 import RequisitosSenha from '@/components/auth/RequisitosSenha';
-import CustomModal, { ModalData } from '@/components/Modal';
-import { formatarCPF, formatarTelefone, limparNaoNumericos, mascararCPF } from '@/lib/masks';
-import { schemaPerfil, schemaSenha } from '@/lib/schemas';
+import CustomModal from '@/components/Modal';
+import GuestLayout from '@/layouts/GuestLayout';
+import { usePerfil, useSenha } from '@/services/identidade/perfilService';
 
 interface Props {
     user: any;
 }
 
 export default function Editar({ user }: Props) {
-    if (!user) return null;
-
     const [activeTab, setActiveTab] = useState<'info' | 'password'>('info');
-    const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
-    const [showFullCpf, setShowFullCpf] = useState(false);
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
 
-    const profileForm = useForm({
-        nome: user.nome,
-        sobre_nome: user.sobre_nome,
-        email: user.email,
-        cpf: user.cpf || '',
-        telefone: user.telefone || '',
-    });
+    const perfil = usePerfil(user);
+    const senha = useSenha();
 
-    const passwordForm = useForm({
-        current_password: '',
-        password: '',
-        password_confirmation: '',
-    });
-
-    useEffect(() => {
-        profileForm.transform((data) => ({
-            ...data,
-            cpf: limparNaoNumericos(data.cpf),
-            telefone: limparNaoNumericos(data.telefone)
-        }));
-    }, [profileForm.data.cpf, profileForm.data.telefone]);
-
-    const handleProfileChange = (campo: string, valor: string) => {
-        const rawValue = limparNaoNumericos(valor);
-        if (campo === 'cpf') {
-            profileForm.setData('cpf', rawValue.substring(0, 11));
-        } else if (campo === 'telefone') {
-            profileForm.setData('telefone', rawValue.substring(0, 11));
-        } else {
-            profileForm.setData(campo as any, valor);
-        }
-    };
-
-    const submitProfile: FormEventHandler = (e) => {
-        e.preventDefault();
-        
-        const result = schemaPerfil.safeParse(profileForm.data);
-        if (!result.success) {
-            const errs: Record<string, string> = {};
-            result.error.issues.forEach(issue => {
-                if (issue.path[0]) errs[issue.path[0].toString()] = issue.message;
-            });
-            setZodErrors(errs);
-            return;
-        }
-
-        setZodErrors({});
-        profileForm.put(route('user.profile.update'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                setModal({
-                    show: true,
-                    mensagem: 'Perfil atualizado com sucesso!',
-                    url: null,
-                });
-            },
-            onError: (err) => {
-                setModal({
-                    show: true,
-                    mensagem: Object.values(err).join('\n'),
-                    url: null,
-                });
-            },
-        });
-    };
-
-    const submitPassword: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        const result = schemaSenha.safeParse(passwordForm.data);
-        if (!result.success) {
-            const errs: Record<string, string> = {};
-            result.error.issues.forEach(issue => {
-                if (issue.path[0]) errs[issue.path[0].toString()] = issue.message;
-            });
-            setZodErrors(errs);
-            return;
-        }
-
-        setZodErrors({});
-        passwordForm.put(route('user.profile.password'), {
-            preserveScroll: true,
-            onSuccess: () => {
-                passwordForm.reset();
-                setModal({
-                    show: true,
-                    mensagem: 'Senha alterada com sucesso!',
-                    url: null,
-                });
-            },
-            onError: (err) => {
-                setModal({
-                    show: true,
-                    mensagem: Object.values(err).join('\n'),
-                    url: null,
-                });
-            },
-        });
-    };
+    if (!user) return null;
 
     return (
         <GuestLayout title="Meu Perfil">
             <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-12">
                 <div className="mb-10 text-center">
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Configurações de Perfil</h1>
-                    <p className="text-gray-500 mt-2 font-medium">Gerencie suas informações pessoais e segurança da conta.</p>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">
+                        Configurações de Perfil
+                    </h1>
+                    <p className="text-gray-500 mt-2 font-medium">
+                        Gerencie suas informações pessoais e segurança da conta.
+                    </p>
                 </div>
 
                 <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-blue-100/50 border border-gray-100 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
@@ -149,8 +47,8 @@ export default function Editar({ user }: Props) {
                             <button
                                 onClick={() => setActiveTab('info')}
                                 className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${
-                                    activeTab === 'info' 
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                    activeTab === 'info'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                         : 'text-gray-500 hover:bg-white hover:text-blue-600'
                                 }`}
                             >
@@ -160,8 +58,8 @@ export default function Editar({ user }: Props) {
                             <button
                                 onClick={() => setActiveTab('password')}
                                 className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all ${
-                                    activeTab === 'password' 
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                    activeTab === 'password'
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
                                         : 'text-gray-500 hover:bg-white hover:text-blue-600'
                                 }`}
                             >
@@ -172,9 +70,16 @@ export default function Editar({ user }: Props) {
 
                         <div className="mt-auto pt-10 px-4">
                             <div className="bg-blue-50/50 p-6 rounded-3xl border border-blue-100/50">
-                                <ShieldCheck className="text-blue-600 mb-2" size={24} />
-                                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Status da Conta</p>
-                                <p className="text-sm font-bold text-blue-900 mt-1">Conta Verificada</p>
+                                <ShieldCheck
+                                    className="text-blue-600 mb-2"
+                                    size={24}
+                                />
+                                <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">
+                                    Status da Conta
+                                </p>
+                                <p className="text-sm font-bold text-blue-900 mt-1">
+                                    Conta Verificada
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -182,112 +87,187 @@ export default function Editar({ user }: Props) {
                     {/* Content Area */}
                     <div className="flex-1 p-8 lg:p-12">
                         {activeTab === 'info' ? (
-                            <form onSubmit={submitProfile} className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                            <form
+                                onSubmit={perfil.submit}
+                                className="space-y-8 animate-in fade-in slide-in-from-bottom-4"
+                            >
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Nome */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Nome</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            Nome
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                                 <UserIcon size={18} />
                                             </div>
                                             <input
                                                 type="text"
-                                                value={profileForm.data.nome}
-                                                onChange={e => handleProfileChange('nome', e.target.value)}
+                                                value={perfil.form.data.nome}
+                                                onChange={(e) =>
+                                                    perfil.handleChange(
+                                                        'nome',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="Seu nome"
                                             />
                                         </div>
-                                        {(zodErrors.nome || profileForm.errors.nome) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.nome || profileForm.errors.nome}</p>}
+                                        {(perfil.zodErrors.nome ||
+                                            perfil.form.errors.nome) && (
+                                            <p className="text-red-500 text-xs font-bold ml-4">
+                                                {perfil.zodErrors.nome ||
+                                                    perfil.form.errors.nome}
+                                            </p>
+                                        )}
                                     </div>
 
+                                    {/* Sobrenome */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Sobrenome</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            Sobrenome
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                                 <UserIcon size={18} />
                                             </div>
                                             <input
                                                 type="text"
-                                                value={profileForm.data.sobre_nome}
-                                                onChange={e => handleProfileChange('sobre_nome', e.target.value)}
+                                                value={
+                                                    perfil.form.data.sobre_nome
+                                                }
+                                                onChange={(e) =>
+                                                    perfil.handleChange(
+                                                        'sobre_nome',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="Seu sobrenome"
                                             />
                                         </div>
-                                        {(zodErrors.sobre_nome || profileForm.errors.sobre_nome) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.sobre_nome || profileForm.errors.sobre_nome}</p>}
+                                        {(perfil.zodErrors.sobre_nome ||
+                                            perfil.form.errors.sobre_nome) && (
+                                            <p className="text-red-500 text-xs font-bold ml-4">
+                                                {perfil.zodErrors.sobre_nome ||
+                                                    perfil.form.errors
+                                                        .sobre_nome}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
+                                {/* E-mail */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">E-mail de Contato</label>
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                        E-mail de Contato
+                                    </label>
                                     <div className="relative group">
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                             <Mail size={18} />
                                         </div>
                                         <input
                                             type="email"
-                                            value={profileForm.data.email}
-                                            onChange={e => profileForm.setData('email', e.target.value)}
+                                            value={perfil.form.data.email}
+                                            onChange={(e) =>
+                                                perfil.form.setData(
+                                                    'email',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                             placeholder="seu@email.com"
                                         />
                                     </div>
-                                    {(zodErrors.email || profileForm.errors.email) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.email || profileForm.errors.email}</p>}
+                                    {(perfil.zodErrors.email ||
+                                        perfil.form.errors.email) && (
+                                        <p className="text-red-500 text-xs font-bold ml-4">
+                                            {perfil.zodErrors.email ||
+                                                perfil.form.errors.email}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* CPF */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">CPF</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            CPF
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                                 <CreditCard size={18} />
                                             </div>
                                             <input
                                                 type="text"
-                                                value={showFullCpf ? formatarCPF(profileForm.data.cpf) : mascararCPF(profileForm.data.cpf)}
+                                                value={perfil.cpfFormatado}
                                                 className="w-full pl-12 pr-14 py-4 bg-gray-50 border-2 border-transparent rounded-2xl font-bold text-gray-900 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all"
                                                 readOnly
                                             />
                                             <button
                                                 type="button"
-                                                onClick={() => setShowFullCpf(!showFullCpf)}
+                                                onClick={() =>
+                                                    perfil.setShowFullCpf(
+                                                        !perfil.showFullCpf,
+                                                    )
+                                                }
                                                 className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                                                title={showFullCpf ? "Esconder" : "Mostrar"}
+                                                title={
+                                                    perfil.showFullCpf
+                                                        ? 'Esconder'
+                                                        : 'Mostrar'
+                                                }
                                             >
-                                                {showFullCpf ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                {perfil.showFullCpf ? (
+                                                    <EyeOff size={18} />
+                                                ) : (
+                                                    <Eye size={18} />
+                                                )}
                                             </button>
                                         </div>
                                     </div>
 
+                                    {/* Telefone */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Telefone</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            Telefone
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                                 <PhoneIcon size={18} />
                                             </div>
                                             <input
                                                 type="text"
-                                                value={formatarTelefone(profileForm.data.telefone)}
-                                                onChange={e => handleProfileChange('telefone', e.target.value)}
+                                                value={perfil.telefoneFormatado}
+                                                onChange={(e) =>
+                                                    perfil.handleChange(
+                                                        'telefone',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="(00) 00000-0000"
                                             />
                                         </div>
-                                        {(zodErrors.telefone || profileForm.errors.telefone) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.telefone || profileForm.errors.telefone}</p>}
+                                        {(perfil.zodErrors.telefone ||
+                                            perfil.form.errors.telefone) && (
+                                            <p className="text-red-500 text-xs font-bold ml-4">
+                                                {perfil.zodErrors.telefone ||
+                                                    perfil.form.errors.telefone}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
                                 <button
                                     type="submit"
-                                    disabled={profileForm.processing}
-                                    // Adicionado flex e items-center para garantir que o spinner também fique centralizado se aparecer
+                                    disabled={perfil.form.processing}
                                     className="flex items-center justify-center rounded-lg bg-[#2071b3] w-113 px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    {profileForm.processing ? (
+                                    {perfil.form.processing ? (
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                     ) : (
-                                        // Substituído <> por <span className="flex items-center gap-2">
                                         <span className="flex items-center gap-2">
                                             <Save size={18} />
                                             <span>Salvar Alterações</span>
@@ -296,85 +276,147 @@ export default function Editar({ user }: Props) {
                                 </button>
                             </form>
                         ) : (
-                            <form onSubmit={submitPassword} className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                            <form
+                                onSubmit={senha.submit}
+                                className="space-y-8 animate-in fade-in slide-in-from-bottom-4"
+                            >
                                 <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl flex items-start gap-4 mb-8">
-                                    <AlertCircle className="text-amber-500 flex-shrink-0" size={24} />
+                                    <AlertCircle
+                                        className="text-amber-500 flex-shrink-0"
+                                        size={24}
+                                    />
                                     <div>
-                                        <p className="text-amber-900 font-bold text-sm">Mudança de Senha</p>
+                                        <p className="text-amber-900 font-bold text-sm">
+                                            Mudança de Senha
+                                        </p>
                                         <p className="text-amber-700 text-xs mt-1 font-medium leading-relaxed">
-                                            Sua nova senha deve seguir os requisitos de segurança da plataforma. Você precisará confirmar sua senha atual para realizar esta alteração.
+                                            Sua nova senha deve seguir os
+                                            requisitos de segurança da
+                                            plataforma. Você precisará confirmar
+                                            sua senha atual para realizar esta
+                                            alteração.
                                         </p>
                                     </div>
                                 </div>
 
+                                {/* Senha Atual */}
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Senha Atual</label>
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                        Senha Atual
+                                    </label>
                                     <div className="relative group">
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                             <Lock size={18} />
                                         </div>
                                         <input
                                             type="password"
-                                            value={passwordForm.data.current_password}
-                                            onChange={e => passwordForm.setData('current_password', e.target.value)}
+                                            value={
+                                                senha.form.data.current_password
+                                            }
+                                            onChange={(e) =>
+                                                senha.form.setData(
+                                                    'current_password',
+                                                    e.target.value,
+                                                )
+                                            }
                                             className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                             placeholder="••••••••"
                                         />
                                     </div>
-                                    {(zodErrors.current_password || passwordForm.errors.current_password) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.current_password || passwordForm.errors.current_password}</p>}
+                                    {(senha.zodErrors.current_password ||
+                                        senha.form.errors.current_password) && (
+                                        <p className="text-red-500 text-xs font-bold ml-4">
+                                            {senha.zodErrors.current_password ||
+                                                senha.form.errors
+                                                    .current_password}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Nova Senha */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Nova Senha</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            Nova Senha
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                                 <Lock size={18} />
                                             </div>
                                             <input
                                                 type="password"
-                                                value={passwordForm.data.password}
-                                                onChange={e => passwordForm.setData('password', e.target.value)}
+                                                value={senha.form.data.password}
+                                                onChange={(e) =>
+                                                    senha.form.setData(
+                                                        'password',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="••••••••"
                                             />
                                         </div>
-                                        {(zodErrors.password || passwordForm.errors.password) && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.password || passwordForm.errors.password}</p>}
-                                        <RequisitosSenha senha={passwordForm.data.password} />
+                                        {(senha.zodErrors.password ||
+                                            senha.form.errors.password) && (
+                                            <p className="text-red-500 text-xs font-bold ml-4">
+                                                {senha.zodErrors.password ||
+                                                    senha.form.errors.password}
+                                            </p>
+                                        )}
+                                        <RequisitosSenha
+                                            senha={senha.form.data.password}
+                                        />
                                     </div>
 
+                                    {/* Confirmar Senha */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">Confirmar Nova Senha</label>
+                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-4">
+                                            Confirmar Nova Senha
+                                        </label>
                                         <div className="relative group">
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
                                                 <Lock size={18} />
                                             </div>
                                             <input
                                                 type="password"
-                                                value={passwordForm.data.password_confirmation}
-                                                onChange={e => passwordForm.setData('password_confirmation', e.target.value)}
+                                                value={
+                                                    senha.form.data
+                                                        .password_confirmation
+                                                }
+                                                onChange={(e) =>
+                                                    senha.form.setData(
+                                                        'password_confirmation',
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 className="w-full pl-12 pr-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-900"
                                                 placeholder="••••••••"
                                             />
                                         </div>
-                                        {zodErrors.password_confirmation && <p className="text-red-500 text-xs font-bold ml-4">{zodErrors.password_confirmation}</p>}
+                                        {senha.zodErrors
+                                            .password_confirmation && (
+                                            <p className="text-red-500 text-xs font-bold ml-4">
+                                                {
+                                                    senha.zodErrors
+                                                        .password_confirmation
+                                                }
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
                                 <button
                                     type="submit"
-                                    disabled={passwordForm.processing}
+                                    disabled={senha.form.processing}
                                     className="flex items-center justify-center rounded-lg bg-[#2071b3] w-113 px-10 py-4 text-lg font-bold text-white shadow-2xl transition duration-300 hover:scale-105 hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    {passwordForm.processing ? (
+                                    {senha.form.processing ? (
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                     ) : (
-                                        <>
-                                            <span className="flex items-center gap-2">
-                                                <Lock size={18} />
-                                                <span>Atualizar Senha</span>
-                                            </span>
-                                        </>
+                                        <span className="flex items-center gap-2">
+                                            <Lock size={18} />
+                                            <span>Atualizar Senha</span>
+                                        </span>
                                     )}
                                 </button>
                             </form>
@@ -382,7 +424,9 @@ export default function Editar({ user }: Props) {
                     </div>
                 </div>
             </div>
-            <CustomModal modalData={modal} setModal={setModal} />
+
+            <CustomModal modalData={perfil.modal} setModal={perfil.setModal} />
+            <CustomModal modalData={senha.modal} setModal={senha.setModal} />
         </GuestLayout>
     );
 }

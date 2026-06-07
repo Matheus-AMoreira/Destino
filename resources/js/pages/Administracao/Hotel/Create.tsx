@@ -1,7 +1,9 @@
+import { Link } from '@inertiajs/react';
+import { Banknote, Building, MapPin, Save, X } from 'lucide-react';
+import React from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Link, useForm } from '@inertiajs/react';
-import { Hotel, Save, X, MapPin, Building, Banknote } from 'lucide-react';
-import React, { useMemo } from 'react';
+import { index as indexHotel } from '@/routes/administracao/hotel';
+import { useHotelForm } from '@/services/hospedagem/hotelService';
 
 interface Regiao {
     id: number;
@@ -28,112 +30,23 @@ interface Props {
 }
 
 export default function Create({ regioes, estados, cidades }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
-        nome: '',
-        endereco: '',
-        diaria: 0,
-        cidade_id: '' as string | number,
-        regiao_id: '' as string | number,
-        estado_id: '' as string | number,
-        cep: '',
-        cep_data: null as any,
-    });
+    const {
+        data,
+        setData,
+        processing,
+        errors,
+        isFetchingCep,
+        cepError,
+        filteredEstados,
+        filteredCidades,
+        handleCepChange,
+        handleSubmit,
+    } = useHotelForm(estados, cidades);
 
-    const [isFetchingCep, setIsFetchingCep] = React.useState(false);
-    const [cepError, setCepError] = React.useState('');
-
-    const filteredEstados = useMemo(() => {
-        if (!data.regiao_id) return [];
-        return estados.filter(e => e.regiao_id === Number(data.regiao_id));
-    }, [data.regiao_id, estados]);
-
-    const filteredCidades = useMemo(() => {
-        if (!data.estado_id) return [];
-        return cidades.filter(c => c.estado_id === Number(data.estado_id));
-    }, [data.estado_id, cidades]);
-
-    const handleCepChange = async (value: string) => {
-        const raw = value.replace(/\D/g, '');
-        let formatted = raw;
-        if (raw.length > 5) {
-            formatted = `${raw.slice(0, 5)}-${raw.slice(5, 8)}`;
-        }
-        setData(d => ({ ...d, cep: formatted }));
-        setCepError('');
-
-        if (raw.length === 8) {
-            setIsFetchingCep(true);
-            try {
-                const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${raw}`);
-                if (!response.ok) {
-                    throw new Error('CEP não encontrado');
-                }
-                const resData = await response.json();
-
-                const addressFields: any = {
-                    cep: formatted,
-                    cep_data: resData
-                };
-
-                let fullAddress = '';
-                if (resData.street) fullAddress += resData.street;
-                if (resData.neighborhood) {
-                    fullAddress += (fullAddress ? ' - ' : '') + resData.neighborhood;
-                }
-                if (fullAddress) {
-                    addressFields.endereco = fullAddress;
-                }
-
-                if (resData.state) {
-                    const matchedEstado = estados.find(
-                        e => e.sigla.toUpperCase() === resData.state.toUpperCase()
-                    );
-                    if (matchedEstado) {
-                        addressFields.regiao_id = matchedEstado.regiao_id;
-                        addressFields.estado_id = matchedEstado.id;
-
-                        if (resData.city) {
-                            const normalizeStr = (str: string) =>
-                                str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-                            const normalizedCityName = normalizeStr(resData.city);
-                            const matchedCidade = cidades.find(
-                                c => c.estado_id === matchedEstado.id && normalizeStr(c.nome) === normalizedCityName
-                            );
-                            if (matchedCidade) {
-                                addressFields.cidade_id = matchedCidade.id;
-                            } else {
-                                addressFields.cidade_id = '';
-                            }
-                        } else {
-                            addressFields.cidade_id = '';
-                        }
-                    } else {
-                        addressFields.regiao_id = '';
-                        addressFields.estado_id = '';
-                        addressFields.cidade_id = '';
-                    }
-                }
-
-                setData(d => ({
-                    ...d,
-                    ...addressFields
-                }));
-            } catch (err: any) {
-                setCepError(err.message || 'Erro ao buscar CEP');
-            } finally {
-                setIsFetchingCep(false);
-            }
-        }
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('administracao.hotel.store'));
-    };
-
-    const inputClasses = "mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none";
-    const labelClasses = "flex items-center gap-2 text-sm font-semibold text-gray-700";
+    const inputClasses =
+        'mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none';
+    const labelClasses =
+        'flex items-center gap-2 text-sm font-semibold text-gray-700';
 
     return (
         <AdminLayout title="Novo Hotel">
@@ -141,16 +54,21 @@ export default function Create({ regioes, estados, cidades }: Props) {
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link
-                             href={route('administracao.hotel.index')}
-                             className="rounded-lg bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
+                            href={indexHotel().url}
+                            className="rounded-lg bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
                         >
                             <X size={20} />
                         </Link>
-                        <h1 className="text-2xl font-bold text-gray-900">Cadastrar Novo Hotel</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Cadastrar Novo Hotel
+                        </h1>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100"
+                >
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div className="md:col-span-2">
                             <label className={labelClasses}>
@@ -160,11 +78,17 @@ export default function Create({ regioes, estados, cidades }: Props) {
                             <input
                                 type="text"
                                 value={data.nome}
-                                onChange={e => setData('nome', e.target.value)}
+                                onChange={(e) =>
+                                    setData('nome', e.target.value)
+                                }
                                 className={inputClasses}
                                 placeholder="Ex: Grand Hyatt Rio"
                             />
-                            {errors.nome && <p className="mt-1 text-xs text-red-500">{errors.nome}</p>}
+                            {errors.nome && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.nome}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -176,7 +100,9 @@ export default function Create({ regioes, estados, cidades }: Props) {
                                 <input
                                     type="text"
                                     value={data.cep}
-                                    onChange={e => handleCepChange(e.target.value)}
+                                    onChange={(e) =>
+                                        handleCepChange(e.target.value)
+                                    }
                                     className={inputClasses}
                                     placeholder="00000-000"
                                     maxLength={9}
@@ -187,8 +113,16 @@ export default function Create({ regioes, estados, cidades }: Props) {
                                     </span>
                                 )}
                             </div>
-                            {cepError && <p className="mt-1 text-xs text-red-500">{cepError}</p>}
-                            {errors.cep && <p className="mt-1 text-xs text-red-500">{errors.cep}</p>}
+                            {cepError && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {cepError}
+                                </p>
+                            )}
+                            {errors.cep && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.cep}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -199,12 +133,18 @@ export default function Create({ regioes, estados, cidades }: Props) {
                             <input
                                 type="number"
                                 value={data.diaria}
-                                onChange={e => setData('diaria', Number(e.target.value))}
+                                onChange={(e) =>
+                                    setData('diaria', Number(e.target.value))
+                                }
                                 className={inputClasses}
                                 min="0"
                                 step="1"
                             />
-                            {errors.diaria && <p className="mt-1 text-xs text-red-500">{errors.diaria}</p>}
+                            {errors.diaria && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.diaria}
+                                </p>
+                            )}
                         </div>
 
                         <div className="md:col-span-2">
@@ -215,71 +155,106 @@ export default function Create({ regioes, estados, cidades }: Props) {
                             <input
                                 type="text"
                                 value={data.endereco}
-                                onChange={e => setData('endereco', e.target.value)}
+                                onChange={(e) =>
+                                    setData('endereco', e.target.value)
+                                }
                                 className={inputClasses}
                                 placeholder="Av. Lucio Costa, 9600 - Barra da Tijuca"
                             />
-                            {errors.endereco && <p className="mt-1 text-xs text-red-500">{errors.endereco}</p>}
+                            {errors.endereco && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.endereco}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     <div className="border-t border-gray-100 pt-6">
-                        <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-gray-400">Localização</h3>
+                        <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-gray-400">
+                            Localização
+                        </h3>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                             <div>
-                                <label className="text-xs font-semibold text-gray-500">Região</label>
+                                <label className="text-xs font-semibold text-gray-500">
+                                    Região
+                                </label>
                                 <select
                                     value={data.regiao_id}
-                                    onChange={e => {
-                                        setData(d => ({ ...d, regiao_id: e.target.value, estado_id: '', cidade_id: '' }));
+                                    onChange={(e) => {
+                                        setData((d) => ({
+                                            ...d,
+                                            regiao_id: e.target.value,
+                                            estado_id: '',
+                                            cidade_id: '',
+                                        }));
                                     }}
                                     className={inputClasses}
                                 >
                                     <option value="">Selecione...</option>
-                                    {regioes.map(r => (
-                                        <option key={r.id} value={r.id}>{r.nome}</option>
+                                    {regioes.map((r) => (
+                                        <option key={r.id} value={r.id}>
+                                            {r.nome}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <label className="text-xs font-semibold text-gray-500">Estado</label>
+                                <label className="text-xs font-semibold text-gray-500">
+                                    Estado
+                                </label>
                                 <select
                                     value={data.estado_id}
-                                    onChange={e => {
-                                        setData(d => ({ ...d, estado_id: e.target.value, cidade_id: '' }));
+                                    onChange={(e) => {
+                                        setData((d) => ({
+                                            ...d,
+                                            estado_id: e.target.value,
+                                            cidade_id: '',
+                                        }));
                                     }}
                                     disabled={!data.regiao_id}
                                     className={`${inputClasses} disabled:bg-gray-50 disabled:text-gray-400`}
                                 >
                                     <option value="">Selecione...</option>
-                                    {filteredEstados.map(e => (
-                                        <option key={e.id} value={e.id}>{e.nome} ({e.sigla})</option>
+                                    {filteredEstados.map((e) => (
+                                        <option key={e.id} value={e.id}>
+                                            {e.nome} ({e.sigla})
+                                        </option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <label className="text-xs font-semibold text-gray-500">Cidade</label>
+                                <label className="text-xs font-semibold text-gray-500">
+                                    Cidade
+                                </label>
                                 <select
                                     value={data.cidade_id}
-                                    onChange={e => setData('cidade_id', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('cidade_id', e.target.value)
+                                    }
                                     disabled={!data.estado_id}
                                     className={`${inputClasses} disabled:bg-gray-50 disabled:text-gray-400`}
                                 >
                                     <option value="">Selecione...</option>
-                                    {filteredCidades.map(c => (
-                                        <option key={c.id} value={c.id}>{c.nome}</option>
+                                    {filteredCidades.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.nome}
+                                        </option>
                                     ))}
                                 </select>
-                                {errors.cidade_id && <p className="mt-1 text-xs text-red-500">{errors.cidade_id}</p>}
+                                {errors.cidade_id && (
+                                    <p className="mt-1 text-xs text-red-500">
+                                        {errors.cidade_id}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
                         <Link
-                            href={route('administracao.hotel.index')}
+                            href={indexHotel().url}
                             className="rounded-lg px-6 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                         >
                             Cancelar
@@ -290,7 +265,9 @@ export default function Create({ regioes, estados, cidades }: Props) {
                             className="flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-2 font-bold text-white shadow-lg transition-all hover:bg-blue-700 disabled:opacity-50"
                         >
                             <Save size={20} />
-                            <span>{processing ? 'Salvando...' : 'Salvar Hotel'}</span>
+                            <span>
+                                {processing ? 'Salvando...' : 'Salvar Hotel'}
+                            </span>
                         </button>
                     </div>
                 </form>

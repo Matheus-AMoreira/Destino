@@ -441,6 +441,29 @@ class AdminUsuarioController extends Controller
         return back()->with('success', 'Status atualizado com sucesso.');
     }
 
+    public function resendInvitation(string $id): RedirectResponse
+    {
+        $realId = Usuario::decryptId($id);
+        $usuario = $this->usuarioRepository->buscarPorId($realId);
+        if (!$usuario || !$usuario->role?->is_staff) {
+            abort(403, 'Ação não permitida.');
+        }
+
+        $plainPassword = \Illuminate\Support\Str::random(10);
+        $usuario->password = \Illuminate\Support\Facades\Hash::make($plainPassword);
+        $usuario->save();
+
+        // Registrar no log de auditoria
+        $this->auditService->logUserCreated(
+            $usuario->id,
+            "Nova senha temporária do funcionário '{$usuario->nome} {$usuario->sobre_nome}' gerada"
+        );
+
+        session()->flash('invitation_password', $plainPassword);
+
+        return back()->with('success', 'Nova senha temporária gerada e exibida com sucesso.');
+    }
+
     public function destroy(Request $request, string $id): RedirectResponse
     {
         $realId = Usuario::decryptId($id);

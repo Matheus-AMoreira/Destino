@@ -74,21 +74,21 @@ class AvaliacaoRepository
         $notaMedia = $avaliacoes->avg('nota') ?? 0.0;
         $quantidadeAvaliacoes = $avaliacoes->count();
 
-        $avaliacoesDTO = $avaliacoes->map(fn($av) => [
-            'id' => $av->id,
-            'nota' => $av->nota,
-            'comentario' => $av->comentario,
-            'user_id' => $av->user_id,
-            'nomeUsuario' => $av->usuario?->nome ?? 'Usuário',
-            'pacote_id' => $av->pacote_id,
-            'created_at' => $av->created_at ? $av->created_at->toISOString() : null,
-        ])->toArray();
+        $avaliacoesDTO = $avaliacoes->map(fn($av) => new \App\DTOs\Comercial\AvaliacaoDTO(
+            id: $av->id,
+            nota: $av->nota,
+            comentario: $av->comentario,
+            user_id: $av->user_id,
+            nomeUsuario: $av->usuario?->nome ?? 'Usuário',
+            pacote_id: $av->pacote_id,
+            created_at: $av->created_at ? $av->created_at->toISOString() : null,
+        ))->toArray();
 
-        return [
-            'notaMedia' => round($notaMedia, 1),
-            'quantidadeAvaliacoes' => $quantidadeAvaliacoes,
-            'avaliacoes' => $avaliacoesDTO,
-        ];
+        return (new \App\DTOs\Comercial\AvaliacaoPacoteDTO(
+            notaMedia: (float) round($notaMedia, 1),
+            quantidadeAvaliacoes: $quantidadeAvaliacoes,
+            avaliacoes: $avaliacoesDTO
+        ))->jsonSerialize();
     }
 }
 

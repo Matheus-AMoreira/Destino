@@ -1,9 +1,8 @@
 import { Trash2 } from 'lucide-react';
 import { formatarData } from '@/utils/dataUtils';
-import type { Avaliacao } from '@/types/Avaliacao';
 
 interface AvaliacaoItemProps {
-    avaliacao: Avaliacao;
+    avaliacao: App.DTOs.Comercial.AvaliacaoDTO;
     isOwner?: boolean;
     onEditar?: () => void;
     onDeletar?: () => void;
@@ -12,7 +11,6 @@ interface AvaliacaoItemProps {
 export default function AvaliacaoItem({
     avaliacao,
     isOwner = false,
-    onEditar,
     onDeletar,
 }: AvaliacaoItemProps) {
     const handleDelete = () => {
@@ -48,7 +46,9 @@ export default function AvaliacaoItem({
                         </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-1">
-                        {formatarData(avaliacao.created_at)}
+                        {avaliacao.created_at
+                            ? formatarData(avaliacao.created_at)
+                            : ''}
                     </p>
                 </div>
 
@@ -64,7 +64,9 @@ export default function AvaliacaoItem({
             </div>
 
             {avaliacao.comentario && (
-                <p className="text-gray-700 text-sm mt-3">{avaliacao.comentario}</p>
+                <p className="text-gray-700 text-sm mt-3">
+                    {avaliacao.comentario}
+                </p>
             )}
         </div>
     );

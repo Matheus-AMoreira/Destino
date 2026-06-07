@@ -152,106 +152,101 @@ export default function Buscar({
                     </div>
 
                     {/* Listagem */}
-                    <>
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-800">
-                                {paginacao.totalElements} Pacotes encontrados
-                            </h2>
-                            <span className="text-sm text-gray-500">
-                                Página {paginacao.page + 1} de{' '}
-                                {paginacao.totalPages}
-                            </span>
+                    <div className="mb-6 flex items-center justify-between">
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            {paginacao.totalElements} Pacotes encontrados
+                        </h2>
+                        <span className="text-sm text-gray-500">
+                            Página {paginacao.page + 1} de{' '}
+                            {paginacao.totalPages}
+                        </span>
+                    </div>
+
+                    {pacotes.length > 0 ? (
+                        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {pacotes.map((pacote) => (
+                                <PacoteCard key={pacote.id} pacote={pacote} />
+                            ))}
                         </div>
+                    ) : (
+                        <div className="rounded-xl border-2 border-dashed border-gray-200 py-16 text-center">
+                            <p className="text-lg text-gray-500">
+                                Nenhum pacote encontrado com estes filtros.
+                            </p>
+                        </div>
+                    )}
 
-                        {pacotes.length > 0 ? (
-                            <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {pacotes.map((pacote) => (
-                                    <PacoteCard
-                                        key={pacote.id}
-                                        pacote={pacote}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="rounded-xl border-2 border-dashed border-gray-200 py-16 text-center">
-                                <p className="text-lg text-gray-500">
-                                    Nenhum pacote encontrado com estes filtros.
-                                </p>
-                            </div>
-                        )}
+                    {/* Controles de Paginação */}
+                    {paginacao.totalPages > 1 && (
+                        <div className="mt-8 flex items-center justify-center gap-6">
+                            <button
+                                onClick={() =>
+                                    handleMudarPagina(paginacao.page - 1)
+                                }
+                                disabled={paginacao.page === 0}
+                                className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <ChevronLeft />
+                            </button>
 
-                        {/* Controles de Paginação */}
-                        {paginacao.totalPages > 1 && (
-                            <div className="mt-8 flex items-center justify-center gap-6">
-                                <button
-                                    onClick={() =>
-                                        handleMudarPagina(paginacao.page - 1)
-                                    }
-                                    disabled={paginacao.page === 0}
-                                    className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <ChevronLeft />
-                                </button>
+                            <div className="flex gap-2">
+                                {Array.from(
+                                    {
+                                        length: Math.min(
+                                            5,
+                                            paginacao.totalPages,
+                                        ),
+                                    },
+                                    (_, i) => {
+                                        let p = i;
 
-                                <div className="flex gap-2">
-                                    {Array.from(
-                                        {
-                                            length: Math.min(
-                                                5,
-                                                paginacao.totalPages,
-                                            ),
-                                        },
-                                        (_, i) => {
-                                            let p = i;
+                                        if (
+                                            paginacao.totalPages > 5 &&
+                                            paginacao.page > 2
+                                        ) {
+                                            p = paginacao.page - 2 + i;
 
-                                            if (
-                                                paginacao.totalPages > 5 &&
-                                                paginacao.page > 2
-                                            ) {
-                                                p = paginacao.page - 2 + i;
-
-                                                if (p >= paginacao.totalPages) {
-                                                    p = i;
-                                                }
+                                            if (p >= paginacao.totalPages) {
+                                                p = i;
                                             }
+                                        }
 
-                                            if (p < paginacao.totalPages) {
-                                                return (
-                                                    <button
-                                                        key={p}
-                                                        onClick={() =>
-                                                            handleMudarPagina(p)
-                                                        }
-                                                        className={`h-10 w-10 rounded-lg font-medium transition ${paginacao.page === p
+                                        if (p < paginacao.totalPages) {
+                                            return (
+                                                <button
+                                                    key={p}
+                                                    onClick={() =>
+                                                        handleMudarPagina(p)
+                                                    }
+                                                    className={`h-10 w-10 rounded-lg font-medium transition ${
+                                                        paginacao.page === p
                                                             ? 'bg-[#2071b3] text-white'
                                                             : 'bg-white text-gray-600 hover:bg-gray-100'
-                                                            }`}
-                                                    >
-                                                        {p + 1}
-                                                    </button>
-                                                );
-                                            }
+                                                    }`}
+                                                >
+                                                    {p + 1}
+                                                </button>
+                                            );
+                                        }
 
-                                            return null;
-                                        },
-                                    )}
-                                </div>
-
-                                <button
-                                    onClick={() =>
-                                        handleMudarPagina(paginacao.page + 1)
-                                    }
-                                    disabled={
-                                        paginacao.page ===
-                                        paginacao.totalPages - 1
-                                    }
-                                    className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <ChevronRight />
-                                </button>
+                                        return null;
+                                    },
+                                )}
                             </div>
-                        )}
-                    </>
+
+                            <button
+                                onClick={() =>
+                                    handleMudarPagina(paginacao.page + 1)
+                                }
+                                disabled={
+                                    paginacao.page === paginacao.totalPages - 1
+                                }
+                                className="rounded-full bg-white p-3 text-blue-600 shadow transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                <ChevronRight />
+                            </button>
+                        </div>
+                    )}
                 </main>
             </div>
         </GuestLayout>

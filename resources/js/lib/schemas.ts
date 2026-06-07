@@ -9,10 +9,21 @@ export const passwordRules = z
     .regex(/[@$!%*?&#\-_]/, 'Um caractere especial (@$!%*?&#-_) é obrigatório');
 
 export const userBaseSchema = {
-    nome: z.string().min(3, 'Mínimo 3 caracteres').regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
-    sobre_nome: z.string().min(3, 'Mínimo 3 caracteres').regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
+    nome: z
+        .string()
+        .min(3, 'Mínimo 3 caracteres')
+        .regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
+    sobre_nome: z
+        .string()
+        .min(3, 'Mínimo 3 caracteres')
+        .regex(/^[a-zA-ZÀ-ÖØ-öø-ÿ\s]*$/, 'Apenas letras'),
     cpf: z.string().length(11, 'CPF deve ter 11 dígitos'),
-    telefone: z.string().min(10, 'Telefone inválido').max(11, 'Telefone inválido').optional().or(z.literal('')),
+    telefone: z
+        .string()
+        .min(10, 'Telefone inválido')
+        .max(11, 'Telefone inválido')
+        .optional()
+        .or(z.literal('')),
     email: z.string().email('E-mail inválido'),
 };
 
@@ -34,28 +45,34 @@ export const schemaPerfil = z.object({
 export const schemaPerfilAdmin = z.object({
     nome: userBaseSchema.nome,
     sobre_nome: userBaseSchema.sobre_nome,
-    cpf: z.string().refine(val => val === '' || val.length === 11, { message: 'CPF deve ter 11 dígitos ou ficar vazio' }),
+    cpf: z.string().refine((val) => val === '' || val.length === 11, {
+        message: 'CPF deve ter 11 dígitos ou ficar vazio',
+    }),
     telefone: userBaseSchema.telefone,
     email: userBaseSchema.email,
 });
 
-export const schemaSenha = z.object({
-    current_password: z.string().min(1, 'Senha atual é obrigatória'),
-    password: passwordRules,
-    password_confirmation: z.string(),
-}).refine(data => data.password === data.password_confirmation, {
-    message: 'As senhas não coincidem',
-    path: ['password_confirmation']
-});
+export const schemaSenha = z
+    .object({
+        current_password: z.string().min(1, 'Senha atual é obrigatória'),
+        password: passwordRules,
+        password_confirmation: z.string(),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+        message: 'As senhas não coincidem',
+        path: ['password_confirmation'],
+    });
 
-export const schemaResetSenha = z.object({
-    email: z.string().email('E-mail inválido'),
-    password: passwordRules,
-    password_confirmation: z.string(),
-}).refine(data => data.password === data.password_confirmation, {
-    message: 'As senhas não coincidem',
-    path: ['password_confirmation']
-});
+export const schemaResetSenha = z
+    .object({
+        email: z.string().email('E-mail inválido'),
+        password: passwordRules,
+        password_confirmation: z.string(),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+        message: 'As senhas não coincidem',
+        path: ['password_confirmation'],
+    });
 
 export const schemaRegistrarStaff = z.object({
     ...userBaseSchema,

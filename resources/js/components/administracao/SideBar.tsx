@@ -1,35 +1,54 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Camera,
+    ChevronDown,
+    Hotel,
     LayoutDashboard,
     MapPinned,
-    Camera,
-    Hotel,
+    Tag,
     Truck,
     Users,
-    ChevronDown,
-    Tag,
 } from 'lucide-react';
 import { useState } from 'react';
+import { dashboard } from '@/routes/administracao';
+import { index as indexPacote } from '@/routes/administracao/pacote';
+import { index as indexPacoteFoto } from '@/routes/administracao/pacote-foto';
+import { index as indexHotel } from '@/routes/administracao/hotel';
+import { index as indexTransporte } from '@/routes/administracao/transporte';
+import { index as indexOferta } from '@/routes/administracao/oferta';
+import { index as indexUsuario } from '@/routes/administracao/usuario';
 import Image from '@/components/Image';
 
 export default function Sidebar() {
     const { url } = usePage();
     const [isAdminOpen, setIsAdminOpen] = useState(true);
 
-    const isActive = (routeName: string) => {
-        try {
-            const currentRoute = route().current();
-            return currentRoute === routeName || currentRoute?.startsWith(`${routeName}.`);
-        } catch (e) {
-            return false;
-        }
+    const isActive = (path: string) => {
+        // Strip query parameters for matching
+        const cleanUrl = url.split('?')[0];
+        const cleanPath = path.split('?')[0];
+
+        // We match if the path is exactly the URL, or if URL represents a subpage of this domain (e.g. /administracao/hotel/novo is subpage of /administracao/hotel)
+        // Wait, for subpages, we should check parent paths. E.g. /administracao/hotel/listar -> /administracao/hotel
+        const getParentPath = (p: string) => {
+            const parts = p.split('/');
+            if (parts.length > 3) {
+                return parts.slice(0, 3).join('/'); // /administracao/hotel
+            }
+            return p;
+        };
+
+        const parentUrl = getParentPath(cleanUrl);
+        const parentPath = getParentPath(cleanPath);
+
+        return cleanUrl === cleanPath || parentUrl === parentPath;
     };
 
-    const linkClass = (routeName: string, isSubItem = false) => `
+    const linkClass = (path: string, isSubItem = false) => `
         flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition-colors mb-1
         ${isSubItem ? 'text-sm pl-8' : ''}
         ${
-            isActive(routeName)
+            isActive(path)
                 ? 'bg-blue-50 text-blue-600 border border-blue-200'
                 : 'text-gray-700 hover:bg-gray-100'
         }
@@ -50,8 +69,8 @@ export default function Sidebar() {
             <nav className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-1">
                     <Link
-                        href={route('administracao.dashboard')}
-                        className={linkClass('administracao.dashboard')}
+                        href={dashboard().url}
+                        className={linkClass(dashboard().url)}
                     >
                         <LayoutDashboard size={20} />
                         <span>Dashboard</span>
@@ -74,9 +93,9 @@ export default function Sidebar() {
                         {isAdminOpen && (
                             <div className="mt-1 space-y-1">
                                 <Link
-                                    href={route('administracao.pacote.index')}
+                                    href={indexPacote().url}
                                     className={linkClass(
-                                        'administracao.pacote.index',
+                                        indexPacote().url,
                                         true,
                                     )}
                                 >
@@ -84,9 +103,9 @@ export default function Sidebar() {
                                     <span>Pacotes de Viagem</span>
                                 </Link>
                                 <Link
-                                    href={route('administracao.pacote-foto.index')}
+                                    href={indexPacoteFoto().url}
                                     className={linkClass(
-                                        'administracao.pacote-foto.index',
+                                        indexPacoteFoto().url,
                                         true,
                                     )}
                                 >
@@ -95,9 +114,9 @@ export default function Sidebar() {
                                 </Link>
 
                                 <Link
-                                    href={route('administracao.hotel.index')}
+                                    href={indexHotel().url}
                                     className={linkClass(
-                                        'administracao.hotel.index',
+                                        indexHotel().url,
                                         true,
                                     )}
                                 >
@@ -106,9 +125,9 @@ export default function Sidebar() {
                                 </Link>
 
                                 <Link
-                                    href={route('administracao.transporte.index')}
+                                    href={indexTransporte().url}
                                     className={linkClass(
-                                        'administracao.transporte.index',
+                                        indexTransporte().url,
                                         true,
                                     )}
                                 >
@@ -116,9 +135,9 @@ export default function Sidebar() {
                                     <span>Transporte</span>
                                 </Link>
                                 <Link
-                                    href={route('administracao.oferta.index')}
+                                    href={indexOferta().url}
                                     className={linkClass(
-                                        'administracao.oferta.index',
+                                        indexOferta().url,
                                         true,
                                     )}
                                 >
@@ -126,9 +145,9 @@ export default function Sidebar() {
                                     <span>Ofertas</span>
                                 </Link>
                                 <Link
-                                    href={route('administracao.usuario.index')}
+                                    href={indexUsuario().url}
                                     className={linkClass(
-                                        'administracao.usuario.index',
+                                        indexUsuario().url,
                                         true,
                                     )}
                                 >

@@ -1,6 +1,3 @@
-import GuestLayout from '@/layouts/GuestLayout';
-import { formatarData } from '@/lib/formatarData';
-import { Pacote } from '@/types/Pacote';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     Building2,
@@ -10,12 +7,15 @@ import {
     TicketsPlane,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Image from '@/components/Image';
 import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
+import Image from '@/components/Image';
+import GuestLayout from '@/layouts/GuestLayout';
+import { formatarData } from '@/lib/formatarData';
+import { checkout as routeCheckout } from '@/routes';
 
 interface DetalhesProps {
     nome: string;
-    pacote: Pacote | null;
+    pacote: App.ViewModels.Catalogo.PacoteDetalhesViewModel | null;
 }
 
 export default function Detalhes({ nome, pacote }: DetalhesProps) {
@@ -53,7 +53,7 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
     const handleComprar = () => {
         if (!temOfertasAtivas || !ofertaAtual) return;
-        router.get(route('checkout', { ofertaId: ofertaAtual.id }));
+        router.get(routeCheckout({ ofertaId: ofertaAtual.id }).url);
     };
 
     if (!pacote) {
@@ -78,12 +78,16 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
     const temOfertasAtivas = (pacote.ofertas?.length ?? 0) > 0;
 
-
     const todasFotos = [
-        { id: -1, url: pacote.fotos_do_pacote?.foto_capa_url, nome: 'Principal' },
+        {
+            id: -1,
+            url: pacote.fotos_do_pacote?.foto_capa_url,
+            nome: 'Principal',
+        },
         ...(pacote.fotos_do_pacote?.fotos?.map((f) => ({
             ...f,
             url: f.caminho_url,
+            nome: `Foto ${f.ordem}`,
         })) || []),
     ].filter((f) => f.url);
 
@@ -129,7 +133,8 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                             <p className="text-orange-800 font-bold flex items-center justify-center gap-2">
                                 ⚠️ Não possuem ofertas abertas no momento.
                                 <span className="font-normal">
-                                    Mostrando informações da última viagem realizada.
+                                    Mostrando informações da última viagem
+                                    realizada.
                                 </span>
                             </p>
                         </div>
@@ -182,21 +187,42 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 <h1 className="mb-2 text-3xl font-bold text-gray-900">
                                     {pacote.nome}
                                 </h1>
-                                {pacote.total_avaliacoes && pacote.total_avaliacoes > 0 ? (
+                                {pacote.total_avaliacoes &&
+                                pacote.total_avaliacoes > 0 ? (
                                     <div className="flex items-center gap-2 mb-3">
                                         <div className="flex text-yellow-400">
                                             {[...Array(5)].map((_, i) => (
-                                                <span key={i} className="text-lg">
-                                                    {i < Math.round(pacote.media_avaliacao ?? 0) ? '★' : '☆'}
+                                                <span
+                                                    key={i}
+                                                    className="text-lg"
+                                                >
+                                                    {i <
+                                                    Math.round(
+                                                        pacote.media_avaliacao ??
+                                                            0,
+                                                    )
+                                                        ? '★'
+                                                        : '☆'}
                                                 </span>
                                             ))}
                                         </div>
                                         <span className="text-sm font-bold text-gray-600">
-                                            {(Number(pacote.media_avaliacao) || 0).toFixed(1)} ({pacote.total_avaliacoes} {pacote.total_avaliacoes === 1 ? 'avaliação' : 'avaliações'})
+                                            {(
+                                                Number(
+                                                    pacote.media_avaliacao,
+                                                ) || 0
+                                            ).toFixed(1)}{' '}
+                                            ({pacote.total_avaliacoes}{' '}
+                                            {pacote.total_avaliacoes === 1
+                                                ? 'avaliação'
+                                                : 'avaliações'}
+                                            )
                                         </span>
                                     </div>
                                 ) : (
-                                    <div className="text-sm text-gray-400 mb-3 font-semibold">Sem avaliações ainda</div>
+                                    <div className="text-sm text-gray-400 mb-3 font-semibold">
+                                        Sem avaliações ainda
+                                    </div>
                                 )}
                                 <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-1">
@@ -245,9 +271,13 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 )}
                             </div>
 
-                            <div className={`rounded-xl border p-6 ${temOfertasAtivas ? 'border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50' : 'border-gray-200 bg-gray-50'}`}>
+                            <div
+                                className={`rounded-xl border p-6 ${temOfertasAtivas ? 'border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50' : 'border-gray-200 bg-gray-50'}`}
+                            >
                                 <div className="flex items-baseline space-x-2">
-                                    <span className={`text-4xl font-bold ${temOfertasAtivas ? 'text-blue-900' : 'text-gray-400'}`}>
+                                    <span
+                                        className={`text-4xl font-bold ${temOfertasAtivas ? 'text-blue-900' : 'text-gray-400'}`}
+                                    >
                                         {formatarPreco(
                                             (ofertaAtual?.preco || 0) *
                                                 numeroPessoas,
@@ -269,7 +299,9 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
 
                             <div className="space-y-3">
                                 <label className="block text-lg font-semibold text-gray-900">
-                                    {temOfertasAtivas ? 'Escolha a data da viagem' : 'Última viagem realizada'}
+                                    {temOfertasAtivas
+                                        ? 'Escolha a data da viagem'
+                                        : 'Última viagem realizada'}
                                 </label>
                                 <div className="flex flex-col gap-2">
                                     {temOfertasAtivas ? (
@@ -310,9 +342,11 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                                         </div>
                                                         <div className="text-sm text-gray-500">
                                                             Hotel:{' '}
-                                                            {oferta.hotel?.nome} |{' '}
+                                                            {oferta.hotel?.nome}{' '}
+                                                            |{' '}
                                                             {
-                                                                oferta.transporte
+                                                                oferta
+                                                                    .transporte
                                                                     ?.meio
                                                             }
                                                         </div>
@@ -334,10 +368,18 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                     ) : (
                                         <div className="rounded-xl border border-gray-200 p-4 bg-white opacity-60">
                                             <div className="font-medium text-gray-900">
-                                                {formatarData(ofertaAtual?.inicio || '')} a {formatarData(ofertaAtual?.fim || '')}
+                                                {formatarData(
+                                                    ofertaAtual?.inicio || '',
+                                                )}{' '}
+                                                a{' '}
+                                                {formatarData(
+                                                    ofertaAtual?.fim || '',
+                                                )}
                                             </div>
                                             <div className="text-sm text-gray-500">
-                                                Hotel: {ofertaAtual?.hotel?.nome} | {ofertaAtual?.transporte?.meio}
+                                                Hotel:{' '}
+                                                {ofertaAtual?.hotel?.nome} |{' '}
+                                                {ofertaAtual?.transporte?.meio}
                                             </div>
                                         </div>
                                     )}
@@ -348,13 +390,17 @@ export default function Detalhes({ nome, pacote }: DetalhesProps) {
                                 onClick={handleComprar}
                                 disabled={!temOfertasAtivas}
                                 className={`flex w-full transform items-center justify-center space-x-2 rounded-xl px-6 py-4 text-lg font-bold text-white shadow-lg transition-all ${
-                                    temOfertasAtivas 
-                                    ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl active:scale-95' 
-                                    : 'bg-gray-400 cursor-not-allowed'
+                                    temOfertasAtivas
+                                        ? 'bg-blue-600 hover:bg-blue-700 hover:shadow-xl active:scale-95'
+                                        : 'bg-gray-400 cursor-not-allowed'
                                 }`}
                             >
                                 <TicketsPlane className="text-2xl" />
-                                <span>{temOfertasAtivas ? 'Reservar Agora' : 'Sem Ofertas Disponíveis'}</span>
+                                <span>
+                                    {temOfertasAtivas
+                                        ? 'Reservar Agora'
+                                        : 'Sem Ofertas Disponíveis'}
+                                </span>
                             </button>
 
                             <div className="rounded-lg bg-gray-50 p-4 text-gray-700">

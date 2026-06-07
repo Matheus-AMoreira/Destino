@@ -133,7 +133,7 @@ O **Destino** utiliza as tecnologias mais recentes para garantir performance e m
 - **Frontend**: React 19, Inertia.js v3
 - **Estilização**: Tailwind CSS v4
 - **Interface**: Lucide Icons
-- **Roteamento**: Ziggy, Laravel Wayfinder
+- **Roteamento**: Laravel Wayfinder
 - **Banco de Dados**: PostgreSQL 18
 - **Testes**: Pest PHP 4
 - **Build Tool**: Vite 8 & Composer 2

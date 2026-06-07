@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { X } from 'lucide-react';
-import type { Avaliacao } from '@/types/Avaliacao';
+import { useState } from 'react';
 
 interface ModalAvaliacaoProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (nota: number, comentario: string) => Promise<void>;
-    avaliacaoExistente?: Avaliacao;
+    avaliacaoExistente?: App.DTOs.Comercial.AvaliacaoDTO;
 }
 
 export default function ModalAvaliacao({
@@ -16,7 +15,9 @@ export default function ModalAvaliacao({
     avaliacaoExistente,
 }: ModalAvaliacaoProps) {
     const [nota, setNota] = useState(avaliacaoExistente?.nota || 0);
-    const [comentario, setComentario] = useState(avaliacaoExistente?.comentario || '');
+    const [comentario, setComentario] = useState(
+        avaliacaoExistente?.comentario || '',
+    );
     const [loading, setLoading] = useState(false);
     const [erro, setErro] = useState<string | null>(null);
 
@@ -36,7 +37,9 @@ export default function ModalAvaliacao({
             setComentario('');
             onClose();
         } catch (err) {
-            setErro(err instanceof Error ? err.message : 'Erro ao enviar avaliação');
+            setErro(
+                err instanceof Error ? err.message : 'Erro ao enviar avaliação',
+            );
         } finally {
             setLoading(false);
         }
@@ -49,7 +52,9 @@ export default function ModalAvaliacao({
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
                 <div className="flex justify-between items-center p-6 border-b">
                     <h2 className="text-xl font-bold">
-                        {avaliacaoExistente ? 'Editar Avaliação' : 'Avaliar Pacote'}
+                        {avaliacaoExistente
+                            ? 'Editar Avaliação'
+                            : 'Avaliar Pacote'}
                     </h2>
                     <button
                         onClick={onClose}
@@ -77,7 +82,9 @@ export default function ModalAvaliacao({
                                     type="button"
                                     onClick={() => setNota(star)}
                                     className={`text-4xl transition-transform hover:scale-110 ${
-                                        star <= nota ? 'text-yellow-400' : 'text-gray-300'
+                                        star <= nota
+                                            ? 'text-yellow-400'
+                                            : 'text-gray-300'
                                     }`}
                                 >
                                     ★
@@ -92,7 +99,9 @@ export default function ModalAvaliacao({
                         </label>
                         <textarea
                             value={comentario}
-                            onChange={(e) => setComentario(e.target.value.slice(0, 500))}
+                            onChange={(e) =>
+                                setComentario(e.target.value.slice(0, 500))
+                            }
                             maxLength={500}
                             rows={4}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

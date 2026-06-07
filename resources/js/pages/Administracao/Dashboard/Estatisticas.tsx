@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Chart, registerables } from 'chart.js';
 import {
     BarChart3,
@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
+import { dashboard as dashboardRoute } from '@/routes/administracao';
+import { useDashboardFiltros } from '@/services/administracao/dashboardService';
 
 Chart.register(...registerables);
 
@@ -86,6 +88,7 @@ export default function Estatisticas({
     filtros,
 }: Props) {
     const [activeTab, setActiveTab] = useState<TabType>('vendas');
+    const { handleFilterChange } = useDashboardFiltros(filtros, ano);
     const chartRef = useRef<HTMLCanvasElement>(null);
     const destinosChartRef = useRef<HTMLCanvasElement>(null);
     const usersChartRef = useRef<HTMLCanvasElement>(null);
@@ -139,13 +142,15 @@ export default function Estatisticas({
 
     const usersChartData = useMemo(() => {
         // Growth data might come in different formats depending on controller fix
-        const growthLabels = Array.isArray(crescimentoUsuarios) 
-            ? crescimentoUsuarios.map(u => u.ano.toString())
-            : (graficos.crescimentoUsuarios?.anos || []).map(a => a.toString());
-            
+        const growthLabels = Array.isArray(crescimentoUsuarios)
+            ? crescimentoUsuarios.map((u) => u.ano.toString())
+            : (graficos.crescimentoUsuarios?.anos || []).map((a) =>
+                  a.toString(),
+              );
+
         const growthValues = Array.isArray(crescimentoUsuarios)
-            ? crescimentoUsuarios.map(u => u.total)
-            : (graficos.crescimentoUsuarios?.totais || []);
+            ? crescimentoUsuarios.map((u) => u.total)
+            : graficos.crescimentoUsuarios?.totais || [];
 
         return {
             labels: growthLabels,
@@ -237,28 +242,19 @@ export default function Estatisticas({
     }, [activeTab, chartData, destinosChartData, usersChartData]);
 
     const totalVendas = useMemo(
-        () => graficos.compras.ACEITO.reduce((a, b) => a + b, 0) + 
-              graficos.compras.PENDENTE.reduce((a, b) => a + b, 0) + 
-              graficos.compras.RECUSADO.reduce((a, b) => a + b, 0),
+        () =>
+            graficos.compras.ACEITO.reduce((a, b) => a + b, 0) +
+            graficos.compras.PENDENTE.reduce((a, b) => a + b, 0) +
+            graficos.compras.RECUSADO.reduce((a, b) => a + b, 0),
         [graficos.compras],
     );
-
-    const handleFilterChange = (key: string, value: any) => {
-        router.get(
-            route().current() || '',
-            {
-                ...filtros,
-                ano,
-                [key]: value,
-            },
-            { preserveState: true, preserveScroll: true },
-        );
-    };
 
     const estadosFiltrados = useMemo(() => {
         if (!filtros.regiao_id) return estados;
 
-        return estados.filter((e) => String(e.regiao_id) === String(filtros.regiao_id));
+        return estados.filter(
+            (e) => String(e.regiao_id) === String(filtros.regiao_id),
+        );
     }, [estados, filtros.regiao_id]);
 
     return (
@@ -269,7 +265,7 @@ export default function Estatisticas({
                 <div>
                     <div className="mb-2 flex items-center gap-2 text-blue-600">
                         <Link
-                            href={route('administracao.dashboard')}
+                            href={dashboardRoute().url}
                             className="flex items-center gap-1 text-sm font-bold hover:underline"
                         >
                             <ChevronLeft size={16} />
@@ -431,7 +427,12 @@ export default function Estatisticas({
                         </div>
 
                         <div className="h-112 w-full">
-                            {(Array.isArray(crescimentoUsuarios) ? crescimentoUsuarios.length > 0 : (graficos.crescimentoUsuarios?.totais?.length > 0)) ? (
+                            {(
+                                Array.isArray(crescimentoUsuarios)
+                                    ? crescimentoUsuarios.length > 0
+                                    : graficos.crescimentoUsuarios?.totais
+                                          ?.length > 0
+                            ) ? (
                                 <canvas ref={usersChartRef}></canvas>
                             ) : (
                                 <EmptyState

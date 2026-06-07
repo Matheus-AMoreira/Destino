@@ -1,46 +1,21 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import { useRoute } from 'ziggy-js';
+import { Head, Link } from '@inertiajs/react';
 import AuthLogo from '@/components/auth/AuthLogo';
 import Image from '@/components/Image';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
+import { useLogin } from '@/services/auth/authService';
+import { cadastro as routeCadastro, home as routeHome } from '@/routes';
+import { request as routePasswordRequest } from '@/routes/password';
 
 export default function Entrar() {
-    const route = useRoute();
-    const { data, setData, post, processing } = useForm({
-        email: '',
-        password: '',
-    });
+    const { form, modal, setModal, handleSubmit } = useLogin();
 
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('login'), {
-            onError: (err) => {
-                const message =
-                    err.email ||
-                    err.password ||
-                    err.login ||
-                    'Erro ao realizar login.';
-                setModal({
-                    show: true,
-                    mensagem: message,
-                    url: null,
-                });
-            },
-        });
-    };
+    const { data, setData, processing } = form;
 
     return (
         <div className="flex min-h-screen w-full bg-white">
             <Head title="Conecte-se" />
-            
+
             <div className="grid w-full grid-cols-1 lg:grid-cols-2 overflow-hidden">
                 {/* Lado Esquerdo: Formulário */}
                 <div className="flex items-center justify-center bg-linear-to-br from-[#e4f3ff] via-[#ffffff] to-[#e4f3ff] p-8">
@@ -96,7 +71,7 @@ export default function Entrar() {
 
                             <div className="mb-6 flex justify-end">
                                 <Link
-                                    href={route('password.request')}
+                                    href={routePasswordRequest().url}
                                     className="text-xs font-bold text-[#007bff] hover:underline"
                                 >
                                     Esqueceu sua senha?
@@ -120,7 +95,7 @@ export default function Entrar() {
                             <p className="text-sm text-[#666]">
                                 Não possui uma conta?
                                 <Link
-                                    href={route('cadastro')}
+                                    href={routeCadastro().url}
                                     className="ml-1 font-bold text-[#007bff] hover:underline"
                                 >
                                     Cadastre-se
@@ -130,7 +105,7 @@ export default function Entrar() {
                             <p className="text-sm text-[#666]">
                                 Voltar para a
                                 <Link
-                                    href={route('home')}
+                                    href={routeHome().url}
                                     className="ml-1 font-bold text-[#007bff] hover:underline"
                                 >
                                     Tela Inicial
@@ -147,7 +122,7 @@ export default function Entrar() {
                         alt={'Imagem de login'}
                         style="absolute inset-0 z-0 h-full w-full object-cover object-center"
                     />
-                    
+
                     {/* Overlay para escurecer levemente a imagem e destacar a logo */}
                     <div className="z-10 flex h-full w-full items-center justify-center bg-black/25 backdrop-brightness-75">
                         <AuthLogo />

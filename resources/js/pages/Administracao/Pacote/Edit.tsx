@@ -1,7 +1,17 @@
+import { Link } from '@inertiajs/react';
+import {
+    FileText,
+    Image as ImageIcon,
+    Package,
+    Save,
+    Type,
+    User,
+    X,
+} from 'lucide-react';
+import type React from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Link, useForm } from '@inertiajs/react';
-import { Package, Save, X, Type, FileText, User, Image as ImageIcon } from 'lucide-react';
-import React from 'react';
+import { index as indexPacote } from '@/routes/administracao/pacote';
+import { usePacoteForm } from '@/services/catalogo/pacoteService';
 
 interface Funcionario {
     id: string;
@@ -29,21 +39,13 @@ interface Props {
 }
 
 export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        nome: pacote.nome,
-        descricao: pacote.descricao,
-        tags: pacote.tags_string || '',
-        funcionario_id: pacote.funcionario_id,
-        pacote_foto_id: pacote.pacote_foto_id?.toString() || '',
-    });
+    const { data, setData, processing, errors, handleSubmit } =
+        usePacoteForm(pacote);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('administracao.pacote.update', { id: pacote.id }));
-    };
-
-    const inputClasses = "mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none";
-    const labelClasses = "flex items-center gap-2 text-sm font-semibold text-gray-700";
+    const inputClasses =
+        'mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none';
+    const labelClasses =
+        'flex items-center gap-2 text-sm font-semibold text-gray-700';
 
     return (
         <AdminLayout title={`Editar ${pacote.nome}`}>
@@ -51,16 +53,21 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link
-                            href={route('administracao.pacote.index')}
+                            href={indexPacote().url}
                             className="rounded-lg bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
                         >
                             <X size={20} />
                         </Link>
-                        <h1 className="text-2xl font-bold text-gray-900">Editar Pacote</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Editar Pacote
+                        </h1>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100"
+                >
                     <div>
                         <label className={labelClasses}>
                             <Type size={16} className="text-orange-500" />
@@ -69,10 +76,14 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                         <input
                             type="text"
                             value={data.nome}
-                            onChange={e => setData('nome', e.target.value)}
+                            onChange={(e) => setData('nome', e.target.value)}
                             className={inputClasses}
                         />
-                        {errors.nome && <p className="mt-1 text-xs text-red-500">{errors.nome}</p>}
+                        {errors.nome && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.nome}
+                            </p>
+                        )}
                     </div>
 
                     <div>
@@ -82,11 +93,17 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                         </label>
                         <textarea
                             value={data.descricao}
-                            onChange={e => setData('descricao', e.target.value)}
+                            onChange={(e) =>
+                                setData('descricao', e.target.value)
+                            }
                             className={`${inputClasses} resize-none`}
                             rows={4}
                         />
-                        {errors.descricao && <p className="mt-1 text-xs text-red-500">{errors.descricao}</p>}
+                        {errors.descricao && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.descricao}
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -97,46 +114,68 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                             </label>
                             <select
                                 value={data.funcionario_id}
-                                onChange={e => setData('funcionario_id', e.target.value)}
+                                onChange={(e) =>
+                                    setData('funcionario_id', e.target.value)
+                                }
                                 className={inputClasses}
                             >
                                 <option value="">Selecione...</option>
-                                {funcionarios.map(f => (
-                                    <option key={f.id} value={f.id}>{f.nome}</option>
+                                {funcionarios.map((f) => (
+                                    <option key={f.id} value={f.id}>
+                                        {f.nome}
+                                    </option>
                                 ))}
                             </select>
-                            {errors.funcionario_id && <p className="mt-1 text-xs text-red-500">{errors.funcionario_id}</p>}
+                            {errors.funcionario_id && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.funcionario_id}
+                                </p>
+                            )}
                         </div>
 
                         <div>
                             <label className={labelClasses}>
-                                <ImageIcon size={16} className="text-orange-500" />
+                                <ImageIcon
+                                    size={16}
+                                    className="text-orange-500"
+                                />
                                 Álbum de Fotos
                             </label>
                             <select
                                 value={data.pacote_foto_id}
-                                onChange={e => setData('pacote_foto_id', e.target.value)}
+                                onChange={(e) =>
+                                    setData('pacote_foto_id', e.target.value)
+                                }
                                 className={inputClasses}
                             >
                                 <option value="">Nenhum</option>
-                                {pacoteFotos.map(pf => (
-                                    <option key={pf.id} value={pf.id}>{pf.nome}</option>
+                                {pacoteFotos.map((pf) => (
+                                    <option key={pf.id} value={pf.id}>
+                                        {pf.nome}
+                                    </option>
                                 ))}
                             </select>
-                            {errors.pacote_foto_id && <p className="mt-1 text-xs text-red-500">{errors.pacote_foto_id}</p>}
+                            {errors.pacote_foto_id && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.pacote_foto_id}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     <div className="pt-6 border-t border-gray-100">
                         <div>
                             <label className={labelClasses}>
-                                <Package size={16} className="text-orange-500" />
+                                <Package
+                                    size={16}
+                                    className="text-orange-500"
+                                />
                                 Tags do Pacote (separadas por vírgula)
                             </label>
                             <input
                                 type="text"
                                 value={data.tags}
-                                onChange={e => {
+                                onChange={(e) => {
                                     const value = e.target.value;
                                     // Permitir apenas letras, espaços e vírgulas
                                     if (/^[a-zA-Z\s,]*$/.test(value)) {
@@ -146,14 +185,20 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                                 className={inputClasses}
                                 placeholder="Ex: aventura, praia, luxo"
                             />
-                            {errors.tags && <p className="mt-1 text-xs text-red-500">{errors.tags}</p>}
-                            <p className="mt-1 text-[10px] text-gray-400 italic">Cada vírgula cria uma nova tag automagicamente.</p>
+                            {errors.tags && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.tags}
+                                </p>
+                            )}
+                            <p className="mt-1 text-[10px] text-gray-400 italic">
+                                Cada vírgula cria uma nova tag automagicamente.
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
                         <Link
-                            href={route('administracao.pacote.index')}
+                            href={indexPacote().url}
                             className="rounded-lg px-6 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                         >
                             Cancelar
@@ -164,7 +209,11 @@ export default function Edit({ pacote, funcionarios, pacoteFotos }: Props) {
                             className="flex items-center gap-2 rounded-lg bg-orange-600 px-8 py-2 font-bold text-white shadow-lg transition-all hover:bg-orange-700 disabled:opacity-50"
                         >
                             <Save size={20} />
-                            <span>{processing ? 'Salvando...' : 'Salvar Alterações'}</span>
+                            <span>
+                                {processing
+                                    ? 'Salvando...'
+                                    : 'Salvar Alterações'}
+                            </span>
                         </button>
                     </div>
                 </form>

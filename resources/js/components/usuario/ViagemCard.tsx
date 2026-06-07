@@ -3,10 +3,14 @@ import {
     ArrowRightFromLine,
     CalendarDays,
     MapPin,
-    Ticket,
     Star,
+    Ticket,
 } from 'lucide-react';
 import { useState } from 'react';
+import {
+    detalhes as detalhesViagem,
+    avaliar as avaliarViagem,
+} from '@/routes/usuario/viagem';
 import Image from '@/components/Image';
 import ImageCarousel from '@/components/ImageCarousel';
 import { tempoPassou } from '@/utils/dataUtils';
@@ -29,18 +33,24 @@ export default function ViagemCard({
     auth,
 }: ViagemCardProps) {
     const [imagemSelecionada, setImagemSelecionada] = useState(
-        grupo.pacote.fotos_do_pacote?.foto_capa_url || '/assets/images/placeholder.jpg'
+        grupo.pacote.fotos_do_pacote?.foto_capa_url ||
+            '/assets/images/placeholder.jpg',
     );
 
     const todasFotos = [
-        ...(grupo.pacote.fotos_do_pacote?.foto_capa_url ? [{ url: grupo.pacote.fotos_do_pacote.foto_capa_url }] : []),
-        ...(grupo.pacote.fotos_do_pacote?.fotos?.map((f: any) => ({ url: f.caminho_url })) || []),
-    ].filter((v, i, a) => a.findIndex(t => t.url === v.url) === i);
+        ...(grupo.pacote.fotos_do_pacote?.foto_capa_url
+            ? [{ url: grupo.pacote.fotos_do_pacote.foto_capa_url }]
+            : []),
+        ...(grupo.pacote.fotos_do_pacote?.fotos?.map((f: any) => ({
+            url: f.caminho_url,
+        })) || []),
+    ].filter((v, i, a) => a.findIndex((t) => t.url === v.url) === i);
 
     return (
         <div
-            className={`group flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-gray-100 bg-white transition-all duration-300 hover:border-blue-100 hover:shadow-2xl hover:shadow-blue-50/50 ${isHistorico ? 'opacity-90 saturate-50' : ''
-                } w-full`}
+            className={`group flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-gray-100 bg-white transition-all duration-300 hover:border-blue-100 hover:shadow-2xl hover:shadow-blue-50/50 ${
+                isHistorico ? 'opacity-90 saturate-50' : ''
+            } w-full`}
         >
             <div className="relative h-72 lg:h-auto lg:w-1/3 overflow-hidden">
                 <Image
@@ -68,7 +78,8 @@ export default function ViagemCard({
                     <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-bold text-white/90 backdrop-blur-md">
                         <MapPin className="text-red-400" size={16} />
                         <span>
-                            {grupo.tickets[0].oferta.hotel.cidade.nome}, {grupo.tickets[0].oferta.hotel.cidade.estado.sigla}
+                            {grupo.tickets[0].oferta.hotel.cidade.nome},{' '}
+                            {grupo.tickets[0].oferta.hotel.cidade.estado.sigla}
                         </span>
                     </div>
                 </div>
@@ -85,14 +96,22 @@ export default function ViagemCard({
 
                 <div className="mt-auto space-y-4 border-t border-gray-100 pt-6">
                     {grupo.tickets.map((compra: any, idx: number) => {
-                        const podeAvaliar = isHistorico || tempoPassou(compra.oferta.fim);
+                        const podeAvaliar =
+                            isHistorico || tempoPassou(compra.oferta.fim);
 
                         return (
-                            <div key={compra.id} className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}>
+                            <div
+                                key={compra.id}
+                                className={`${idx > 0 ? 'mt-4 border-t border-gray-50 pt-4' : ''}`}
+                            >
                                 <div className="mb-4 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <span className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}>
-                                            {isHistorico ? 'CONCLUÍDA' : compra.status}
+                                        <span
+                                            className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-wider uppercase ${getStatusColor(compra.status)}`}
+                                        >
+                                            {isHistorico
+                                                ? 'CONCLUÍDA'
+                                                : compra.status}
                                         </span>
                                         <span className="text-[10px] font-bold text-gray-400 uppercase">
                                             Ticket #{compra.id.split('-')[0]}
@@ -108,15 +127,26 @@ export default function ViagemCard({
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-center justify-between rounded-2xl border border-transparent bg-gray-50 p-4 transition-colors group-hover:border-blue-100/50 group-hover:bg-blue-50/50">
                                         <div className="flex items-center gap-3">
-                                            <CalendarDays className="text-blue-500" size={18} />
+                                            <CalendarDays
+                                                className="text-blue-500"
+                                                size={18}
+                                            />
                                             <span className="text-sm font-bold text-gray-700">
-                                                {formatarData(compra.oferta.inicio)} - {formatarData(compra.oferta.fim)}
+                                                {formatarData(
+                                                    compra.oferta.inicio,
+                                                )}{' '}
+                                                -{' '}
+                                                {formatarData(
+                                                    compra.oferta.fim,
+                                                )}
                                             </span>
                                         </div>
                                         <Link
-                                            href={route('usuario.viagem.detalhes', {
-                                                id: compra.id,
-                                            })}
+                                            href={
+                                                detalhesViagem({
+                                                    id: compra.id,
+                                                }).url
+                                            }
                                             className="flex items-center gap-1 text-sm font-black text-blue-600 transition-colors hover:text-blue-700"
                                         >
                                             Detalhes
@@ -128,31 +158,53 @@ export default function ViagemCard({
                                         <div className="flex justify-end">
                                             {compra.avaliacao ? (
                                                 <Link
-                                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                                    href={
+                                                        avaliarViagem({
+                                                            id: compra.id,
+                                                        }).url
+                                                    }
                                                     className="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-200 px-4 py-2 text-xs font-black text-gray-700 hover:bg-gray-100 transition-colors"
                                                 >
-                                                    <span className="uppercase tracking-wider">Avaliado</span>
+                                                    <span className="uppercase tracking-wider">
+                                                        Avaliado
+                                                    </span>
                                                     <div className="flex items-center gap-0.5">
-                                                        {[1, 2, 3, 4, 5].map((estrela) => (
-                                                            <Star
-                                                                key={estrela}
-                                                                size={14}
-                                                                className={
-                                                                    estrela <= compra.avaliacao.nota
-                                                                        ? 'fill-yellow-400 text-yellow-400'
-                                                                        : 'text-gray-300'
-                                                                }
-                                                            />
-                                                        ))}
+                                                        {[1, 2, 3, 4, 5].map(
+                                                            (estrela) => (
+                                                                <Star
+                                                                    key={
+                                                                        estrela
+                                                                    }
+                                                                    size={14}
+                                                                    className={
+                                                                        estrela <=
+                                                                        compra
+                                                                            .avaliacao
+                                                                            .nota
+                                                                            ? 'fill-yellow-400 text-yellow-400'
+                                                                            : 'text-gray-300'
+                                                                    }
+                                                                />
+                                                            ),
+                                                        )}
                                                     </div>
                                                 </Link>
                                             ) : (
                                                 <Link
-                                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                                    href={
+                                                        avaliarViagem({
+                                                            id: compra.id,
+                                                        }).url
+                                                    }
                                                     className="flex items-center gap-2 rounded-xl bg-yellow-50 border border-yellow-300 px-4 py-2 text-xs font-black text-yellow-700 hover:bg-yellow-100 transition-colors"
                                                 >
-                                                    <Star size={14} className="fill-yellow-500 text-yellow-500" />
-                                                    <span className="uppercase tracking-wider">Avaliar Viagem</span>
+                                                    <Star
+                                                        size={14}
+                                                        className="fill-yellow-500 text-yellow-500"
+                                                    />
+                                                    <span className="uppercase tracking-wider">
+                                                        Avaliar Viagem
+                                                    </span>
                                                 </Link>
                                             )}
                                         </div>

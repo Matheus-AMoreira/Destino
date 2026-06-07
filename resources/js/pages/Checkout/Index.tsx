@@ -1,90 +1,33 @@
-import GuestLayout from '@/layouts/GuestLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, usePage } from '@inertiajs/react';
 import { Calendar, CreditCard, Package, User } from 'lucide-react';
-import CustomModal, { ModalData } from '@/components/Modal';
+import React from 'react';
+import CustomModal from '@/components/Modal';
+import GuestLayout from '@/layouts/GuestLayout';
 import { formatarData } from '@/lib/formatarData';
+import { useCheckout } from '@/services/comercial/checkoutService';
 
 interface CheckoutProps {
-    oferta: any;
+    oferta: App.DTOs.Comercial.CheckoutDTO;
 }
 
 export default function Index({ oferta }: CheckoutProps) {
     const { auth } = usePage().props as any;
     const usuario = auth.user;
 
-    const [metodoPagamento, setMetodoPagamento] = useState('cartao-credito');
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
-
-    const { data, setData, post, processing } = useForm({
-        oferta_id: oferta.id,
-        metodo: 'VISTA',
-        processador: 'VISA',
-        parcelas: 1,
-    });
-
-    const valorTotal = parseFloat(oferta.preco) || 0;
-    const descontoPix = valorTotal * 0.05;
-    const valorComDescontoPix = valorTotal - descontoPix;
-
-    const formatarValor = (valor: number) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(valor);
-    };
-
-    const handleMetodoChange = (val: string) => {
-        setMetodoPagamento(val);
-        if (val === 'pix') {
-            setData({
-                ...data,
-                metodo: 'VISTA',
-                processador: 'PIX',
-                parcelas: 1,
-            });
-        } else if (val === 'cartao-credito') {
-            setData({
-                ...data,
-                metodo: data.parcelas > 1 ? 'PARCELADO' : 'VISTA',
-                processador: 'MASTERCARD',
-            });
-        } else {
-            setData({
-                ...data,
-                metodo: 'VISTA',
-                processador: 'VISA',
-                parcelas: 1,
-            });
-        }
-    };
-
-    const handleParcelasChange = (p: number) => {
-        setData({
-            ...data,
-            parcelas: p,
-            metodo: p > 1 ? 'PARCELADO' : 'VISTA',
-        });
-    };
-
-    const handleSubmit = (e: React.SubmitEvent) => {
-        e.preventDefault();
-        post(route('checkout.process', { ofertaId: oferta.id }), {
-            onError: (err) => {
-                setModal({
-                    show: true,
-                    mensagem:
-                        Object.values(err).join('\n') ||
-                        'Erro ao processar compra.',
-                    url: null,
-                });
-            },
-        });
-    };
+    const {
+        data,
+        processing,
+        metodoPagamento,
+        handleMetodoChange,
+        handleParcelasChange,
+        handleSubmit,
+        modal,
+        setModal,
+        valorTotal,
+        descontoPix,
+        valorComDescontoPix,
+        formatarValor,
+    } = useCheckout(oferta);
 
     return (
         <GuestLayout title="Confirmar Compra">

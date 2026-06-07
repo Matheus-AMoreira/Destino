@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Star } from 'lucide-react';
+import { useAvaliacoes } from '@/services/comercial/avaliacaoService';
 import AvaliacaoItem from './AvaliacaoItem';
-import { avaliacaoApi } from '@/utils/avaliacaoApi';
-import type { AvaliacaoPacote, Avaliacao } from '@/types/Avaliacao';
 
 interface SecaoAvaliacoesProps {
     pacoteId: number;
@@ -15,36 +13,10 @@ export default function SecaoAvaliacoes({
     userId,
     onAvaliacaoDeleted,
 }: SecaoAvaliacoesProps) {
-    const [avaliacoes, setAvaliacoes] = useState<AvaliacaoPacote | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [erro, setErro] = useState<string | null>(null);
-
-    const carregarAvaliacoes = async () => {
-        try {
-            setLoading(true);
-            const data = await avaliacaoApi.obterAvaliacoesPacote(pacoteId);
-            setAvaliacoes(data);
-            setErro(null);
-        } catch (err) {
-            setErro(err instanceof Error ? err.message : 'Erro ao carregar avaliações');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        carregarAvaliacoes();
-    }, [pacoteId]);
-
-    const handleDeletar = async (avaliacaoId: number) => {
-        try {
-            await avaliacaoApi.deletarAvaliacao(avaliacaoId);
-            await carregarAvaliacoes();
-            onAvaliacaoDeleted?.();
-        } catch (err) {
-            setErro(err instanceof Error ? err.message : 'Erro ao deletar avaliação');
-        }
-    };
+    const { avaliacoes, loading, erro, handleDeletar } = useAvaliacoes(
+        pacoteId,
+        onAvaliacaoDeleted,
+    );
 
     if (loading) {
         return (
@@ -56,9 +28,7 @@ export default function SecaoAvaliacoes({
 
     if (erro) {
         return (
-            <div className="p-4 bg-red-50 text-red-700 rounded-md">
-                {erro}
-            </div>
+            <div className="p-4 bg-red-50 text-red-700 rounded-md">{erro}</div>
         );
     }
 

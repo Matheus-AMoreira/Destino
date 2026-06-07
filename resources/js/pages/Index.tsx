@@ -1,13 +1,13 @@
+import { router } from '@inertiajs/react';
+import { ArrowLeft, ChevronRight, MapPinned } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import Image from '@/components/Image';
 import Card from '@/components/landingPage/Card';
 import GuestLayout from '@/layouts/GuestLayout';
-import { Pacote } from '@/types/Pacote';
-import { router } from '@inertiajs/react';
-import React, { useState, useEffect } from 'react';
-import { MapPinned, ArrowLeft, ChevronRight } from 'lucide-react';
-import Image from '@/components/Image';
 
 interface IndexProps {
-    pacotes: Pacote[];
+    pacotes: App.ViewModels.Catalogo.PacoteCardViewModel[];
     totalPaginas: number;
     paginaAtual: number;
 }
@@ -23,7 +23,6 @@ export default function Index({
     const [termoBusca, setTermoBusca] = useState('');
     const [imagemAtual, setImagemAtual] = useState(0);
 
-    // Avança automaticamente a cada 5 segundos
     useEffect(() => {
         const intervalo = setInterval(() => {
             setImagemAtual((prev) => (prev + 1) % IMAGENS_CARROSSEL.length);
@@ -33,7 +32,7 @@ export default function Index({
 
     const handleAnterior = () => {
         setImagemAtual((prev) =>
-            prev === 0 ? IMAGENS_CARROSSEL.length - 1 : prev - 1
+            prev === 0 ? IMAGENS_CARROSSEL.length - 1 : prev - 1,
         );
     };
 
@@ -61,16 +60,16 @@ export default function Index({
     return (
         <GuestLayout title="PAULA VIAGENS E TURISMO">
             <main className="grow p-4 md:p-8">
-
                 {/* ===== SEÇÃO CARROSSEL ===== */}
-                <section className="relative min-h-[500px] w-full overflow-hidden bg-gray-900 py-20 px-4 flex items-center justify-center rounded-xl">
-
+                <section className="relative min-h-125 w-full overflow-hidden bg-gray-900 py-20 px-4 flex items-center justify-center rounded-xl">
                     {/* Imagens do carrossel com fade */}
                     {IMAGENS_CARROSSEL.map((nome, index) => (
                         <div
                             key={nome}
                             className={`absolute inset-0 z-0 transition-opacity duration-700 ${
-                                index === imagemAtual ? 'opacity-60' : 'opacity-0'
+                                index === imagemAtual
+                                    ? 'opacity-60'
+                                    : 'opacity-0'
                             }`}
                         >
                             <Image
@@ -201,10 +200,11 @@ export default function Index({
                             <button
                                 onClick={handlePaginaAnterior}
                                 disabled={paginaAtual === 0}
-                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === 0
+                                className={`rounded-full p-3 shadow-md transition ${
+                                    paginaAtual === 0
                                         ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
-                                    }`}
+                                }`}
                             >
                                 <ArrowLeft />
                             </button>
@@ -216,10 +216,11 @@ export default function Index({
                             <button
                                 onClick={handleProximaPagina}
                                 disabled={paginaAtual === totalPaginas - 1}
-                                className={`rounded-full p-3 shadow-md transition ${paginaAtual === totalPaginas - 1
+                                className={`rounded-full p-3 shadow-md transition ${
+                                    paginaAtual === totalPaginas - 1
                                         ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                                         : 'bg-white text-[#2071b3] hover:bg-[#2071b3] hover:text-white'
-                                    }`}
+                                }`}
                             >
                                 <ChevronRight />
                             </button>

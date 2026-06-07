@@ -1,6 +1,11 @@
+import { Link } from '@inertiajs/react';
+import { Bus, Pencil, Plane, Plus, Ship, Trash2, Truck } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Link, router } from '@inertiajs/react';
-import { Truck, Plus, Pencil, Trash2, Plane, Ship, Bus } from 'lucide-react';
+import {
+    create as createTransporte,
+    edit as editTransporte,
+} from '@/routes/administracao/transporte';
+import { deletarTransporte } from '@/services/hospedagem/transporteService';
 
 interface TransporteData {
     id: number;
@@ -27,9 +32,7 @@ const MeioIcon = ({ meio }: { meio: string }) => {
 
 export default function Index({ transportes = [], success }: Props) {
     const handleDelete = (id: number) => {
-        if (confirm('Deseja realmente excluir este transporte?')) {
-            router.delete(route('administracao.transporte.destroy', { id }));
-        }
+        deletarTransporte(id);
     };
 
     return (
@@ -39,11 +42,13 @@ export default function Index({ transportes = [], success }: Props) {
                     <div className="bg-blue-600 p-2 rounded-lg text-white">
                         <Truck size={24} />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Gerenciar Transporte</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        Gerenciar Transporte
+                    </h1>
                 </div>
-                
+
                 <Link
-                    href={route('administracao.transporte.create')}
+                    href={createTransporte().url}
                     className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
                 >
                     <Plus size={20} />
@@ -61,40 +66,68 @@ export default function Index({ transportes = [], success }: Props) {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Empresa</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Meio</th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Preço Base</th>
-                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Ações</th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                ID
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Empresa
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Meio
+                            </th>
+                            <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Preço Base
+                            </th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Ações
+                            </th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
                         {transportes.length > 0 ? (
                             transportes.map((transporte) => (
-                                <tr key={transporte.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">#{transporte.id}</td>
+                                <tr
+                                    key={transporte.id}
+                                    className="hover:bg-gray-50 transition-colors"
+                                >
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                        #{transporte.id}
+                                    </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
                                         {transporte.empresa}
                                     </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
                                         <div className="flex items-center gap-2">
                                             <MeioIcon meio={transporte.meio} />
-                                            <span className="capitalize">{transporte.meio.toLowerCase()}</span>
+                                            <span className="capitalize">
+                                                {transporte.meio.toLowerCase()}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                                        R$ {Number(transporte.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        R${' '}
+                                        {Number(
+                                            transporte.preco,
+                                        ).toLocaleString('pt-BR', {
+                                            minimumFractionDigits: 2,
+                                        })}
                                     </td>
                                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                                         <div className="flex justify-end gap-2">
                                             <Link
-                                                href={route('administracao.transporte.edit', { id: transporte.id })}
+                                                href={
+                                                    editTransporte({
+                                                        id: transporte.id,
+                                                    }).url
+                                                }
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                             >
                                                 <Pencil size={18} />
                                             </Link>
                                             <button
-                                                onClick={() => handleDelete(transporte.id)}
+                                                onClick={() =>
+                                                    handleDelete(transporte.id)
+                                                }
                                                 className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
                                             >
                                                 <Trash2 size={18} />
@@ -105,7 +138,10 @@ export default function Index({ transportes = [], success }: Props) {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} className="px-6 py-12 text-center text-sm text-gray-500">
+                                <td
+                                    colSpan={5}
+                                    className="px-6 py-12 text-center text-sm text-gray-500"
+                                >
                                     Nenhum transporte cadastrado.
                                 </td>
                             </tr>

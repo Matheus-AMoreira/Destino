@@ -1,14 +1,13 @@
-import { useState } from 'react';
 import { Star } from 'lucide-react';
+import { useState } from 'react';
+import { useAvaliacaoForm } from '@/services/comercial/avaliacaoService';
 import ModalAvaliacao from './ModalAvaliacao';
-import { avaliacaoApi } from '@/utils/avaliacaoApi';
-import type { Avaliacao } from '@/types/Avaliacao';
 
 interface BotaoAvaliacaoProps {
     pacoteId: number;
     compraId: string;
     onAvaliacaoSalva?: () => void;
-    avaliacaoExistente?: Avaliacao;
+    avaliacaoExistente?: App.DTOs.Comercial.AvaliacaoDTO;
 }
 
 export default function BotaoAvaliacao({
@@ -19,22 +18,18 @@ export default function BotaoAvaliacao({
 }: BotaoAvaliacaoProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleSubmit = async (nota: number, comentario: string) => {
-        if (avaliacaoExistente) {
-            await avaliacaoApi.atualizarAvaliacao(avaliacaoExistente.id, {
-                nota,
-                comentario: comentario || undefined,
-            });
-        } else {
-            await avaliacaoApi.criarAvaliacao({
-                pacote_id: pacoteId,
-                compra_id: compraId,
-                nota,
-                comentario: comentario || undefined,
-            });
-        }
+    const { enviarAvaliacao } = useAvaliacaoForm({
+        pacoteId,
+        compraId,
+        avaliacaoExistente,
+        onSuccess: () => {
+            onAvaliacaoSalva?.();
+            setIsModalOpen(false);
+        },
+    });
 
-        onAvaliacaoSalva?.();
+    const handleSubmit = async (nota: number, comentario: string) => {
+        await enviarAvaliacao(nota, comentario);
     };
 
     return (

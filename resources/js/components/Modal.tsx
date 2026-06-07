@@ -54,12 +54,14 @@ export default function Modal({ modalData, setModal }: CustomModalProps) {
                         <button
                             onClick={handleConfirm}
                             className={`w-full rounded-lg py-3 font-bold text-white transition active:scale-95 ${
-                                modalData.method === 'DELETE' 
-                                    ? 'bg-red-600 hover:bg-red-700 shadow-md shadow-red-200' 
+                                modalData.method === 'DELETE'
+                                    ? 'bg-red-600 hover:bg-red-700 shadow-md shadow-red-200'
                                     : 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200'
                             }`}
                         >
-                            {modalData.method === 'DELETE' ? 'Deletar' : 'Confirmar'}
+                            {modalData.method === 'DELETE'
+                                ? 'Deletar'
+                                : 'Confirmar'}
                         </button>
                     </div>
                 ) : (

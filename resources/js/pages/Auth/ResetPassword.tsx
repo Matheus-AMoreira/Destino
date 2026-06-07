@@ -1,10 +1,9 @@
-import { Head, useForm } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Head } from '@inertiajs/react';
 import AuthLogo from '@/components/auth/AuthLogo';
+import Image from '@/components/Image';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
-import Image from '@/components/Image'; // Importação do componente Image
-import { schemaResetSenha } from '@/lib/schemas';
+import { useResetPassword } from '@/services/auth/authService';
 
 export default function ResetPassword({
     token,
@@ -13,63 +12,17 @@ export default function ResetPassword({
     token: string;
     email: string;
 }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        token: token,
-        email: email,
-        password: '',
-        password_confirmation: '',
-    });
+    const { form, modal, setModal, zodErrors, handleSubmit } = useResetPassword(
+        token,
+        email,
+    );
 
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
-
-    const [zodErrors, setZodErrors] = useState<Record<string, string>>({});
-
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const result = schemaResetSenha.safeParse(data);
-        if (!result.success) {
-            const errs: Record<string, string> = {};
-            result.error.issues.forEach(issue => {
-                if (issue.path[0]) errs[issue.path[0].toString()] = issue.message;
-            });
-            setZodErrors(errs);
-            return;
-        }
-
-        setZodErrors({});
-        post(route('password.update'), {
-            onSuccess: () => {
-                setModal({
-                    show: true,
-                    mensagem: 'Sua senha foi redefinida com sucesso!',
-                    url: route('entrar'),
-                });
-            },
-            onError: (err) => {
-                setModal({
-                    show: true,
-                    mensagem: Object.values(err).join('\n') || 'Erro ao redefinir senha.',
-                    url: null,
-                });
-            },
-        });
-    };
+    const { data, setData, processing, errors } = form;
 
     return (
         <div className="flex min-h-screen w-full bg-white">
             <Head title="Redefinir Senha" />
-            
+
             <div className="grid w-full grid-cols-1 lg:grid-cols-2 overflow-hidden">
                 {/* Lado Esquerdo: Formulário */}
                 <div className="flex items-center justify-center bg-linear-to-br from-[#e4f3ff] via-[#ffffff] to-[#e4f3ff] p-8">
@@ -97,11 +50,15 @@ export default function ResetPassword({
                                     name="email"
                                     value={data.email}
                                     autoComplete="username"
-                                    onChange={(e) => setData('email', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('email', e.target.value)
+                                    }
                                     required
                                 />
                                 {(zodErrors.email || errors.email) && (
-                                    <p className="mt-1 text-xs text-red-500 font-bold">{zodErrors.email || errors.email}</p>
+                                    <p className="mt-1 text-xs text-red-500 font-bold">
+                                        {zodErrors.email || errors.email}
+                                    </p>
                                 )}
                             </div>
 
@@ -123,11 +80,15 @@ export default function ResetPassword({
                                     name="password"
                                     value={data.password}
                                     autoComplete="new-password"
-                                    onChange={(e) => setData('password', e.target.value)}
+                                    onChange={(e) =>
+                                        setData('password', e.target.value)
+                                    }
                                     required
                                 />
                                 {(zodErrors.password || errors.password) && (
-                                    <p className="mt-1 text-xs text-red-500 font-bold">{zodErrors.password || errors.password}</p>
+                                    <p className="mt-1 text-xs text-red-500 font-bold">
+                                        {zodErrors.password || errors.password}
+                                    </p>
                                 )}
                             </div>
 
@@ -140,7 +101,8 @@ export default function ResetPassword({
                                 </label>
                                 <input
                                     className={`w-full rounded-lg border px-4 py-3 text-base transition duration-300 focus:outline-none ${
-                                        zodErrors.password_confirmation || errors.password_confirmation
+                                        zodErrors.password_confirmation ||
+                                        errors.password_confirmation
                                             ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_5px_rgba(255,0,0,0.3)]'
                                             : 'border-gray-300 focus:border-[#007bff] focus:shadow-[0_0_5px_rgba(0,123,255,0.3)]'
                                     }`}
@@ -149,12 +111,19 @@ export default function ResetPassword({
                                     name="password_confirmation"
                                     value={data.password_confirmation}
                                     autoComplete="new-password"
-                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    onChange={(e) =>
+                                        setData(
+                                            'password_confirmation',
+                                            e.target.value,
+                                        )
+                                    }
                                     required
                                 />
-                                {(zodErrors.password_confirmation || errors.password_confirmation) && (
+                                {(zodErrors.password_confirmation ||
+                                    errors.password_confirmation) && (
                                     <p className="mt-1 text-xs text-red-500 font-bold">
-                                        {zodErrors.password_confirmation || errors.password_confirmation}
+                                        {zodErrors.password_confirmation ||
+                                            errors.password_confirmation}
                                     </p>
                                 )}
                             </div>
@@ -168,7 +137,9 @@ export default function ResetPassword({
                                 type="submit"
                                 disabled={processing}
                             >
-                                {processing ? 'Redefinindo...' : 'Redefinir Senha'}
+                                {processing
+                                    ? 'Redefinindo...'
+                                    : 'Redefinir Senha'}
                             </button>
                         </form>
                     </div>
@@ -181,7 +152,7 @@ export default function ResetPassword({
                         alt={'Imagem de redefinição de senha'}
                         style="absolute inset-0 z-0 h-full w-full object-cover object-center"
                     />
-                    
+
                     {/* Overlay para escurecer levemente a imagem e destacar a logo */}
                     <div className="z-10 flex h-full w-full items-center justify-center bg-black/25 backdrop-brightness-75">
                         <AuthLogo />

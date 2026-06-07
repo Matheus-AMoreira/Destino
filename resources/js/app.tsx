@@ -1,6 +1,5 @@
 import '../css/app.css';
 import { createInertiaApp } from '@inertiajs/react';
-import { Ziggy } from './ziggy';
 
 createInertiaApp({
     strictMode: true,
@@ -10,8 +9,6 @@ createInertiaApp({
         lazy: true,
     },
     withApp(app) {
-        globalThis.Ziggy = Ziggy;
-
         return app;
     },
 });

@@ -6,7 +6,7 @@ export type Role = {
 };
 
 export type User = {
-    id: number;
+    id: number | string;
     name: string;
     email: string;
     avatar?: string;
@@ -22,6 +22,7 @@ export type User = {
     cpf?: string;
     cpf_mascarado?: string;
     is_valid: boolean;
+    telefone?: string | null;
     [key: string]: unknown;
 };
 

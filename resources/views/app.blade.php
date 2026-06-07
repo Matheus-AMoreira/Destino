@@ -6,7 +6,6 @@
 
         <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
 
-        @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx','resources/css/app.css'])
         <x-inertia::head>

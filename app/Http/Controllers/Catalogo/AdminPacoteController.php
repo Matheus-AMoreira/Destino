@@ -107,27 +107,30 @@ class AdminPacoteController extends Controller
 
     public function compras(int $pacoteId): JsonResponse
     {
-        // Usa query direta ou repository para buscar compras de um pacote específico
-        $compras = \Illuminate\Support\Facades\DB::table('compras')
-            ->join('ofertas', 'compras.oferta_id', '=', 'ofertas.id')
-            ->join('users', 'compras.user_id', '=', 'users.id')
-            ->where('ofertas.pacote_id', $pacoteId)
-            ->select(
-                'compras.id',
-                'compras.data_compra',
-                'compras.status',
-                'compras.valor_final',
-                'users.nome as usuario_nome',
-                'users.email as usuario_email'
-            )
+        $compras = \App\Models\Comercial\Compra::with(['usuario', 'oferta.hotel.cidade'])
+            ->whereHas('oferta', function($query) use ($pacoteId) {
+                $query->where('pacote_id', $pacoteId);
+            })
             ->get()
             ->map(fn($c) => [
                 'id' => $c->id,
-                'data_compra' => $c->data_compra,
+                'data_compra' => $c->data_compra->toIso8601String(),
                 'status' => $c->status,
                 'valor_final' => (float) $c->valor_final,
-                'usuario_nome' => $c->usuario_nome,
-                'usuario_email' => $c->usuario_email,
+                'user' => $c->usuario ? [
+                    'nome' => $c->usuario->nome,
+                    'sobre_nome' => $c->usuario->sobre_nome ?? '',
+                    'email' => $c->usuario->email,
+                ] : null,
+                'oferta' => $c->oferta ? [
+                    'inicio' => $c->oferta->inicio,
+                    'fim' => $c->oferta->fim,
+                    'hotel' => $c->oferta->hotel ? [
+                        'cidade' => $c->oferta->hotel->cidade ? [
+                            'nome' => $c->oferta->hotel->cidade->nome,
+                        ] : null,
+                    ] : null,
+                ] : null,
             ])
             ->toArray();
 

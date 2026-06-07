@@ -1,5 +1,6 @@
-import GuestLayout from '@/layouts/GuestLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import GuestLayout from '@/layouts/GuestLayout';
+import { listar as routeViagemListar } from '@/routes/usuario/viagem';
 
 interface ConfirmacaoProps {
     compra: any;
@@ -97,9 +98,10 @@ export default function Confirmacao({ compra }: ConfirmacaoProps) {
                         </div>
 
                         <Link
-                            href={route('usuario.viagem.listar', {
-                                usuario: usuario?.nome,
-                            })}
+                            href={
+                                routeViagemListar({ usuario: usuario?.nome })
+                                    .url
+                            }
                             className="block w-full rounded-lg bg-blue-600 px-6 py-3 text-center font-semibold text-white transition-colors hover:bg-blue-700"
                         >
                             Ver Minhas Viagens

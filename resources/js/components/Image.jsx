@@ -13,12 +13,13 @@ export default function Image({ name, alt, style, noFallback = false }) {
             name.startsWith('blob:') ||
             name.startsWith('data:') ||
             name.includes('.'));
-    
+
     const staticAsset =
         name && typeof name === 'string' && ASSETS.IMAGES[name.toUpperCase()];
 
     let src =
-        staticAsset || (isUrl ? name : noFallback ? null : ASSETS.IMAGES.PLACEHOLDER);
+        staticAsset ||
+        (isUrl ? name : noFallback ? null : ASSETS.IMAGES.PLACEHOLDER);
 
     // If we already tried the placeholder and it failed, or if we have an error and no fallback, return null
     if (hasError) {

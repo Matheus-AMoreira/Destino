@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef } from 'react';
 
 Chart.register(...registerables);
 
@@ -44,10 +44,10 @@ export const BarChartComponent: React.FC<BarChartComponentProps> = ({
                 chartInstance.current = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: data.map(item => item[xAxisKey]),
-                        datasets: bars.map(bar => ({
+                        labels: data.map((item) => item[xAxisKey]),
+                        datasets: bars.map((bar) => ({
                             label: bar.label,
-                            data: data.map(item => item[bar.key]),
+                            data: data.map((item) => item[bar.key]),
                             backgroundColor: bar.color,
                             borderRadius: 4,
                         })),

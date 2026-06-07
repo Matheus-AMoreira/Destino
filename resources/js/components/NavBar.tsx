@@ -10,12 +10,15 @@ import {
     ShieldUser,
     User,
 } from 'lucide-react';
-import { useRoute } from 'ziggy-js';
+import { buscar, contato, entrar, logout } from '@/routes';
+import { dashboard } from '@/routes/administracao';
+import { listar as listarViagens } from '@/routes/usuario/viagem';
+import { edit as editProfile } from '@/routes/user/profile';
+import type { Auth } from '@/types/auth';
 import Icon from './Icon';
 
 export default function Navbar() {
-    const route = useRoute();
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth?: Auth | null }>().props;
 
     return (
         <header className="bg-[#ff944d] px-8 pt-3 pb-1 shadow-md">
@@ -32,19 +35,23 @@ export default function Navbar() {
                 </Link>
                 <nav className="flex gap-6 pr-0 pl-0 text-lg">
                     <Link
-                        href={route('buscar', {
-                            termo: '',
-                            precoMax: 0,
-                            page: 0,
-                            size: 12,
-                        })}
+                        href={
+                            buscar({
+                                query: {
+                                    termo: '',
+                                    precoMax: 0,
+                                    page: 0,
+                                    size: 12,
+                                },
+                            }).url
+                        }
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
                         <PackageSearch className="text-xl" />
                         <span>Buscar Pacotes</span>
                     </Link>
                     <Link
-                        href={route('contato')}
+                        href={contato().url}
                         className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                     >
                         <MailCheck className="text-xl" />
@@ -77,9 +84,10 @@ export default function Navbar() {
                                 </div>
 
                                 {(auth?.user?.role?.name === 'ADMINISTRADOR' ||
-                                    auth?.user?.role?.name === 'FUNCIONARIO') && (
+                                    auth?.user?.role?.name ===
+                                        'FUNCIONARIO') && (
                                     <Link
-                                        href={route('administracao.dashboard')}
+                                        href={dashboard().url}
                                         className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                     >
                                         <ShieldUser />
@@ -88,10 +96,16 @@ export default function Navbar() {
                                 )}
 
                                 <Link
-                                    href={route('usuario.viagem.listar', {
-                                        usuario: auth.user.nome,
-                                        view: 'andamento',
-                                    })}
+                                    href={
+                                        listarViagens(
+                                            {
+                                                usuario: auth.user.nome,
+                                            },
+                                            {
+                                                query: { view: 'andamento' },
+                                            },
+                                        ).url
+                                    }
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <MapPin />
@@ -99,10 +113,16 @@ export default function Navbar() {
                                 </Link>
 
                                 <Link
-                                    href={route('usuario.viagem.listar', {
-                                        usuario: auth.user.nome,
-                                        view: 'concluidas',
-                                    })}
+                                    href={
+                                        listarViagens(
+                                            {
+                                                usuario: auth.user.nome,
+                                            },
+                                            {
+                                                query: { view: 'concluidas' },
+                                            },
+                                        ).url
+                                    }
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <History />
@@ -110,7 +130,7 @@ export default function Navbar() {
                                 </Link>
 
                                 <Link
-                                    href={route('user.profile.edit')}
+                                    href={editProfile().url}
                                     className="flex items-center space-x-3 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-blue-50 hover:text-blue-600"
                                 >
                                     <User size={18} />
@@ -119,7 +139,7 @@ export default function Navbar() {
 
                                 <div className="mt-1 border-t border-gray-50 pt-1">
                                     <Link
-                                        href={route('logout')}
+                                        href={logout().url}
                                         method="post"
                                         as="button"
                                         className="flex w-full items-center space-x-3 px-4 py-3 text-left text-sm font-bold text-red-500 transition-colors hover:bg-red-50"
@@ -132,7 +152,7 @@ export default function Navbar() {
                         </div>
                     ) : (
                         <Link
-                            href={route('entrar')}
+                            href={entrar().url}
                             className="flex items-center space-x-2 font-bold text-white hover:text-[#2071b3]"
                         >
                             <CircleArrowRight />

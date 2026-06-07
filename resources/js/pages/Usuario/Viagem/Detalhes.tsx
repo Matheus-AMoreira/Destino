@@ -6,18 +6,22 @@ import {
     CalendarSync,
     Hotel,
     Mail,
-    Map,
+    Map as MapIcon,
     Phone,
     Plane,
     Receipt,
     Star,
 } from 'lucide-react';
 import react from 'react';
-import { useRoute } from 'ziggy-js';
+import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
-import SecaoAvaliacoes from '@/components/Avaliacao/SecaoAvaliacoes';
 import { tempoPassou } from '@/utils/dataUtils';
+import {
+    listar as routeViagemListar,
+    avaliar as routeViagemAvaliar,
+} from '@/routes/usuario/viagem';
+import { contato as routeContato } from '@/routes';
 
 interface Compra {
     id: string;
@@ -65,8 +69,8 @@ interface Props {
 }
 
 export default function Detalhes({ compra, auth }: Props) {
-    const route = useRoute();
     const { flash } = usePage().props as any;
+
     const todasFotos = [
         ...(compra.oferta.pacote.fotos_do_pacote?.foto_capa_url
             ? [
@@ -129,9 +133,11 @@ export default function Detalhes({ compra, auth }: Props) {
                     <div className="animate-fade-in mb-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
                         <div>
                             <Link
-                                href={route('usuario.viagem.listar', {
-                                    usuario: auth.user.nome,
-                                })}
+                                href={
+                                    routeViagemListar({
+                                        usuario: auth.user.nome,
+                                    }).url
+                                }
                                 className="group mb-4 inline-flex items-center text-sm font-black tracking-widest text-blue-600 uppercase transition-colors hover:text-blue-700"
                             >
                                 <ArrowLeftFromLine className="mr-4" />
@@ -159,15 +165,27 @@ export default function Detalhes({ compra, auth }: Props) {
                         <div className="flex gap-4">
                             {tempoPassou(compra.oferta.fim) && (
                                 <Link
-                                    href={route('usuario.viagem.avaliar', { id: compra.id })}
+                                    href={
+                                        routeViagemAvaliar({ id: compra.id })
+                                            .url
+                                    }
                                     className={`flex items-center gap-2 rounded-2xl border-2 px-8 py-4 text-sm font-black transition-all shadow-sm hover:shadow-xl active:scale-95 ${
                                         compra.avaliacao
                                             ? 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
                                             : 'bg-yellow-400 text-gray-900 border-yellow-400 hover:bg-yellow-500 hover:border-yellow-500'
                                     }`}
                                 >
-                                    <Star className={compra.avaliacao ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-900 text-gray-900'} size={18} />
-                                    {compra.avaliacao ? 'Editar Avaliação' : 'Avaliar Viagem'}
+                                    <Star
+                                        className={
+                                            compra.avaliacao
+                                                ? 'fill-yellow-400 text-yellow-400'
+                                                : 'fill-gray-900 text-gray-900'
+                                        }
+                                        size={18}
+                                    />
+                                    {compra.avaliacao
+                                        ? 'Editar Avaliação'
+                                        : 'Avaliar Viagem'}
                                 </Link>
                             )}
                             <button
@@ -235,7 +253,7 @@ export default function Detalhes({ compra, auth }: Props) {
                             <div className="animate-fade-in rounded-4xl border border-gray-100 bg-white p-10 shadow-xl shadow-blue-50">
                                 <h2 className="font-outfit mb-8 flex items-center gap-4 text-2xl font-black text-gray-900">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600 shadow-inner">
-                                        <Map />
+                                        <MapIcon />
                                     </div>
                                     Resumo do Itinerário
                                 </h2>
@@ -435,7 +453,7 @@ export default function Detalhes({ compra, auth }: Props) {
                                     </div>
                                 </div>
                                 <Link
-                                    href={route('contato')}
+                                    href={routeContato().url}
                                     className="mt-8 block w-full rounded-2xl bg-white py-4 text-center text-sm font-black text-gray-900 shadow-lg shadow-black/20 transition-all hover:bg-blue-50 active:scale-95"
                                 >
                                     Precisa de Ajuda?

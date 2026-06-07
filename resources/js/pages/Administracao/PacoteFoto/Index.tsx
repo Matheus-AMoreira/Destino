@@ -1,6 +1,11 @@
-import { Link, router } from '@inertiajs/react';
-import { Camera, Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Camera, Image as ImageIcon, Pencil, Plus, Trash2 } from 'lucide-react';
 import AdminLayout from '@/layouts/AdminLayout';
+import {
+    create as createPacoteFoto,
+    edit as editPacoteFoto,
+} from '@/routes/administracao/pacote-foto';
+import { deletarPacoteFoto } from '@/services/catalogo/pacoteFotoService';
 
 interface PacoteFotoData {
     id: number;
@@ -17,9 +22,7 @@ interface Props {
 
 export default function Index({ pacoteFotos = [], success }: Props) {
     const handleDelete = (id: number) => {
-        if (confirm('Deseja realmente excluir este álbum?')) {
-            router.delete(route('administracao.pacote-foto.destroy', { id }));
-        }
+        deletarPacoteFoto(id);
     };
 
     return (
@@ -35,7 +38,7 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                 </div>
 
                 <Link
-                    href={route('administracao.pacote-foto.create')}
+                    href={createPacoteFoto().url}
                     className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white shadow-sm transition-colors hover:bg-purple-700"
                 >
                     <Plus size={20} />
@@ -85,7 +88,9 @@ export default function Index({ pacoteFotos = [], success }: Props) {
                                 </h3>
                                 <div className="flex items-center justify-between border-t border-gray-100 pt-3">
                                     <Link
-                                        href={route('administracao.pacote-foto.edit', { id: album.id })}
+                                        href={
+                                            editPacoteFoto({ id: album.id }).url
+                                        }
                                         className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
                                     >
                                         <Pencil size={14} />

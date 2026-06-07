@@ -1,7 +1,18 @@
+import { Link } from '@inertiajs/react';
+import {
+    Banknote,
+    Building,
+    Bus,
+    Plane,
+    Save,
+    Ship,
+    Truck,
+    X,
+} from 'lucide-react';
+import type React from 'react';
 import AdminLayout from '@/layouts/AdminLayout';
-import { Link, useForm } from '@inertiajs/react';
-import { Truck, Save, X, Building, Banknote, Ship, Plane, Bus } from 'lucide-react';
-import React from 'react';
+import { index as indexTransporte } from '@/routes/administracao/transporte';
+import { useTransporteForm } from '@/services/hospedagem/transporteService';
 
 interface TransporteData {
     id: number;
@@ -16,19 +27,13 @@ interface Props {
 }
 
 export default function Edit({ transporte, meios }: Props) {
-    const { data, setData, put, processing, errors } = useForm({
-        empresa: transporte.empresa,
-        meio: transporte.meio,
-        preco: transporte.preco,
-    });
+    const { data, setData, processing, errors, handleSubmit } =
+        useTransporteForm(transporte);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('administracao.transporte.update', { id: transporte.id }));
-    };
-
-    const inputClasses = "mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none";
-    const labelClasses = "flex items-center gap-2 text-sm font-semibold text-gray-700";
+    const inputClasses =
+        'mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none';
+    const labelClasses =
+        'flex items-center gap-2 text-sm font-semibold text-gray-700';
 
     return (
         <AdminLayout title={`Editar ${transporte.empresa}`}>
@@ -36,16 +41,21 @@ export default function Edit({ transporte, meios }: Props) {
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <Link
-                            href={route('administracao.transporte.index')}
+                            href={indexTransporte().url}
                             className="rounded-lg bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
                         >
                             <X size={20} />
                         </Link>
-                        <h1 className="text-2xl font-bold text-gray-900">Editar Transporte</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Editar Transporte
+                        </h1>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100">
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6 rounded-2xl bg-white p-8 shadow-sm border border-gray-100"
+                >
                     <div>
                         <label className={labelClasses}>
                             <Building size={16} className="text-blue-500" />
@@ -54,10 +64,14 @@ export default function Edit({ transporte, meios }: Props) {
                         <input
                             type="text"
                             value={data.empresa}
-                            onChange={e => setData('empresa', e.target.value)}
+                            onChange={(e) => setData('empresa', e.target.value)}
                             className={inputClasses}
                         />
-                        {errors.empresa && <p className="mt-1 text-xs text-red-500">{errors.empresa}</p>}
+                        {errors.empresa && (
+                            <p className="mt-1 text-xs text-red-500">
+                                {errors.empresa}
+                            </p>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -68,15 +82,23 @@ export default function Edit({ transporte, meios }: Props) {
                             </label>
                             <select
                                 value={data.meio}
-                                onChange={e => setData('meio', e.target.value)}
+                                onChange={(e) =>
+                                    setData('meio', e.target.value)
+                                }
                                 className={inputClasses}
                             >
                                 <option value="">Selecione...</option>
-                                {meios.map(m => (
-                                    <option key={m} value={m}>{m}</option>
+                                {meios.map((m) => (
+                                    <option key={m} value={m}>
+                                        {m}
+                                    </option>
                                 ))}
                             </select>
-                            {errors.meio && <p className="mt-1 text-xs text-red-500">{errors.meio}</p>}
+                            {errors.meio && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.meio}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -87,17 +109,23 @@ export default function Edit({ transporte, meios }: Props) {
                             <input
                                 type="number"
                                 value={data.preco}
-                                onChange={e => setData('preco', Number(e.target.value))}
+                                onChange={(e) =>
+                                    setData('preco', Number(e.target.value))
+                                }
                                 className={inputClasses}
                                 min="0"
                             />
-                            {errors.preco && <p className="mt-1 text-xs text-red-500">{errors.preco}</p>}
+                            {errors.preco && (
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.preco}
+                                </p>
+                            )}
                         </div>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
                         <Link
-                            href={route('administracao.transporte.index')}
+                            href={indexTransporte().url}
                             className="rounded-lg px-6 py-2 font-medium text-gray-600 hover:bg-gray-100 transition-colors"
                         >
                             Cancelar
@@ -108,7 +136,11 @@ export default function Edit({ transporte, meios }: Props) {
                             className="flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-2 font-bold text-white shadow-lg transition-all hover:bg-blue-700 disabled:opacity-50"
                         >
                             <Save size={20} />
-                            <span>{processing ? 'Salvando...' : 'Salvar Alterações'}</span>
+                            <span>
+                                {processing
+                                    ? 'Salvando...'
+                                    : 'Salvar Alterações'}
+                            </span>
                         </button>
                     </div>
                 </form>

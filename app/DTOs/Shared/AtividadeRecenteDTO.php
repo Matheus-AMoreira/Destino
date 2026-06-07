@@ -2,6 +2,9 @@
 
 namespace App\DTOs\Shared;
 
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
 readonly class AtividadeRecenteDTO implements \JsonSerializable
 {
     public function __construct(

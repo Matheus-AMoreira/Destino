@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified', AdminMiddleware::class])->prefix('adminis
         Route::get('/listar', [UsuarioController::class, 'index'])->name('index')->middleware('authorize.ui:user-client,read');
         Route::get('/novo', [UsuarioController::class, 'create'])->name('create')->middleware('authorize.ui:user-staff,create');
         Route::post('/', [UsuarioController::class, 'store'])->name('store')->middleware('authorize.api:user-staff,create');
+        Route::post('/{user}/resend-invitation', [UsuarioController::class, 'resendInvitation'])->name('resend-invitation')->middleware('authorize.api:user-staff,create');
         Route::get('/editar/{nome}/{id}', [UsuarioController::class, 'edit'])->name('edit'); // Permissão verificada no controller (staff vs cliente)
         Route::put('/{id}', [UsuarioController::class, 'update'])->name('update'); // Permissão verificada no controller
         Route::patch('/{id}/status', [UsuarioController::class, 'updateStatus'])->name('update-status'); // Permissão verificada no controller

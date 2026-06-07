@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\Identidade\AuthService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Tighten\Ziggy\Ziggy;
+
 
 class HandleInertiaRequests extends Middleware
 {
@@ -33,10 +33,6 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'warning' => $request->session()->get('warning'),
                 'invitation_password' => app()->isProduction() ? null : $request->session()->get('invitation_password'),
-            ],
-            'ziggy' => fn () => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
             ],
         ];
     }

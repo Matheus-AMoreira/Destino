@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import Icon from '@/components/Icon';
 import Image from '@/components/Image';
 import GuestLayout from '@/layouts/GuestLayout';

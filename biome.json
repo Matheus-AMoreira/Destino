@@ -1,0 +1,69 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+    "assist": { "actions": { "source": { "organizeImports": "on" } } },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "style": {
+                "useConst": "error"
+            },
+            "suspicious": {
+                "noExplicitAny": "off",
+                "noArrayIndexKey": "off"
+            },
+            "a11y": {
+                "useAltText": "error",
+                "useButtonType": "off",
+                "useKeyWithClickEvents": "off",
+                "useKeyWithMouseEvents": "off",
+                "noNoninteractiveElementToInteractiveRole": "off",
+                "noLabelWithoutControl": "off",
+                "noSvgWithoutTitle": "off",
+                "noStaticElementInteractions": "off",
+                "useValidAnchor": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "warn"
+            },
+            "security": {
+                "noDangerouslySetInnerHtml": "off"
+            }
+        }
+    },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": false,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 80
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "semicolons": "always",
+            "trailingCommas": "all",
+            "quoteProperties": "asNeeded"
+        }
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    },
+    "files": {
+        "includes": [
+            "**",
+            "!**/vendor",
+            "!**/node_modules",
+            "!**/public",
+            "!**/bootstrap/ssr",
+            "!**/tailwind.config.js",
+            "!**/vite.config.ts",
+            "!**/resources/js/actions",
+            "!**/resources/js/components/ui",
+            "!**/resources/js/routes",
+            "!**/resources/js/wayfinder"
+        ]
+    }
+}

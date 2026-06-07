@@ -1,3 +1,4 @@
+import { exec } from 'node:child_process';
 import path from 'node:path';
 import inertia from '@inertiajs/vite';
 import { wayfinder } from '@laravel/vite-plugin-wayfinder';
@@ -22,6 +23,25 @@ export default defineConfig({
         wayfinder({
             formVariants: true,
         }),
+        {
+            name: 'laravel-typescript-transformer',
+            handleHotUpdate({ file }) {
+                if (
+                    file.includes('app/DTOs') ||
+                    file.includes('app/Enums') ||
+                    file.includes('app/ViewModels')
+                ) {
+                    console.log('\n[Vite] PHP data structure changed. Regenerating TypeScript types...');
+                    exec('php artisan typescript:transform', (err, stdout, stderr) => {
+                        if (err) {
+                            console.error(`[Vite] TypeScript generation failed: ${stderr || err.message}`);
+                        } else {
+                            console.log('[Vite] TypeScript types generated successfully.');
+                        }
+                    });
+                }
+            },
+        },
     ],
     resolve: {
         alias: {

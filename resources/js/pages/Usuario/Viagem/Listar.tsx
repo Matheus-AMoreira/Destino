@@ -8,10 +8,11 @@ import {
     User,
 } from 'lucide-react';
 import { useMemo } from 'react';
-import { useRoute } from 'ziggy-js';
 import ViagemCard from '@/components/usuario/ViagemCard';
 import GuestLayout from '@/layouts/GuestLayout';
 import type { Auth } from '@/types';
+import { listar as routeViagemListar } from '@/routes/usuario/viagem';
+import { buscar as routeBuscar } from '@/routes';
 
 interface Compra {
     id: string;
@@ -51,7 +52,6 @@ interface Props {
 }
 
 export default function Listar({ compras, view, auth }: Props) {
-    const route = useRoute();
     const isHistorico = view === 'concluidas';
 
     const formatarValor = (valor: number) => {
@@ -126,10 +126,12 @@ export default function Listar({ compras, view, auth }: Props) {
 
                     <nav className="mt-4 space-y-2 p-4">
                         <Link
-                            href={route('usuario.viagem.listar', {
-                                usuario: auth.user.nome,
-                                view: 'andamento',
-                            })}
+                            href={
+                                routeViagemListar(
+                                    { usuario: auth.user.nome },
+                                    { query: { view: 'andamento' } },
+                                ).url
+                            }
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
                                 view === 'andamento'
                                     ? 'translate-x-1 bg-blue-600 text-white shadow-xl shadow-blue-100'
@@ -141,10 +143,12 @@ export default function Listar({ compras, view, auth }: Props) {
                         </Link>
 
                         <Link
-                            href={route('usuario.viagem.listar', {
-                                usuario: auth.user.nome,
-                                view: 'concluidas',
-                            })}
+                            href={
+                                routeViagemListar(
+                                    { usuario: auth.user.nome },
+                                    { query: { view: 'concluidas' } },
+                                ).url
+                            }
                             className={`flex w-full items-center gap-3 rounded-2xl px-6 py-4 font-bold transition-all duration-200 ${
                                 view === 'concluidas'
                                     ? 'translate-x-1 bg-blue-600 text-white shadow-xl shadow-blue-100'
@@ -203,7 +207,7 @@ export default function Listar({ compras, view, auth }: Props) {
                                 </p>
                                 {!isHistorico && (
                                     <Link
-                                        href={route('buscar')}
+                                        href={routeBuscar().url}
                                         className="inline-flex items-center gap-3 rounded-2xl bg-blue-600 px-8 py-4 font-bold text-white shadow-lg shadow-blue-100 transition-all hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
                                     >
                                         <PackageSearch />

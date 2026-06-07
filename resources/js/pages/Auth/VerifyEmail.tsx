@@ -1,14 +1,11 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AuthLogo from '@/components/auth/AuthLogo';
 import Image from '@/components/Image';
+import { useVerifyEmail } from '@/services/auth/authService';
+import { logout as routeLogout } from '@/routes';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
-
-    const submit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('verification.send'));
-    };
+    const { processing, handleSubmit } = useVerifyEmail();
 
     const linkSent = status === 'verification-link-sent';
 
@@ -20,7 +17,6 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 {/* Lado Esquerdo: Conteúdo */}
                 <div className="flex items-center justify-center bg-linear-to-br from-[#fff6ea] via-[#ffffff] to-[#fff6ea] p-8">
                     <div className="z-10 w-full max-w-md rounded-xl border border-gray-100 bg-white/95 p-8 shadow-2xl backdrop-blur-sm">
-
                         {/* Ícone de envelope */}
                         <div className="mb-6 flex justify-center">
                             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#fff3e0]">
@@ -45,18 +41,20 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             Verifique seu e-mail
                         </h1>
                         <p className="mb-6 text-center text-sm text-gray-500">
-                            Obrigado por se cadastrar! Enviamos um link de confirmação para o seu e-mail.
-                            Clique nele para ativar sua conta.
+                            Obrigado por se cadastrar! Enviamos um link de
+                            confirmação para o seu e-mail. Clique nele para
+                            ativar sua conta.
                         </p>
 
                         {/* Feedback de reenvio */}
                         {linkSent && (
                             <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
-                                ✓ Um novo link de verificação foi enviado para o seu e-mail.
+                                ✓ Um novo link de verificação foi enviado para o
+                                seu e-mail.
                             </div>
                         )}
 
-                        <form onSubmit={submit}>
+                        <form onSubmit={handleSubmit}>
                             <button
                                 type="submit"
                                 disabled={processing}
@@ -66,13 +64,15 @@ export default function VerifyEmail({ status }: { status?: string }) {
                                         : 'cursor-pointer bg-[#ff7300] text-white hover:bg-[#cc5c00]'
                                 }`}
                             >
-                                {processing ? 'Enviando...' : 'Reenviar E-mail de Verificação'}
+                                {processing
+                                    ? 'Enviando...'
+                                    : 'Reenviar E-mail de Verificação'}
                             </button>
                         </form>
 
                         <div className="mt-6 text-center text-sm text-[#666]">
                             <Link
-                                href={route('logout')}
+                                href={routeLogout().url}
                                 method="post"
                                 as="button"
                                 className="font-semibold text-[#007bff] hover:underline"

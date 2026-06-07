@@ -1,45 +1,20 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link } from '@inertiajs/react';
 import AuthLogo from '@/components/auth/AuthLogo';
+import Image from '@/components/Image';
 import type { ModalData } from '@/components/Modal';
 import Modal from '@/components/Modal';
-import Image from '@/components/Image';
+import { useForgotPassword } from '@/services/auth/authService';
+import { entrar as routeEntrar } from '@/routes';
 
 export default function ForgotPassword({ status }: { status?: string }) {
-    const { data, setData, post, processing, errors } = useForm({
-        email: '',
-    });
+    const { form, modal, setModal, handleSubmit } = useForgotPassword();
 
-    const [modal, setModal] = useState<ModalData>({
-        show: false,
-        mensagem: '',
-        url: null,
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('password.email'), {
-            onSuccess: () => {
-                setModal({
-                    show: true,
-                    mensagem: 'Um link de recuperação foi enviado para o seu e-mail.',
-                    url: null,
-                });
-            },
-            onError: (err) => {
-                setModal({
-                    show: true,
-                    mensagem: err.email || 'Erro ao enviar e-mail de recuperação.',
-                    url: null,
-                });
-            },
-        });
-    };
+    const { data, setData, processing, errors } = form;
 
     return (
         <div className="flex min-h-screen w-full bg-white">
             <Head title="Esqueci minha senha" />
-            
+
             <div className="grid w-full grid-cols-1 lg:grid-cols-2 overflow-hidden">
                 {/* Lado Esquerdo: Formulário */}
                 <div className="flex items-center justify-center bg-linear-to-br from-[#e4f3ff] via-[#ffffff] to-[#e4f3ff] p-8">
@@ -49,7 +24,9 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         </h1>
 
                         <p className="mb-8 text-sm text-gray-600">
-                            Esqueceu sua senha? Sem problemas. Basta nos informar seu endereço de e-mail e enviaremos um link de redefinição de senha.
+                            Esqueceu sua senha? Sem problemas. Basta nos
+                            informar seu endereço de e-mail e enviaremos um link
+                            de redefinição de senha.
                         </p>
 
                         {status && (
@@ -76,11 +53,15 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                 name="email"
                                 value={data.email}
                                 autoComplete="username"
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) =>
+                                    setData('email', e.target.value)
+                                }
                                 required
                             />
                             {errors.email && (
-                                <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                                <p className="mt-1 text-xs text-red-500">
+                                    {errors.email}
+                                </p>
                             )}
 
                             <button
@@ -98,7 +79,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                         <div className="mt-8 flex flex-col gap-4">
                             <Link
-                                href={route('entrar')}
+                                href={routeEntrar().url}
                                 className="text-sm font-bold text-gray-500 hover:text-gray-700 hover:underline"
                             >
                                 Voltar para o Login
@@ -114,7 +95,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         alt={'Imagem de recuperação de senha'}
                         style="absolute inset-0 z-0 h-full w-full object-cover object-center"
                     />
-                    
+
                     {/* Overlay para escurecer levemente a imagem e destacar a logo */}
                     <div className="z-10 flex h-full w-full items-center justify-center bg-black/25 backdrop-brightness-75">
                         <AuthLogo />
