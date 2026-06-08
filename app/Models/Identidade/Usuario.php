@@ -13,6 +13,44 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 
+/**
+ * @property string $id
+ * @property string $nome
+ * @property string $sobre_nome
+ * @property \App\ValueObjects\Cpf $cpf
+ * @property string $email
+ * @property string $telefone
+ * @property string $password
+ * @property bool $is_valid
+ * @property \Carbon\CarbonImmutable|null $email_verified_at
+ * @property string|null $remember_token
+ * @property int|null $role_id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Identidade\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Models\Identidade\Role|null $role
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereCpf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereIsValid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereNome($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereRoleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereSobreNome($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereTelefone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Usuario extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasUuids;

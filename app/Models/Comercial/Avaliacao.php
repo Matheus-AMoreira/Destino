@@ -8,6 +8,31 @@ use App\Models\Catalogo\Pacote;
 use App\Models\Comercial\Oferta;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int $id
+ * @property int $nota
+ * @property string|null $comentario
+ * @property string $user_id
+ * @property int $pacote_id
+ * @property string $compra_id
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Comercial\Compra $compra
+ * @property-read Pacote $pacote
+ * @property-read Usuario $usuario
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereComentario($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereCompraId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereNota($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao wherePacoteId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Avaliacao whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Avaliacao extends Model
 {
     protected $table = 'avaliacoes';

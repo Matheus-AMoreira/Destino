@@ -7,9 +7,11 @@ use App\Models\Hospedagem\Hotel;
 use App\Models\Hospedagem\Transporte;
 use App\Models\Catalogo\Pacote;
 use App\Models\Comercial\Oferta;
+use App\Enums\Comercial\StatusCompra;
 use App\DTOs\Shared\EstatisticasDTO;
 use App\DTOs\Shared\AtividadeRecenteDTO;
 use App\DTOs\Shared\DadosGraficosDTO;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class EstatisticasService
@@ -45,7 +47,7 @@ class EstatisticasService
         return array_map(fn($row) => new AtividadeRecenteDTO(
             id: $row->id,
             description: $this->formatarDescricao($row->description),
-            time: \Carbon\Carbon::parse($row->created_at)->diffForHumans(),
+            time: Carbon::parse($row->created_at)->diffForHumans(),
             causer: $row->causer_nome ? "{$row->causer_nome} {$row->causer_sobrenome}" : 'Sistema',
         ), $rows);
     }
@@ -82,7 +84,7 @@ class EstatisticasService
             ->join('estados', 'cidades.estado_id', '=', 'estados.id')
             ->join('regiaos', 'estados.regiao_id', '=', 'regiaos.id')
             ->select('cidades.nome as cidade', 'estados.sigla as estado', DB::raw('count(compras.id) as total'))
-            ->where('compras.status', '=', 'ACEITO')
+            ->where('compras.status', '=', \App\Enums\Comercial\StatusCompra::ACEITO->value)
             ->whereRaw("CAST({$yearSql} AS INTEGER) = ?", [$anoSelecionado]);
 
         if ($regiaoId) $query->where('regiaos.id', $regiaoId);
@@ -114,9 +116,9 @@ class EstatisticasService
 
         $dadosCompras = [
             'meses' => ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            'ACEITO' => array_fill(0, 12, 0),
-            'PENDENTE' => array_fill(0, 12, 0),
-            'RECUSADO' => array_fill(0, 12, 0),
+            StatusCompra::ACEITO->value => array_fill(0, 12, 0),
+            StatusCompra::PENDENTE->value => array_fill(0, 12, 0),
+            StatusCompra::RECUSADO->value => array_fill(0, 12, 0),
         ];
 
         foreach ($comprasMesStatus as $row) {

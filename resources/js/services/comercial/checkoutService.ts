@@ -9,23 +9,20 @@ interface CheckoutDTO {
 }
 
 export function useCheckout(oferta: CheckoutDTO) {
-    const [metodoPagamento, setMetodoPagamento] = useState('cartao-credito');
     const [modal, setModal] = useState<ModalData>({
         show: false,
         mensagem: '',
         url: null,
     });
 
-    const { data, setData, post, processing } = useForm({
+    const { data, post, processing } = useForm({
         oferta_id: oferta.id,
         metodo: 'VISTA',
-        processador: 'VISA',
+        processador: 'MERCADOPAGO',
         parcelas: 1,
     });
 
     const valorTotal = oferta.preco || 0;
-    const descontoPix = valorTotal * 0.05;
-    const valorComDescontoPix = valorTotal - descontoPix;
 
     const formatarValor = (valor: number) => {
         return new Intl.NumberFormat('pt-BR', {
@@ -34,42 +31,9 @@ export function useCheckout(oferta: CheckoutDTO) {
         }).format(valor);
     };
 
-    const handleMetodoChange = (val: string) => {
-        setMetodoPagamento(val);
-
-        if (val === 'pix') {
-            setData({
-                ...data,
-                metodo: 'VISTA',
-                processador: 'PIX',
-                parcelas: 1,
-            });
-        } else if (val === 'cartao-credito') {
-            setData({
-                ...data,
-                metodo: data.parcelas > 1 ? 'PARCELADO' : 'VISTA',
-                processador: 'MASTERCARD',
-            });
-        } else {
-            setData({
-                ...data,
-                metodo: 'VISTA',
-                processador: 'VISA',
-                parcelas: 1,
-            });
-        }
-    };
-
-    const handleParcelasChange = (p: number) => {
-        setData({
-            ...data,
-            parcelas: p,
-            metodo: p > 1 ? 'PARCELADO' : 'VISTA',
-        });
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         post(checkoutProcess({ ofertaId: oferta.id }).url, {
             onError: (err) => {
                 setModal({
@@ -85,17 +49,11 @@ export function useCheckout(oferta: CheckoutDTO) {
 
     return {
         data,
-        setData,
         processing,
-        metodoPagamento,
-        handleMetodoChange,
-        handleParcelasChange,
         handleSubmit,
         modal,
         setModal,
         valorTotal,
-        descontoPix,
-        valorComDescontoPix,
         formatarValor,
     };
 }

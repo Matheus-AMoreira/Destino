@@ -407,6 +407,8 @@ CREATE TABLE public.compras (
     valor_final             numeric(10,2)   NOT NULL,
     user_id                 uuid            NOT NULL,
     oferta_id               bigint          NOT NULL,
+    mp_preference_id        varchar(255),
+    mp_payment_id           varchar(255),
     created_at              timestamp(0),
     updated_at              timestamp(0),
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Webhook\MercadoPagoWebhookController;
 use Illuminate\Auth\Middleware\Authenticate;
 
 // Públicas
@@ -19,6 +20,9 @@ Route::get('/', [PublicHomeController::class, 'index'])->name('home');
 Route::get('/contato', [PublicHomeController::class, 'contato'])->name('contato');
 Route::get('/buscar', [PublicoBuscaController::class, 'buscar'])->name('buscar');
 Route::get('/pacote/{nome}', [PublicoPacoteController::class, 'detalhes'])->name('pacote.detalhes');
+
+// Webhook Mercado Pago
+Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle'])->name('webhook.mercadopago');
 
 // API de Avaliações Públicas
 Route::get('/api/pacotes/{pacoteId}/avaliacoes', [AvaliacaoController::class, 'show']);

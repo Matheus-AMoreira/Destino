@@ -11,6 +11,31 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * Registra ações realizadas por usuários do sistema,
  * incluindo quem fez, quem foi afetado e quais dados mudaram.
+ *
+ * @property string $id
+ * @property string|null $user_id
+ * @property string|null $target_user_id
+ * @property string $action
+ * @property string|null $description
+ * @property array<array-key, mixed>|null $changes
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property-read \App\Models\Identidade\Usuario|null $performer
+ * @property-read \App\Models\Identidade\Usuario|null $target
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereAction($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereChanges($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereTargetUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUserId($value)
+ * @mixin \Eloquent
  */
 class AuditLog extends Model
 {
