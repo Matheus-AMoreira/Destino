@@ -62,23 +62,23 @@ declare namespace App {
     }
     namespace Enums {
         namespace Comercial {
-            export type Metodo = 'VISTA' | 'PARCELADO';
+            export type Metodo = "VISTA" | "PARCELADO";
             export type OfertaStatus =
-                | 'CONCLUIDO'
-                | 'EMANDAMENTO'
-                | 'CANCELADO';
-            export type Processador = 'VISA' | 'MASTERCARD' | 'UOL' | 'PIX';
-            export type StatusCompra = 'PENDENTE' | 'RECUSADO' | 'ACEITO';
+                | "CONCLUIDO"
+                | "EMANDAMENTO"
+                | "CANCELADO";
+            export type Processador = "VISA" | "MASTERCARD" | "UOL" | "PIX";
+            export type StatusCompra = "pending" | "rejected" | "approved";
         }
         namespace Hospedagem {
-            export type Meio = 'AEREO' | 'TERRESTRE' | 'MARITIMO';
+            export type Meio = "AEREO" | "TERRESTRE" | "MARITIMO";
         }
         namespace Identidade {
             export type UserAuthority =
-                | 'DELETAR_USUARIO'
-                | 'CRIAR_PACOTE'
-                | 'EDICAO_PERFIL';
-            export type UserRole = 'USUARIO' | 'FUNCIONARIO' | 'ADMINISTRADOR';
+                | "DELETAR_USUARIO"
+                | "CRIAR_PACOTE"
+                | "EDICAO_PERFIL";
+            export type UserRole = "USUARIO" | "FUNCIONARIO" | "ADMINISTRADOR";
         }
     }
     namespace ViewModels {

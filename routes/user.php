@@ -9,6 +9,11 @@ use App\Http\Middleware\CheckUserStatus;
 
 // Checkout e Área do Usuário (Requer Auth)
 Route::middleware(['auth', 'verified', CheckUserStatus::class])->group(function () {
+    // Callbacks do Mercado Pago
+    Route::get('/checkout/sucesso', [CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/falha', [CheckoutController::class, 'failure'])->name('checkout.failure');
+    Route::get('/checkout/pendente', [CheckoutController::class, 'pending'])->name('checkout.pending');
+
     Route::get('/checkout/{ofertaId}', [CheckoutController::class, 'index'])->name('checkout');
     Route::post('/checkout/{ofertaId}', [CheckoutController::class, 'process'])->name('checkout.process');
     

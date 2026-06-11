@@ -9,6 +9,38 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Identidade\Usuario;
 
+/**
+ * @property int $id
+ * @property string $nome
+ * @property string $descricao
+ * @property string $funcionario_id
+ * @property int|null $pacote_foto_id
+ * @property array<array-key, mixed>|null $tag_ids
+ * @property float|null $media_avaliacao
+ * @property int|null $total_avaliacoes
+ * @property \Carbon\CarbonImmutable|null $created_at
+ * @property \Carbon\CarbonImmutable|null $updated_at
+ * @property-read \App\Models\Catalogo\PacoteFoto|null $album
+ * @property-read Usuario $funcionario
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Oferta> $ofertas
+ * @property-read int|null $ofertas_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Catalogo\Tag> $tags
+ * @property-read int|null $tags_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereDescricao($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereFuncionarioId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereMediaAvaliacao($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereNome($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote wherePacoteFotoId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereTagIds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereTotalAvaliacoes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Pacote whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Pacote extends Model
 {
     protected $table = 'pacotes';

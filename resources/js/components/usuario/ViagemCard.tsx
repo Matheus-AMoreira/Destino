@@ -99,6 +99,23 @@ export default function ViagemCard({
                         const podeAvaliar =
                             isHistorico || tempoPassou(compra.oferta.fim);
 
+                        const getStatusLabel = (status: string) => {
+                            switch (status) {
+                                case 'approved':
+                                case 'ACEITO':
+                                    return 'ACEITO';
+                                case 'pending':
+                                case 'PENDENTE':
+                                    return 'PENDENTE';
+                                case 'rejected':
+                                case 'RECUSADO':
+                                case 'CANCELADO':
+                                    return 'RECUSADO';
+                                default:
+                                    return status.toUpperCase();
+                            }
+                        };
+
                         return (
                             <div
                                 key={compra.id}
@@ -111,7 +128,7 @@ export default function ViagemCard({
                                         >
                                             {isHistorico
                                                 ? 'CONCLUÍDA'
-                                                : compra.status}
+                                                : getStatusLabel(compra.status)}
                                         </span>
                                         <span className="text-[10px] font-bold text-gray-400 uppercase">
                                             Ticket #{compra.id.split('-')[0]}

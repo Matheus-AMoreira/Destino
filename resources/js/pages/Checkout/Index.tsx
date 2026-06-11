@@ -11,21 +11,16 @@ interface CheckoutProps {
 }
 
 export default function Index({ oferta }: CheckoutProps) {
-    const { auth } = usePage().props as any;
+    const { auth, flash } = usePage().props as any;
     const usuario = auth.user;
 
     const {
         data,
         processing,
-        metodoPagamento,
-        handleMetodoChange,
-        handleParcelasChange,
         handleSubmit,
         modal,
         setModal,
         valorTotal,
-        descontoPix,
-        valorComDescontoPix,
         formatarValor,
     } = useCheckout(oferta);
 
@@ -45,6 +40,22 @@ export default function Index({ oferta }: CheckoutProps) {
                             Confirmar Compra
                         </h1>
                     </div>
+
+                    {flash?.success && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded-3xl font-bold shadow-xs">
+                            🎉 {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-3xl font-bold shadow-xs">
+                            ⚠️ {flash.error}
+                        </div>
+                    )}
+                    {flash?.warning && (
+                        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-3xl font-bold shadow-xs">
+                            💡 {flash.warning}
+                        </div>
+                    )}
 
                     <form
                         onSubmit={handleSubmit}
@@ -67,104 +78,18 @@ export default function Index({ oferta }: CheckoutProps) {
                                 </div>
                             </div>
 
-                            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-                                <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-900">
-                                    <CreditCard className="text-xl" />
-                                    Forma de Pagamento
-                                </h2>
-
-                                <div className="mb-6">
-                                    <label className="mb-3 block text-sm font-medium text-gray-700">
-                                        Selecione como deseja pagar:
-                                    </label>
-                                    <select
-                                        value={metodoPagamento}
-                                        onChange={(e) =>
-                                            handleMetodoChange(e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                                    >
-                                        <option value="cartao-credito">
-                                            Cartão de Crédito
-                                        </option>
-                                        <option value="cartao-debito">
-                                            Cartão de Débito
-                                        </option>
-                                        <option value="pix">PIX</option>
-                                    </select>
-                                </div>
-
-                                {metodoPagamento === 'cartao-credito' && (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="mb-2 block text-sm font-medium text-gray-700">
-                                                Parcelas
-                                            </label>
-                                            <select
-                                                value={data.parcelas}
-                                                onChange={(e) =>
-                                                    handleParcelasChange(
-                                                        Number(e.target.value),
-                                                    )
-                                                }
-                                                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none"
-                                            >
-                                                {[
-                                                    1, 2, 3, 4, 5, 6, 7, 8, 9,
-                                                    10, 11, 12,
-                                                ].map((num) => (
-                                                    <option
-                                                        key={num}
-                                                        value={num}
-                                                    >
-                                                        {num}x de{' '}
-                                                        {formatarValor(
-                                                            valorTotal / num,
-                                                        )}
-                                                        {num > 1
-                                                            ? ' sem juros'
-                                                            : ''}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {metodoPagamento === 'pix' && (
-                                    <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-                                        <div className="flex items-center">
-                                            <span className="mr-3 text-2xl">
-                                                🧾
-                                            </span>
-                                            <div>
-                                                <p className="font-semibold text-green-800">
-                                                    5% de desconto no PIX!
-                                                </p>
-                                                <p className="text-sm text-green-600">
-                                                    Economize{' '}
-                                                    {formatarValor(descontoPix)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
                             <button
                                 type="submit"
                                 disabled={processing}
                                 className={`w-full rounded-xl px-6 py-4 text-lg font-semibold text-white shadow-lg transition-all ${
                                     processing
                                         ? 'cursor-not-allowed bg-gray-400'
-                                        : 'cursor-pointer bg-green-600 hover:bg-green-700'
+                                        : 'cursor-pointer bg-blue-600 hover:bg-blue-700'
                                 }`}
                             >
                                 {processing
-                                    ? 'Processando...'
-                                    : metodoPagamento === 'pix'
-                                      ? `Pagar com PIX - ${formatarValor(valorComDescontoPix)}`
-                                      : `Confirmar Compra - ${formatarValor(valorTotal)}`}
+                                    ? 'Redirecionando...'
+                                    : `Pagar com Mercado Pago`}
                             </button>
                         </div>
 
@@ -220,23 +145,10 @@ export default function Index({ oferta }: CheckoutProps) {
                                         <span>{formatarValor(valorTotal)}</span>
                                     </div>
 
-                                    {metodoPagamento === 'pix' && (
-                                        <div className="mb-2 flex justify-between text-sm text-green-600">
-                                            <span>Desconto PIX:</span>
-                                            <span>
-                                                -{formatarValor(descontoPix)}
-                                            </span>
-                                        </div>
-                                    )}
-
                                     <div className="mt-4 flex items-center justify-between border-t pt-4 text-lg font-bold">
                                         <span>Total:</span>
                                         <span className="text-blue-600">
-                                            {metodoPagamento === 'pix'
-                                                ? formatarValor(
-                                                      valorComDescontoPix,
-                                                  )
-                                                : formatarValor(valorTotal)}
+                                            {formatarValor(valorTotal)}
                                         </span>
                                     </div>
                                 </div>

@@ -103,14 +103,35 @@ export default function Detalhes({ compra, auth }: Props) {
 
     const getStatusStyle = (status: string) => {
         switch (status) {
+            case 'approved':
             case 'ACEITO':
                 return 'bg-green-100 text-green-700 font-bold';
+            case 'pending':
             case 'PENDENTE':
                 return 'bg-yellow-100 text-yellow-700 font-bold';
+            case 'rejected':
             case 'CANCELADO':
+            case 'RECUSADO':
                 return 'bg-red-100 text-red-700 font-bold';
             default:
                 return 'bg-gray-100 text-gray-700 font-bold';
+        }
+    };
+
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case 'approved':
+            case 'ACEITO':
+                return 'Aceito';
+            case 'pending':
+            case 'PENDENTE':
+                return 'Pendente';
+            case 'rejected':
+            case 'RECUSADO':
+            case 'CANCELADO':
+                return 'Recusado';
+            default:
+                return status;
         }
     };
 
@@ -150,7 +171,7 @@ export default function Detalhes({ compra, auth }: Props) {
                                 <span
                                     className={`rounded-full border px-4 py-1.5 text-xs tracking-widest uppercase ${getStatusStyle(compra.status)}`}
                                 >
-                                    Status: {compra.status}
+                                    Status: {getStatusLabel(compra.status)}
                                 </span>
                                 <span className="text-sm font-bold text-gray-400">
                                     |

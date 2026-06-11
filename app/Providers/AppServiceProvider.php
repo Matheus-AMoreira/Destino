@@ -15,6 +15,7 @@ use App\Observers\Hospedagem\HotelObserver;
 use App\Observers\Hospedagem\TransporteObserver;
 use App\Observers\Identidade\UsuarioObserver;
 use Carbon\CarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Connection;
 use Illuminate\Database\PostgresConnection;
@@ -40,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
                     $grammar = $this->getQueryGrammar();
 
                     foreach ($bindings as $key => $value) {
-                        if ($value instanceof \DateTimeInterface) {
+                        if ($value instanceof DateTimeInterface) {
                             $bindings[$key] = $value->format($grammar->getDateFormat());
                         } elseif (is_bool($value)) {
                             $bindings[$key] = $value ? 'true' : 'false';
@@ -59,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') === 'production') {
+        if (config('app.env') === 'production' | config('app.env') === 'ngrok') {
             URL::forceScheme('https');
         }else{
             $this->configureDefaults();
