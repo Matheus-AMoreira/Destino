@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Comercial;
 
-use App\Models\Comercial\Oferta;
 use App\Enums\Comercial\OfertaStatus;
 use App\Http\Requests\Comercial\StoreOfertaRequest;
 use App\Http\Requests\Comercial\UpdateOfertaRequest;

@@ -61,12 +61,12 @@ class ViagemController extends Controller
 
             return [
                 'id' => $c->id,
-                'dataCompra' => $c->data_compra?->toIso8601String(),
+                'data_compra' => $c->data_compra?->toIso8601String(),
                 'status' => $c->status,
                 'metodo' => $c->metodo,
-                'processadorPagamento' => $c->processador_pagamento,
+                'processador_pagamento' => $c->processador_pagamento,
                 'parcelas' => $c->parcelas,
-                'valorFinal' => (float) $c->valor_final,
+                'valor_final' => (float) $c->valor_final,
                 'oferta' => $oferta ? [
                     'id' => $oferta->id,
                     'preco' => (float) $oferta->preco,
@@ -147,11 +147,11 @@ class ViagemController extends Controller
 
         $compraData = [
             'id' => $c->id,
-            'valorFinal' => (float) $c->valor_final,
+            'valor_final' => (float) $c->valor_final,
             'status' => $c->status,
-            'dataCompra' => $c->data_compra?->toIso8601String(),
+            'data_compra' => $c->data_compra?->toIso8601String(),
             'metodo' => $c->metodo,
-            'processadorPagamento' => $c->processador_pagamento,
+            'processador_pagamento' => $c->processador_pagamento,
             'parcelas' => $c->parcelas,
             'oferta' => [
                 'id' => $oferta->id,
@@ -213,11 +213,11 @@ class ViagemController extends Controller
 
         $compraData = [
             'id' => $c->id,
-            'valorFinal' => (float) $c->valor_final,
+            'valor_final' => (float) $c->valor_final,
             'status' => $c->status,
-            'dataCompra' => $c->data_compra?->toIso8601String(),
+            'data_compra' => $c->data_compra?->toIso8601String(),
             'metodo' => $c->metodo,
-            'processadorPagamento' => $c->processador_pagamento,
+            'processador_pagamento' => $c->processador_pagamento,
             'parcelas' => $c->parcelas,
             'oferta' => [
                 'id' => $oferta->id,

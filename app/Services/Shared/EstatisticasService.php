@@ -23,7 +23,7 @@ class EstatisticasService
             hoteis: Hotel::count(),
             transportes: Transporte::count(),
             pacotes: Pacote::count(),
-            ofertas: Oferta::count(),
+            ofertas: Oferta::where('status', 'ATIVO')->count(),
         );
     }
 

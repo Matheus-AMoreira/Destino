@@ -49,9 +49,9 @@ interface Estado {
 interface Graficos {
     compras: {
         meses: string[];
-        ACEITO: number[];
-        PENDENTE: number[];
-        RECUSADO: number[];
+        approved: number[];
+        pending: number[];
+        rejected: number[];
     };
     destinosPopulares: DestinoPopular[];
     crescimentoUsuarios: {
@@ -105,19 +105,19 @@ export default function Estatisticas({
             datasets: [
                 {
                     label: 'Concluídas',
-                    data: graficos.compras.ACEITO,
+                    data: graficos.compras.approved,
                     backgroundColor: '#10b981', // Emerald 500
                     borderRadius: 4,
                 },
                 {
                     label: 'Em Andamento',
-                    data: graficos.compras.PENDENTE,
+                    data: graficos.compras.pending,
                     backgroundColor: '#f59e0b', // Amber 500
                     borderRadius: 4,
                 },
                 {
                     label: 'Canceladas',
-                    data: graficos.compras.RECUSADO,
+                    data: graficos.compras.rejected,
                     backgroundColor: '#ef4444', // Red 500
                     borderRadius: 4,
                 },
@@ -243,9 +243,9 @@ export default function Estatisticas({
 
     const totalVendas = useMemo(
         () =>
-            graficos.compras.ACEITO.reduce((a, b) => a + b, 0) +
-            graficos.compras.PENDENTE.reduce((a, b) => a + b, 0) +
-            graficos.compras.RECUSADO.reduce((a, b) => a + b, 0),
+            (graficos.compras.approved || []).reduce((a, b) => a + b, 0) +
+            (graficos.compras.pending || []).reduce((a, b) => a + b, 0) +
+            (graficos.compras.rejected || []).reduce((a, b) => a + b, 0),
         [graficos.compras],
     );
 
