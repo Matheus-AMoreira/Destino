@@ -84,23 +84,7 @@ class Usuario extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function (Usuario $usuario) {
-            if (empty($usuario->slug)) {
-                $baseSlug = Str::slug("{$usuario->nome} {$usuario->sobre_nome}");
-                $slug = $baseSlug;
-                $counter = 2;
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = "{$baseSlug}-{$counter}";
-                    $counter++;
-                }
-                $usuario->slug = $slug;
-            }
-        });
-    }
+  
 
     public function hasPermission(string $permissionSlug): bool
     {
